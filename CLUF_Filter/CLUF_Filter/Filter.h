@@ -6,6 +6,7 @@ class Filter
 private:
 	std::ifstream inputFileStream;
 	std::stringstream fileStream;
+	bool isFileRead;
 
 public:
 	Filter(const std::string &fileName);

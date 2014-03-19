@@ -4,8 +4,8 @@
 #include <iostream>
 
 Filter::Filter(const std::string &fileName)
+	: isFileRead(false), fileStream(), inputFileStream(fileName.c_str())
 {
-	inputFileStream.open(fileName.c_str());
 }
 Filter::~Filter()
 {
@@ -14,18 +14,28 @@ Filter::~Filter()
 
 void Filter::ReadFile()
 {
-	if (inputFileStream.is_open())
+	if (!inputFileStream.is_open())
 	{
-		fileStream << inputFileStream.rdbuf();
+		std::printf("Error: File not open\n");
+		return;
 	}
-	else
-	{
-		std::printf("Error: File not open");
-	}
+
+	fileStream << inputFileStream.rdbuf();
+	isFileRead = true;
 }
 
 void Filter::OutputFilterWord(const std::string &word)
 {
+	if (!inputFileStream.is_open())
+	{
+		std::printf("Error: File not open for filtering\n");
+		return;
+	}
+	if (isFileRead == false)
+	{
+		std::printf("Warn: File not read\n");
+	}
+
 	std::printf("Read string:\n");
 
 	std::string currentLine;
