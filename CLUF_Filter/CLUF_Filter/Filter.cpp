@@ -1,6 +1,7 @@
 #include "Filter.h"
 
-#include <sstream>
+#include <string>
+#include <iostream>
 
 Filter::Filter(const std::string &fileName)
 {
@@ -15,9 +16,7 @@ void Filter::ReadFile()
 {
 	if (inputFileStream.is_open())
 	{
-		std::stringstream fileStream;
 		fileStream << inputFileStream.rdbuf();
-		fileBuffer = fileStream.str();
 	}
 	else
 	{
@@ -25,7 +24,16 @@ void Filter::ReadFile()
 	}
 }
 
-void Filter::OutputFilterWord(const std::string &word) const
+void Filter::OutputFilterWord(const std::string &word)
 {
-	std::printf("Read string: %s\n", fileBuffer.c_str());
+	std::printf("Read string:\n");
+
+	std::string currentLine;
+	while (std::getline(fileStream, currentLine))
+	{
+		if (currentLine.find(word) != std::string::npos)
+		{
+			std::printf("Line: %s\n", currentLine.c_str());
+		}
+	}
 }

@@ -1,16 +1,16 @@
 #include <fstream>
-#include <string>
+#include <sstream>
 
 class Filter
 {
 private:
 	std::ifstream inputFileStream;
-	std::string fileBuffer;
+	std::stringstream fileStream;
 
 public:
 	Filter(const std::string &fileName);
 	~Filter();
 
 	void ReadFile();
-	void OutputFilterWord(const std::string &word) const;
+	void OutputFilterWord(const std::string &word);
 };
