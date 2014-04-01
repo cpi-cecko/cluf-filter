@@ -1,3 +1,6 @@
+#ifndef _CLUF__FILTER_H
+#define _CLUF__FILTER_H
+
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -20,3 +23,5 @@ public:
 
 	std::vector<std::string> GetFilteredFile();
 };
+
+#endif
