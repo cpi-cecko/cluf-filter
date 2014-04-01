@@ -1,27 +1,18 @@
 #ifndef _CLUF__FILTER_H
 #define _CLUF__FILTER_H
 
-#include <fstream>
 #include <sstream>
-#include <vector>
 
 class Filter
 {
 private:
-	std::ifstream inputFileStream;
-	std::stringstream fileStream;
-	std::vector<std::string> filteredFile;
-	bool isFileRead;
-	bool isFileFiltered;
+	std::string filterExpression;
 
 public:
-	Filter(const std::string &fileName);
-	~Filter();
+	Filter(const std::string &newFilterExpression);
 
-	void ReadFile();
-	void FilterFile(const std::string &word);
-
-	std::vector<std::string> GetFilteredFile();
+	std::string GetFilterExpression() const;
+	void FilterStream(std::stringstream &stream) const;
 };
 
 #endif
