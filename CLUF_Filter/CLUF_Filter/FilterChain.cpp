@@ -1,9 +1,10 @@
 #include "FilterChain.h"
 
 #include <iostream>
+#include <sstream>
 
 FilterChain::FilterChain(const std::string &newInputFileName, const std::string &newOutputFileName)
-	: inputFile(newInputFileName), outputFile(newOutputFileName),
+	: inputFile(newInputFileName), outputFile(newOutputFileName, std::ios::trunc),
 	  inputFileName(newInputFileName), outputFileName(newOutputFileName), filters()
 {
 }
@@ -70,11 +71,12 @@ void FilterChain::ProcessThroughFilters()
 {
 	std::stringstream fileStream;
 	fileStream << inputFile.rdbuf();
+	std::string filteredText = fileStream.str();
 
 	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 	{
-		filter->FilterStream(fileStream);
+		filter->FilterText(filteredText);
 	}
 
-	outputFile << fileStream.str();
+	outputFile << filteredText;
 }

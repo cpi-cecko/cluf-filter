@@ -1,6 +1,7 @@
 #include "Filter.h"
 
 #include <string>
+#include <sstream>
 #include <iostream>
 
 Filter::Filter(const std::string &newFilterExpression)
@@ -8,19 +9,20 @@ Filter::Filter(const std::string &newFilterExpression)
 {
 }
 
-void Filter::FilterStream(std::stringstream &stream) const
+void Filter::FilterText(std::string &text) const
 {
 	std::string currentLine;
-	std::stringstream filteredStream;
-	while (std::getline(stream, currentLine))
+	std::string filteredText;
+	std::stringstream streamedText(text);
+	while (std::getline(streamedText, currentLine))
 	{
 		if (currentLine.find(filterExpression) != std::string::npos)
 		{
-			filteredStream << currentLine;
+			filteredText.append(currentLine);
+			filteredText += "\n";
 		}
 	}
-	stream.clear();
-	stream << filteredStream;
+	text = filteredText;
 }
 
 std::string Filter::GetFilterExpression() const
