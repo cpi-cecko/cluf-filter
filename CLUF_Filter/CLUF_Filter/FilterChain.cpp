@@ -29,19 +29,34 @@ void FilterChain::RemoveFilter(const std::string &filterExpression)
 		}
 	}
 
-	std::cerr << "Filter with filter expression `" << filterExpression << "' not found\n";
+	std::cerr << "Error: Filter with filter expression `" << filterExpression << "' not found\n";
 }
 
 void FilterChain::Serialize(const std::string &fileName) const
 {
 	std::ofstream serializationFile(fileName, std::ios::trunc | std::ios::binary);
 
-	serializationFile << inputFileName;
-	serializationFile << outputFileName;
-	serializationFile << filters.size();
-	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	if (serializationFile.is_open())
 	{
-		serializationFile << filter->GetFilterExpression();
+		size_t inputFileStrLength = inputFileName.length();
+		serializationFile.write((char*)&inputFileStrLength, sizeof(size_t));
+		serializationFile.write(inputFileName.c_str(), inputFileName.length() * sizeof(char));
+		size_t outputFileStrLength = outputFileName.length();
+		serializationFile.write((char*)&outputFileStrLength, sizeof(size_t));
+		serializationFile.write(outputFileName.c_str(), outputFileName.length() * sizeof(char));
+		size_t filtersSize = filters.size();
+		serializationFile.write((char*)&filtersSize, sizeof(size_t));
+		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+		{
+			std::string filterExpression = filter->GetFilterExpression();
+			size_t filterExpressionLength = filterExpression.length();
+			serializationFile.write((char*)&filterExpressionLength, sizeof(size_t));
+			serializationFile.write(filterExpression.c_str(), filterExpressionLength * sizeof(char));
+		}
+	}
+	else
+	{
+		std::cerr << "Error: Unable to open serialization file.\n";
 	}
 
 	serializationFile.close();
@@ -50,18 +65,36 @@ void FilterChain::Desearialize(const std::string &fileName)
 {
 	std::ifstream serializationFile(fileName, std::ios::binary);
 
-	serializationFile >> inputFileName;
-	inputFile.open(inputFileName);
-	serializationFile >> outputFileName;
-	outputFile.open(outputFileName);
-	
-	int filtersSize = 0;
-	serializationFile >> filtersSize;
-	for (int i = 0; i < filtersSize; i++)
+	if (serializationFile.is_open())
 	{
-		std::string filterExpression = "";
-		serializationFile >> filterExpression;
-		AddFilter(filterExpression);
+		size_t inputFileNameLength = 0;
+		serializationFile.read((char*)&inputFileNameLength, sizeof(size_t));
+		char strInputFileName[30] = "";
+		serializationFile.read((char*)&strInputFileName, inputFileNameLength * sizeof(char));
+		inputFileName.append(strInputFileName);
+		inputFile.open(inputFileName);
+
+		size_t outputFileNameLength = 0;
+		serializationFile.read((char*)&outputFileNameLength, sizeof(size_t));
+		char strOutputFileName[30] = "";
+		serializationFile.read((char*)&strOutputFileName, outputFileNameLength * sizeof(char));
+		outputFileName.append(strOutputFileName);
+		outputFile.open(outputFileName);
+		
+		int filtersSize = 0;
+		serializationFile.read((char*)&filtersSize, sizeof(int));
+		for (int i = 0; i < filtersSize; i++)
+		{
+			size_t filterExpressionLength = 0;
+			serializationFile.read((char*)&filterExpressionLength, sizeof(size_t));
+			char filterExpression[100] = "";
+			serializationFile.read((char*)&filterExpression, filterExpressionLength * sizeof(char));
+			AddFilter(filterExpression);
+		}
+	}
+	else
+	{
+		std::cerr << "Error: Unable to open deserialization file.\n";
 	}
 
 	serializationFile.close();
@@ -69,14 +102,21 @@ void FilterChain::Desearialize(const std::string &fileName)
 
 void FilterChain::ProcessThroughFilters()
 {
-	std::stringstream fileStream;
-	fileStream << inputFile.rdbuf();
-	std::string filteredText = fileStream.str();
-
-	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	if (inputFile.is_open() && outputFile.is_open())
 	{
-		filter->FilterText(filteredText);
-	}
+		std::stringstream fileStream;
+		fileStream << inputFile.rdbuf();
+		std::string filteredText = fileStream.str();
 
-	outputFile << filteredText;
+		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+		{
+			filter->FilterText(filteredText);
+		}
+
+		outputFile << filteredText;
+	}
+	else
+	{
+		std::cerr << "Error: Unable to open input or output file.\n";
+	}
 }
