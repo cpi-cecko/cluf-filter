@@ -59,11 +59,28 @@ public:
 	///
 	void OpenOutputFile(const std::string &newOutputFileName);
 
+public:
+	bool operator==(const FilterChain &other) const;
+	bool operator!=(const FilterChain &other) const;
+
+	FilterChain& operator+=(const Filter &filterToAdd);
+	FilterChain& operator-=(const char *str);
+
+	Filter operator[](int idx) const;
+	Filter operator[](const char *str) const;
+
+#ifndef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
 private:
+#endif
 	/// Locked assignment operator and copy constructor to prevent dangerous initialization of
 	/// FilterChain instances
 	FilterChain(const FilterChain &other);
 	FilterChain& operator=(const FilterChain &other);
 };
+
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+FilterChain operator|(const FilterChain &chain, const Filter &filter);
+FilterChain operator+(const FilterChain &lhs, const FilterChain &rhs);
+#endif
 
 #endif

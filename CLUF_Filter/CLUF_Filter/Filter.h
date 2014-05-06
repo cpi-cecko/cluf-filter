@@ -3,6 +3,12 @@
 
 #include <string>
 
+///
+/// @brief Enables dangerous features.
+///		   Possible elephant assault on user who uncomments this!
+///
+#define BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+
 class Filter
 {
 private:
@@ -35,19 +41,28 @@ public:
 	std::istream& operator>>(std::istream &is);
 
 	Filter& operator+=(char ch);
-	Filter& operator+=(const char* str);
+	Filter& operator+=(const char *str);
 };
-
-class FilterChain;
 
 ///
 /// Source of bugs. We may forget to set the filter chain files if we use this to 
 /// initialize a brand new FilterChain.
+/// Also, this requires the copy constructor to be implemented for FilterChain and set to public. Given
+///	that it opens files during its operation, it's better if we prevent its copying and asignment.
 ///
 /// During the last meeting we decided to drop this operator because it would be a possible source 
 /// of hard-to-fix bugs.
+/// Contact Tsvetan Tsvetanov at cpi.cecko@gmail.com for further info and discussion of the issue.
 ///
-//FilterChain operator|(const Filter &lhs, const Filter &rhs);
+/// OK. If you want to use these things, uncomment #define BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+///
+///
+/// @brief Creates a new FilterChain with the two Filters as initial filters
+///
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+class FilterChain;
+FilterChain operator|(const Filter &lhs, const Filter &rhs);
+#endif
 
 
 #endif

@@ -120,3 +120,82 @@ void FilterChain::ProcessThroughFilters()
 		std::cerr << "Error: Unable to open input or output file.\n";
 	}
 }
+
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+FilterChain::FilterChain(const FilterChain &other)
+{
+	if (this != &other)
+	{
+		FilterChain(other.inputFileName, other.outputFileName);
+		for (auto filter = other.filters.begin(); filter != other.filters.end(); ++filter)
+		{
+			AddFilter(filter->GetFilterExpression());
+		}
+	}
+}
+#endif
+
+/////////////////
+//  Operators  //
+/////////////////
+
+bool FilterChain::operator==(const FilterChain &other) const
+{
+	if (filters.size() != other.filters.size())
+	{
+		return false;
+	}
+
+	for (size_t idx = 0; idx < filters.size(); ++idx)
+	{
+		if (filters[idx] != other.filters[idx])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+bool FilterChain::operator!=(const FilterChain &other) const
+{
+	return !(*this == other);
+}
+
+FilterChain& FilterChain::operator+=(const Filter &filterToAdd)
+{
+	AddFilter(filterToAdd.GetFilterExpression());
+	return *this;
+}
+FilterChain& FilterChain::operator-=(const char *str)
+{
+	//for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	//{
+	//	std::string text = str;
+	//	filter->FilterText(text);
+	//	if (text != str)
+	//	{
+
+	//	}
+	//}
+
+	return *this;
+}
+
+Filter FilterChain::operator[](int idx) const
+{
+	return filters[idx];
+}
+Filter FilterChain::operator[](const char *str) const
+{
+	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	{
+		std::string text = str;
+		filter->FilterText(text);
+		if (text != str)
+		{
+			return *filter;
+		}
+	}
+
+	return Filter("");
+}

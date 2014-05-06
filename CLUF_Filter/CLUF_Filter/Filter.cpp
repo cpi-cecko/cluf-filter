@@ -76,12 +76,14 @@ Filter& Filter::operator+=(const char *str)
 	return *this;
 }
 
-//FilterChain operator|(const Filter &lhs, const Filter &rhs)
-//{
-//	FilterChain newFilterChain();
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+FilterChain operator|(const Filter &lhs, const Filter &rhs)
+{
+	FilterChain newFilterChain;
 
-//	newFilterChain.AddFilterChain(lhs);
-//	newFilterChain.AddFilterChain(rhs);
+	newFilterChain.AddFilter(lhs.GetFilterExpression());
+	newFilterChain.AddFilter(rhs.GetFilterExpression());
 
-//	return newFilterChain;
-//}
+	return newFilterChain;
+}
+#endif
