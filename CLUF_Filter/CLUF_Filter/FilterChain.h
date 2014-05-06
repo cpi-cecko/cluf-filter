@@ -20,8 +20,7 @@ public:
 	/// @brief Constructs the FilterChain object and opens the input/output files.
 	/// 
 	FilterChain(const std::string &newInputFileName, const std::string &newOutputFileName);
-	FilterChain()
-		: inputFileName(""), outputFileName("") {}
+	explicit FilterChain() : inputFileName(""), outputFileName("") {}
 	///
 	/// @brief Closes the files opened by the FilterChain instance.
 	///
@@ -43,13 +42,22 @@ public:
 	///
 	/// @brief Deserializes the FilterChain instance
 	///
-	void Desearialize(const std::string &fileName);
+	void Deserialize(const std::string &fileName);
 
 	///
 	/// @brief Consequentially applies the stored filters to the inputFile and outputs the result
 	///		   to the ouptutFile
 	///
 	void ProcessThroughFilters();
+
+	///
+	/// @brief Opens the input file if such wasn't opened before. Used after operator| for Filter.
+	///
+	void OpenInputFile(const std::string &newInputFileName);
+	///
+	/// @brief Opens the output file if such wasn't opened before. Used after operator| for Filter.
+	///
+	void OpenOutputFile(const std::string &newOutputFileName);
 
 private:
 	/// Locked assignment operator and copy constructor to prevent dangerous initialization of

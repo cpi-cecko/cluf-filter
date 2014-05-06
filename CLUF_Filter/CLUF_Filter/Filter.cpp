@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "FilterChain.h"
+
 Filter::Filter(const std::string &newFilterExpression)
 	: filterExpression(newFilterExpression)
 {
@@ -29,3 +31,57 @@ std::string Filter::GetFilterExpression() const
 {
 	return filterExpression;
 }
+
+/////////////////
+//  Operators  //
+/////////////////
+
+Filter& Filter::operator=(const Filter &other)
+{
+	if (this != &other)
+	{
+		filterExpression = other.filterExpression;
+	}
+	return *this;
+}
+
+bool Filter::operator==(const Filter &other) const
+{
+	return filterExpression == other.filterExpression;
+}
+bool Filter::operator!=(const Filter &other) const
+{
+	return !(*this == other);
+}
+
+std::ostream& Filter::operator<<(std::ostream &os) const
+{
+	os << filterExpression;
+	return os;
+}
+std::istream& Filter::operator>>(std::istream &is)
+{
+	is >> filterExpression;
+	return is;
+}
+
+Filter& Filter::operator+=(char ch)
+{
+	filterExpression += ch;
+	return *this;
+}
+Filter& Filter::operator+=(const char *str)
+{
+	filterExpression += str;
+	return *this;
+}
+
+//FilterChain operator|(const Filter &lhs, const Filter &rhs)
+//{
+//	FilterChain newFilterChain();
+
+//	newFilterChain.AddFilterChain(lhs);
+//	newFilterChain.AddFilterChain(rhs);
+
+//	return newFilterChain;
+//}

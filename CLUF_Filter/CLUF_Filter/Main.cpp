@@ -15,7 +15,7 @@ int main()
 	}
 
 	FilterChain newChain;
-	newChain.Desearialize("serialize.txt");
+	newChain.Deserialize("serialize.txt");
 
 	newChain.AddFilter("Why");
 	newChain.ProcessThroughFilters();

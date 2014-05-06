@@ -61,7 +61,7 @@ void FilterChain::Serialize(const std::string &fileName) const
 
 	serializationFile.close();
 }
-void FilterChain::Desearialize(const std::string &fileName)
+void FilterChain::Deserialize(const std::string &fileName)
 {
 	std::ifstream serializationFile(fileName, std::ios::binary);
 
