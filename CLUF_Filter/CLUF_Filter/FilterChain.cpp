@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 FilterChain::FilterChain(const std::string &newInputFileName, const std::string &newOutputFileName)
 	: inputFile(newInputFileName), outputFile(newOutputFileName, std::ios::trunc),
@@ -16,7 +17,10 @@ FilterChain::~FilterChain()
 
 void FilterChain::AddFilter(const std::string &filterExpression)
 {
-	filters.push_back(Filter(filterExpression));
+	if (std::find(filters.begin(), filters.end(), filterExpression) == filters.end())
+	{
+		filters.push_back(Filter(filterExpression));
+	}
 }
 void FilterChain::RemoveFilter(const std::string &filterExpression)
 {
@@ -30,6 +34,11 @@ void FilterChain::RemoveFilter(const std::string &filterExpression)
 	}
 
 	std::cerr << "Error: Filter with filter expression `" << filterExpression << "' not found\n";
+}
+
+const std::vector<Filter>& FilterChain::GetFilters() const
+{
+	return filters;
 }
 
 void FilterChain::Serialize(const std::string &fileName) const
@@ -122,7 +131,7 @@ void FilterChain::ProcessThroughFilters()
 }
 
 #ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
-FilterChain::FilterChain(const FilterChain &other)
+void FilterChain::CopyFrom(const FilterChain &other)
 {
 	if (this != &other)
 	{
@@ -132,6 +141,18 @@ FilterChain::FilterChain(const FilterChain &other)
 			AddFilter(filter->GetFilterExpression());
 		}
 	}
+}
+
+FilterChain::FilterChain(const FilterChain &other)
+{
+	CopyFrom(other);
+}
+
+FilterChain& FilterChain::operator=(const FilterChain &other)
+{
+	CopyFrom(other);
+	
+	return *this;
 }
 #endif
 
@@ -168,15 +189,14 @@ FilterChain& FilterChain::operator+=(const Filter &filterToAdd)
 }
 FilterChain& FilterChain::operator-=(const char *str)
 {
-	//for (auto filter = filters.begin(); filter != filters.end(); ++filter)
-	//{
-	//	std::string text = str;
-	//	filter->FilterText(text);
-	//	if (text != str)
-	//	{
-
-	//	}
-	//}
+	filters.erase(std::remove_if(std::begin(filters), std::end(filters),
+		[&str](const Filter &filter)
+		{
+			std::string text = str;
+			filter.FilterText(text);
+			return text != str;
+		}),
+		std::end(filters));
 
 	return *this;
 }
@@ -199,3 +219,23 @@ Filter FilterChain::operator[](const char *str) const
 
 	return Filter("");
 }
+
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+FilterChain operator|(const FilterChain &chain, const Filter &filter)
+{
+	FilterChain newFilterChain(chain);
+	newFilterChain.AddFilter(filter.GetFilterExpression());
+	return newFilterChain;
+}
+FilterChain operator+(const FilterChain &lhs, const FilterChain &rhs)
+{
+	FilterChain newFilterChain(lhs);
+	auto otherFilters = rhs.GetFilters();
+	for (auto filter = otherFilters.begin(); filter != otherFilters.end(); ++filter)
+	{
+		newFilterChain.AddFilter(filter->GetFilterExpression());
+	}
+
+	return newFilterChain;
+}
+#endif

@@ -33,14 +33,39 @@ public:
 	void FilterText(std::string &text) const;
 
 public:
+	///
+	/// @brief Standard assignment operator
+	///
 	Filter& operator=(const Filter &other);
+	///
+	/// @brief Compares two filters by their filterExpressions
+	/// @return true if the filter expressions are equal
+	///
 	bool operator==(const Filter &other) const;
+	///
+	/// @brief Compares two filters by their filterExpressions
+	/// @return true if the filter expressions are different
+	///
 	bool operator!=(const Filter &other) const;
 
+	///
+	/// @brief Write a filterExpression
+	///
 	std::ostream& operator<<(std::ostream &os) const;
+	///
+	/// @brief Read a filterExpression
+	///
 	std::istream& operator>>(std::istream &is);
 
+	///
+	/// @brief Concatenates a character at the end of the filterExpression
+	/// @return A Filter with a concatenated character at the end of it
+	///
 	Filter& operator+=(char ch);
+	///
+	/// @brief Concatenates a string at the end of the filterExpression
+	/// @return A Filter with a concatenated string at the end of it
+	///
 	Filter& operator+=(const char *str);
 };
 
@@ -58,6 +83,7 @@ public:
 ///
 ///
 /// @brief Creates a new FilterChain with the two Filters as initial filters
+/// @return The created filter chain
 ///
 #ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
 class FilterChain;

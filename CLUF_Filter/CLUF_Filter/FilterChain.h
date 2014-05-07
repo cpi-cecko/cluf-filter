@@ -36,6 +36,11 @@ public:
 	void RemoveFilter(const std::string &filterExpression);
 
 	///
+	/// @brief Returns the chain's filters
+	///
+	const std::vector<Filter>& GetFilters() const;
+
+	///
 	/// @brief Serializes the FilterChain instance
 	///
 	void Serialize(const std::string &fileName) const;
@@ -60,26 +65,66 @@ public:
 	void OpenOutputFile(const std::string &newOutputFileName);
 
 public:
+#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+	///
+	/// @brief Method to copy the containts of another FilterChain into this FilterChain
+	///
+	void CopyFrom(const FilterChain &other);
+#endif
+
+public:
+	///
+	/// @brief Compares two FilterChains based on their Filters
+	/// @return true if the Filters are equal
+	///
 	bool operator==(const FilterChain &other) const;
+	///
+	/// @brief Compares two FilterChains based on their Filters
+	/// @return true if the Filters are different
+	///
 	bool operator!=(const FilterChain &other) const;
 
+	///
+	/// @brief Adds a filter to filters
+	///
 	FilterChain& operator+=(const Filter &filterToAdd);
+	///
+	/// @brief Removes filters which contain `str' in them
+	///
 	FilterChain& operator-=(const char *str);
 
+	///
+	/// @brief Returns a filter at the given index
+	///
 	Filter operator[](int idx) const;
+	///
+	/// @brief Returns a filter which filters the given string
+	///
 	Filter operator[](const char *str) const;
 
 #ifndef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
 private:
-#endif
 	/// Locked assignment operator and copy constructor to prevent dangerous initialization of
 	/// FilterChain instances
+#endif
+	///
+	/// @brief Copy constructor
+	///
 	FilterChain(const FilterChain &other);
+	///
+	/// @brief Assignment operator
+	///
 	FilterChain& operator=(const FilterChain &other);
 };
 
 #ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
+///
+/// @brief Adds a Filter to the given FilterChain
+///
 FilterChain operator|(const FilterChain &chain, const Filter &filter);
+///
+/// @brief Concatenates the two given FilterChains. The new FilterChain has unique filters.
+///
 FilterChain operator+(const FilterChain &lhs, const FilterChain &rhs);
 #endif
 
