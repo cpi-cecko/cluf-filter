@@ -54,14 +54,14 @@ bool Filter::operator!=(const Filter &other) const
 	return !(*this == other);
 }
 
-std::ostream& Filter::operator<<(std::ostream &os) const
+std::ostream& operator<<(std::ostream &os, const Filter &filter)
 {
-	os << filterExpression;
+	os << filter.filterExpression;
 	return os;
 }
-std::istream& Filter::operator>>(std::istream &is)
+std::istream& operator>>(std::istream &is, Filter &filter)
 {
-	is >> filterExpression;
+	is >> filter.filterExpression;
 	return is;
 }
 

@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClInclude Include="Filter.h" />
     <ClInclude Include="FilterChain.h" />
+    <ClInclude Include="Tests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Filter.cpp" />

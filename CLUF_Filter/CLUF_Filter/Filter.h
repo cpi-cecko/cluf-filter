@@ -49,15 +49,6 @@ public:
 	bool operator!=(const Filter &other) const;
 
 	///
-	/// @brief Write a filterExpression
-	///
-	std::ostream& operator<<(std::ostream &os) const;
-	///
-	/// @brief Read a filterExpression
-	///
-	std::istream& operator>>(std::istream &is);
-
-	///
 	/// @brief Concatenates a character at the end of the filterExpression
 	/// @return A Filter with a concatenated character at the end of it
 	///
@@ -67,7 +58,20 @@ public:
 	/// @return A Filter with a concatenated string at the end of it
 	///
 	Filter& operator+=(const char *str);
+
+public:
+	friend std::ostream& operator<<(std::ostream &os, const Filter &filter);
+	friend std::istream& operator>>(std::istream &is, Filter &filter);
 };
+
+///
+/// @brief Write a filterExpression
+///
+std::ostream& operator<<(std::ostream &os, const Filter &filter);
+///
+/// @brief Read a filterExpression
+///
+std::istream& operator>>(std::istream &is, Filter &filter);
 
 ///
 /// Source of bugs. We may forget to set the filter chain files if we use this to 
