@@ -155,7 +155,8 @@ bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string
 	chain.ProcessThroughFilters();
 	std::stringstream fileStream;
 	fileStream << chain.outputFile.rdbuf(); 
-	return fileStream.str() == expectedOutput;
+	std::string stringedStream = fileStream.str();
+	return stringedStream == expectedOutput;
 }
 
 bool Test_FilterChainCopyFrom(const FilterChain &toCopyFrom)
