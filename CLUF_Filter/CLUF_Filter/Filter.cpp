@@ -61,7 +61,13 @@ std::ostream& operator<<(std::ostream &os, const Filter &filter)
 }
 std::istream& operator>>(std::istream &is, Filter &filter)
 {
-	is >> filter.filterExpression;
+	std::string currentLine;
+	std::string newExpression = "";
+	while (std::getline(is, currentLine))
+	{
+		newExpression.append(currentLine);
+	}
+	filter.filterExpression = newExpression;
 	return is;
 }
 

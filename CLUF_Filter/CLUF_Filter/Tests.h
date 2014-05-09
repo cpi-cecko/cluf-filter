@@ -46,7 +46,7 @@ bool Test_FilterOutput(const Filter &filterToWrite)
 	strStream << filterToWrite;
 	return strStream.str() == filterToWrite.GetFilterExpression();
 }
-bool Test_FilterInput(const std::string expressionToPut)
+bool Test_FilterInput(const std::string &expressionToPut)
 {
 	std::stringstream strStream;
 	strStream << expressionToPut;
@@ -59,16 +59,18 @@ bool Test_FilterInput(const std::string expressionToPut)
 
 bool Test_FilterCharConcat(Filter &filter, char ch)
 {
+	std::string expressionBefore = filter.GetFilterExpression();
 	filter += ch;
-	return filter.GetFilterExpression() == (filter.GetFilterExpression() + ch);
+	return filter.GetFilterExpression() == (expressionBefore + ch);
 }
 bool Test_FilterStringConcat(Filter &filter, const char *str)
 {
+	std::string expressionBefore = filter.GetFilterExpression();
 	filter += str;
-	return filter.GetFilterExpression() == (filter.GetFilterExpression() + str);
+	return filter.GetFilterExpression() == (expressionBefore + str);
 }
 
-bool Test_FilterChainCreation(const Filter &lhs, const Filter &rhs)
+bool Test_FilterChainOpCreation(const Filter &lhs, const Filter &rhs)
 {
 	FilterChain newChain = lhs | rhs;
 	bool isSizeTwo = newChain.GetFilters().size() == 2;
@@ -125,9 +127,11 @@ bool Test_FilterChainAddFilters(const std::vector<std::string> &filterExpression
 	return true;
 }
 
-void Test_FilterChainRemoveFilter(FilterChain &chain, const std::string &filterExprToRemove)
+bool Test_FilterChainRemoveFilter(FilterChain &chain, const std::string &filterExprToRemove,
+								  const FilterChain &expectedChain)
 {
 	chain.RemoveFilter(filterExprToRemove);
+	return chain == expectedChain;
 }
 
 bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName)
@@ -146,10 +150,12 @@ bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &
 	return false;
 }
 
-bool Test_FilterChainProcessThroughFilters(const FilterChain &chain, const std::string &expectedOutput)
+bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string &expectedOutput)
 {
 	chain.ProcessThroughFilters();
-	return chain.outputFile.rdbuf().str() == expectedOutput;
+	std::stringstream fileStream;
+	fileStream << chain.outputFile.rdbuf(); 
+	return fileStream.str() == expectedOutput;
 }
 
 bool Test_FilterChainCopyFrom(const FilterChain &toCopyFrom)
@@ -189,7 +195,7 @@ bool Test_FilterChainFilterAdd(const Filter &filterToTest)
 	FilterChain newChain(TEST_FILE_NAME, TEST_FILE_NAME);
 	newChain += filterToTest;
 
-	newChain.filters.back() == filterToTest;
+	return newChain.filters.back() == filterToTest;
 }
 
 bool Test_FilterChainRemoveFilterByString(const char *str)
@@ -202,7 +208,7 @@ bool Test_FilterChainRemoveFilterByString(const char *str)
 							[&str](const Filter &filter)
 							{
 								auto filterExpr = filter.GetFilterExpression();
-								filterExpr.find(str) != filterExpr.npos;
+								return filterExpr.find(str) != filterExpr.npos;
 							});
 
 	return elem == chainFilters.end();

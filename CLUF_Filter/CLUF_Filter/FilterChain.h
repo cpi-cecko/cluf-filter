@@ -118,9 +118,8 @@ private:
 
 public:
 	friend bool Test_FilterChainCreation(const std::string&, const std::string&);
-	friend bool Test_FilterChainSerialize(const FilterChain &chain, const std::string &fileName);
-	friend bool Test_FilterChainDeserialization(const FilterChain &chain, const std::string &fileName);
-	friend bool Test_FilterChainProcessThroughFilters(const FilterChain &chain, const std::string &expectedOutput);
+	friend bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName);
+	friend bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string &expectedOutput);
 	friend bool Test_FilterChainFilterAdd(const Filter &filterToTest);
 };
 
