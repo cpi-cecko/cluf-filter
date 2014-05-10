@@ -143,25 +143,108 @@ int main()
 	testSuite.AddFunction(funcName.str(), 
 						  std::bind(Test_FilterChainProcessThroughFilters, otherChain, expectedOutput));
 
+	FilterChain toCopyFrom(TEST_FILE_NAME, "oback.txt");
+	toCopyFrom.AddFilter("room");
+	toCopyFrom.AddFilter("");
+	toCopyFrom.AddFilter("ismail\0is bad");
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainCopyFrom('" << VectorToString(toCopyFrom.GetFilters()) << "')";  
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainCopyFrom, toCopyFrom));
+
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainEqualOp('" << VectorToString(toCopyFrom.GetFilters()) << "')";  
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainEqualOp, toCopyFrom));
+
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainCopyCtor('" << VectorToString(toCopyFrom.GetFilters()) << "')";  
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainCopyCtor, toCopyFrom));
+
+	expectedEq = false;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainEquality('" << VectorToString(toCopyFrom.GetFilters()) << "', '"  
+			 << VectorToString(otherChain.GetFilters()) << "', '" << expectedEq << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainEquality, toCopyFrom, otherChain, expectedEq));
+
+	expectedEq = true;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainInequality('" << VectorToString(toCopyFrom.GetFilters()) << "', '"  
+			 << VectorToString(otherChain.GetFilters()) << "', '" << expectedEq << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainInequality, toCopyFrom, otherChain, expectedEq));
+
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainFilterAdd('" << testFilter << "')";
+	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainFilterAdd, testFilter)); 
+
+	FilterChain otherTestChain(TEST_FILE_NAME, "other_test.txt");
+	otherTestChain.AddFilter("sadded");
+	otherTestChain.AddFilter("onform is my");
+	std::string str = "sad";
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainRemoveFilterByString('" 
+			 << VectorToString(otherTestChain.GetFilters()) << "', '" << str << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainRemoveFilterByString, otherTestChain, str.c_str())); 
+
+	int idx = 0;
+	std::string expectedExpr = "sadded";
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainIdxOperator('" 
+			 << VectorToString(otherTestChain.GetFilters()) << "', '" << idx << "', '"
+			 << expectedExpr << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainIdxOperator, otherTestChain, idx, expectedExpr)); 
+
+	const char *strToFilter = "the person is sadded";
+	expectedExpr = "sadded";
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainStrOperator('" 
+			 << VectorToString(otherTestChain.GetFilters()) << "', '" << strToFilter << "', '"
+			 << expectedExpr << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainStrOperator, otherTestChain, strToFilter, expectedExpr)); 
+
+	Filter filterToAdd("inexplicable");
+	FilterChain expectedChainTwo(otherTestChain);
+	expectedChainTwo.AddFilter(filterToAdd.GetFilterExpression());
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainOperatorAddFilterToChain('" 
+			 << VectorToString(otherTestChain.GetFilters()) 
+			 << "', '" << filterToAdd.GetFilterExpression() 
+			 << "', '" << VectorToString(expectedChainTwo.GetFilters()) << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainOperatorAddFilterToChain, 
+									otherTestChain, filterToAdd, expectedChainTwo)); 
+
+	FilterChain expectedChainThree(otherTestChain);
+	expectedChainThree.AddFilter(filterToAdd.GetFilterExpression());
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainOperatorCombineChains('" 
+			 << VectorToString(otherTestChain.GetFilters()) 
+			 << "', '" << VectorToString(expectedChainTwo.GetFilters()) 
+			 << "', '" << VectorToString(expectedChainThree.GetFilters()) << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainOperatorCombineChains, 
+									otherTestChain, expectedChainTwo, expectedChainThree)); 
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	testSuite.RunTests();
-
-	//{
-	//	FilterChain testChain("test.txt", "filtered.txt");
-	//	testChain.AddFilter("pony");
-	//	testChain.AddFilter("sad");
-
-	//	testChain.ProcessThroughFilters();
-
-	//	testChain.Serialize("serialize.txt");
-	//}
-
-	//FilterChain newChain;
-	//newChain.Deserialize("serialize.txt");
-
-	//newChain.AddFilter("Why");
-	//newChain.ProcessThroughFilters();
 
 	return 0;
 }
