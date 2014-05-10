@@ -153,9 +153,11 @@ bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &
 bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string &expectedOutput)
 {
 	chain.ProcessThroughFilters();
+	std::ifstream filteredFile(chain.outputFileName);
 	std::stringstream fileStream;
-	fileStream << chain.outputFile.rdbuf(); 
+	fileStream << filteredFile.rdbuf(); 
 	std::string stringedStream = fileStream.str();
+	filteredFile.close();
 	return stringedStream == expectedOutput;
 }
 

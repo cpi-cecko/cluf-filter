@@ -130,16 +130,18 @@ int main()
 	///
 	/// Untestable due to some strange behavior of std::bind
 	/// The copy ctor of FilterChain isn't invoked properly? The file names aren't copied.
+	/// ^^^^
+	/// |||| Disregard! NEVER BLAME THE LIBRARY!!!
 	///
-	//FilterChain otherChain("back.txt", "oback.txt");
-	//otherChain.AddFilter("room for 'two'");
-	//std::string expectedOutput = "there is always room for 'two'\n";
-	//funcName.str(std::string());
-	//funcName.clear();
-	//funcName << "Test_FilterChainProcessThroughFilters('" << VectorToString(otherChain.GetFilters()) << "', '"  
-	//		 << expectedOutput << "')";
-	//testSuite.AddFunction(funcName.str(), 
-	//					  std::bind(Test_FilterChainProcessThroughFilters, otherChain, expectedOutput));
+	FilterChain otherChain("back.txt", "oback.txt");
+	otherChain.AddFilter("room for 'two'");
+	std::string expectedOutput = "there is always room for 'two'\n";
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainProcessThroughFilters('" << VectorToString(otherChain.GetFilters()) << "', '"  
+			 << expectedOutput << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainProcessThroughFilters, otherChain, expectedOutput));
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 

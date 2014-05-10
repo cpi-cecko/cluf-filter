@@ -123,6 +123,7 @@ void FilterChain::ProcessThroughFilters()
 		}
 
 		outputFile << filteredText;
+		outputFile.flush();
 	}
 	else
 	{
@@ -135,7 +136,10 @@ void FilterChain::CopyFrom(const FilterChain &other)
 {
 	if (this != &other)
 	{
-		FilterChain(other.inputFileName, other.outputFileName);
+		inputFileName = other.inputFileName;
+		outputFileName = other.outputFileName;
+		inputFile.open(inputFileName);
+		outputFile.open(outputFileName);
 		for (auto filter = other.filters.begin(); filter != other.filters.end(); ++filter)
 		{
 			AddFilter(filter->GetFilterExpression());
