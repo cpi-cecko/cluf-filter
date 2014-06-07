@@ -14,11 +14,6 @@ void Filter::FilterText(std::string &text) const
 	std::stringstream streamedText(text);
 	while (std::getline(streamedText, currentLine))
 	{
-		//if (currentLine.find(filterExpression) != std::string::npos)
-		//{
-		//	filteredText.append(currentLine);
-		//	filteredText += "\n";
-		//}
 		std::string resultText = DoFiltering(currentLine);
 		filteredText.append(resultText);
 	}

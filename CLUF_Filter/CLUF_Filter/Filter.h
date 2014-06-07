@@ -49,7 +49,7 @@ public:
 	void Deserialize(const std::ifstream &serializationFile);
 
 protected:
-	virtual const std::string &DoFiltering(const std::string &inputText) const = 0;
+	virtual std::string DoFiltering(const std::string &inputText) const = 0;
 
 };
 

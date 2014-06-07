@@ -23,7 +23,7 @@ public:
 	std::string GetFilterExpression() const;
 
 private:
-	virtual const std::string &DoFiltering(const std::string &inputText) const;
+	virtual std::string DoFiltering(const std::string &inputText) const;
 };
 
 

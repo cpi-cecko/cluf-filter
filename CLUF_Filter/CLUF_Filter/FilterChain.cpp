@@ -16,30 +16,30 @@ FilterChain::~FilterChain()
 
 	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 	{
-		delete *filter;
+		delete filter->second;
 	}
 	filters.clear();
 }
 
-void FilterChain::AddFilter(Filter *newFilter)
+void FilterChain::AddFilter(Filter *newFilter, int filterID)
 {
-	filters.push_back(newFilter);
+	filters.insert(std::make_pair(filterID, newFilter));
 }
-void FilterChain::RemoveFilter(const std::string &filterExpression)
+void FilterChain::RemoveFilter(int filterID)
 {
-	//for (auto filter = filters.begin(); filter != filters.end(); ++filter)
-	//{
-	//	if ((*filter)->GetFilterExpression() == filterExpression)
-	//	{
-	//		filters.erase(filter);
-	//		return;
-	//	}
-	//}
+	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	{
+		if (filter->first == filterID)
+		{
+			filters.erase(filter);
+			return;
+		}
+	}
 
-	//std::cerr << "Error: Filter with filter expression `" << filterExpression << "' not found\n";
+	std::cerr << "Error: Filter with id `" << filterID << "' not found\n";
 }
 
-const std::vector<Filter*>& FilterChain::GetFilters() const
+const std::map<int, Filter*>& FilterChain::GetFilters() const
 {
 	return filters;
 }
@@ -126,7 +126,7 @@ void FilterChain::ProcessThroughFilters()
 
 		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 		{
-			(*filter)->FilterText(filteredText);
+			filter->second->FilterText(filteredText);
 		}
 
 		outputFile << filteredText;
@@ -149,7 +149,7 @@ void FilterChain::CopyFrom(const FilterChain &other)
 		outputFile.open(outputFileName);
 		for (auto filter = other.filters.begin(); filter != other.filters.end(); ++filter)
 		{
-			AddFilter((*filter)->GetFilterExpression());
+			AddFilter(filter, filter->first);
 		}
 	}
 }

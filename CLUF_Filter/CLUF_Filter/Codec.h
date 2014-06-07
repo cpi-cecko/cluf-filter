@@ -5,13 +5,13 @@
 class EncodeFilter : public Filter
 {
 private:
-	virtual const std::string &DoFiltering(const std::string &inputText) const;
+	virtual std::string DoFiltering(const std::string &inputText) const;
 };
 
 class DecodeFilter : public Filter
 {
 private:
-	virtual const std::string &DoFiltering(const std::string &inputText) const;
+	virtual std::string DoFiltering(const std::string &inputText) const;
 };
 
 

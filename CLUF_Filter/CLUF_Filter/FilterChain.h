@@ -2,8 +2,7 @@
 #define _CLUF__FILTER_CHAIN_H
 
 #include <fstream>
-#include <vector>
-#include <memory>
+#include <map>
 
 #include "Filter.h"
 
@@ -14,7 +13,7 @@ private:
 	std::ofstream outputFile; /// @property outputFile - the file which we'll output the filtered text to
 	std::string inputFileName; /// @property inputFileName - the name of the inputFile
 	std::string outputFileName; /// @property outputFileName - the name of the outputFile
-	std::vector<Filter*> filters; /// @property filters - an array of conequentially applied filters
+	std::map<int, Filter*> filters; /// @property filters - a map <id, filter> of conequentially applied filters
 
 public:
 	///
@@ -30,16 +29,16 @@ public:
 	///
 	/// @brief Adds a filter to the filter chain.
 	///
-	void AddFilter(Filter *newFilter);
+	void AddFilter(Filter *newFilter, int filterID);
 	/// 
-	/// @brief Removes a filter from the filter chain.
+	/// @brief Removes a filter from the filter chain by address.
 	///
-	void RemoveFilter(const std::string &filterExpression);
+	void RemoveFilter(int filterID);
 
 	///
 	/// @brief Returns the chain's filters
 	///
-	const std::vector<Filter*>& GetFilters() const;
+	const std::map<int, Filter*>& GetFilters() const;
 
 	///
 	/// @brief Serializes the FilterChain instance

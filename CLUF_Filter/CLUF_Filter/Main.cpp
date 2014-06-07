@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "TestSuite.h"
 #include "Tests.h"
@@ -20,12 +21,12 @@ int main()
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//std::stringstream funcName;
-	//funcName.str(std::string());
-	//funcName.clear();
-	//funcName << "Test_FilterChainCreation('" << TEST_FILE_NAME << "', '" << TEST_FILE_NAME << "')";
-	//testSuite.AddFunction(funcName.str(), 
-	//					  std::bind(Test_FilterChainCreation, TEST_FILE_NAME, TEST_FILE_NAME));
+	std::stringstream funcName;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainCreation('" << TEST_FILE_NAME << "', '" << TEST_FILE_NAME << "')";
+	testSuite.AddFunction(funcName.str(), 
+						  std::bind(Test_FilterChainCreation, TEST_FILE_NAME, TEST_FILE_NAME));
 
 	//std::string newFilterExpr = "labadidula'' ";
 	//funcName.str(std::string());

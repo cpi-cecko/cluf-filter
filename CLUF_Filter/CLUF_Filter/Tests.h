@@ -21,15 +21,21 @@ extern const char *TEST_FILE_NAME;
 
 bool Test_FilterChainCreation(const std::string &inputFile, const std::string &outputFile);
 
-bool Test_FilterChainAddFilter(const std::string &filterExpression);
-bool Test_FilterChainAddFilters(const std::vector<std::string> &filterExpressions);
+bool Test_FilterChainAddFilter(Filter *filter, int filterID);
 
-bool Test_FilterChainRemoveFilter(FilterChain &chain, const std::string &filterExprToRemove,
+bool Test_FilterChainRemoveFilter(FilterChain &chain, int filterID, 
 								  const FilterChain &expectedChain);
 
 bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName);
 
 bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string &expectedOutput);
+
+///////////////////////////
+//  Encode Filter tests  //
+///////////////////////////
+
+bool Test_WordFilter(const WordFilter &filter, const std::string &inputText,
+				     const std::string &outputText);
 
 ///////////////////////////
 //  Encode Filter tests  //
