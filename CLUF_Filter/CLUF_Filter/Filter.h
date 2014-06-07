@@ -41,7 +41,7 @@ public:
 	///
 	/// @brief Serializes the filter. Adds its type first.
 	///
-	void Serialize(const std::ofstream &serializationFile) const;
+	void Serialize(std::ofstream &serializationFile) const;
 
 	///
 	/// @brief Deserializes the filter.
@@ -50,7 +50,8 @@ public:
 
 protected:
 	virtual std::string DoFiltering(const std::string &inputText) const = 0;
-
+	
+	virtual void DoSerialization(std::ofstream &serializationFile) const = 0;
 };
 
 

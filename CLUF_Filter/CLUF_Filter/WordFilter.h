@@ -24,6 +24,8 @@ public:
 
 private:
 	virtual std::string DoFiltering(const std::string &inputText) const;
+
+	virtual void DoSerialization(std::ofstream &serializationFile) const;
 };
 
 

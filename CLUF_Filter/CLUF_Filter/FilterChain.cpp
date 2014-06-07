@@ -60,12 +60,8 @@ void FilterChain::Serialize(const std::string &fileName) const
 		serializationFile.write((char*)&filtersSize, sizeof(size_t));
 		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 		{
-			//(*filter)->Serialize(serializationFile);
-
-			//std::string filterExpression = (*filter)->GetFilterExpression();
-			//size_t filterExpressionLength = filterExpression.length();
-			//serializationFile.write((char*)&filterExpressionLength, sizeof(size_t));
-			//serializationFile.write(filterExpression.c_str(), filterExpressionLength * sizeof(char));
+			serializationFile.write((char*)&filter->first, sizeof(int));
+			filter->second->Serialize(serializationFile);
 		}
 	}
 	else
@@ -106,6 +102,18 @@ void FilterChain::Deserialize(const std::string &fileName)
 			//AddFilter(filterExpression);
 
 			// Read filter type. Instantiate new filter. Filter->Deserialize(). Push back to vector.
+			FilterType readType;
+			serializationFile.read((char*)&readType, sizeof(FilterType));
+			switch(readType)
+			{
+				case TYPE_WORD_FILTER:
+					break;
+				case TYPE_ENCODE_FILTER:
+				case TYPE_DECODE_FILTER:
+				case TYPE_ESCAPE_FILTER:
+				case TYPE_UNESCAPE_FILTER:
+				case TYPE_CAPITALIZE_FILTER:
+			}
 		}
 	}
 	else

@@ -19,3 +19,8 @@ void Filter::FilterText(std::string &text) const
 	}
 	text = filteredText;
 }
+
+void Filter::Serialize(std::ofstream &serializationFile) const
+{
+	DoSerialization(serializationFile);
+}
