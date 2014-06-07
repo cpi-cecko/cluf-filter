@@ -28,21 +28,29 @@ int main()
 	testSuite.AddFunction(funcName.str(), 
 						  std::bind(Test_FilterChainCreation, TEST_FILE_NAME, TEST_FILE_NAME));
 
-	//std::string newFilterExpr = "labadidula'' ";
-	//funcName.str(std::string());
-	//funcName.clear();
-	//funcName << "Test_FilterChainAddFilter('" << newFilterExpr << "')";
-	//testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilter, newFilterExpr));
+	WordFilter *wordFilter = new WordFilter("labadidula");
+	int index = 0;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainAddFilter('" << wordFilter->GetFilterExpression() 
+			 << "', '" << index << "')";
+	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilter, wordFilter, index));
 
-	//std::vector<std::string> filterExpressions;
-	//filterExpressions.push_back("inform");
-	//filterExpressions.push_back("c''sii\'\"  ");
-	//filterExpressions.push_back("\0I'm SOO NULL\0"); // To add or not to add? Nah... Won't bother.
-	//filterExpressions.push_back("peshoo");
-	//funcName.str(std::string());
-	//funcName.clear();
-	//funcName << "Test_FilterChainAddFilters('" << VectorToString(filterExpressions) << "')";
-	//testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilters, filterExpressions));
+	WordFilter *wordFilterTwo = new WordFilter("");
+	index = 2;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainAddFilter('" << wordFilterTwo->GetFilterExpression() 
+			 << "', '" << index << "')";
+	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilter, wordFilterTwo, index));
+
+	WordFilter *wordFilterThree = new WordFilter("Is mail here?\0 No");
+	index = 5;
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainAddFilter('" << wordFilterThree->GetFilterExpression() 
+			 << "', '" << index << "')";
+	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilter, wordFilterThree, index));
 
 	//FilterChain newChain(TEST_FILE_NAME, TEST_FILE_NAME);
 	//FilterChain expectedChain(TEST_FILE_NAME, TEST_FILE_NAME);

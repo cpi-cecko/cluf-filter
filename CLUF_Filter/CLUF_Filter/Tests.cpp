@@ -13,36 +13,16 @@ bool Test_FilterChainCreation(const std::string &inputFile, const std::string &o
 	return testChain.inputFile.is_open() && testChain.outputFile.is_open();
 }
 
-//bool Test_FilterChainAddFilter(const std::string &filterExpression)
-//{
-//	FilterChain testChain(TEST_FILE_NAME, TEST_FILE_NAME);
-//	testChain.AddFilter(filterExpression);	
-//
-//	return testChain.GetFilters()[0].GetFilterExpression() == filterExpression;
-//}
-//bool Test_FilterChainAddFilters(const std::vector<std::string> &filterExpressions)
-//{
-//	FilterChain testChain(TEST_FILE_NAME, TEST_FILE_NAME);
-//	for (auto expr : filterExpressions)
-//	{
-//		testChain.AddFilter(expr);
-//	}
-//
-//	auto filters = testChain.GetFilters();
-//	if (filters.size() != filterExpressions.size())
-//	{
-//		return false;
-//	}
-//	for (size_t idx = 0; idx < filters.size(); ++idx)
-//	{
-//		if (filters[idx].GetFilterExpression() != filterExpressions[idx])
-//		{
-//			return false;
-//		}
-//	}
-//
-//	return true;
-//}
+bool Test_FilterChainAddFilter(Filter *filter, int filterID)
+{
+	FilterChain testChain(TEST_FILE_NAME, TEST_FILE_NAME);
+	testChain.AddFilter(filter, filterID);	
+
+	auto addedFilters = testChain.GetFilters();
+	auto foundFilter = addedFilters.find(filterID);
+
+	return foundFilter != addedFilters.end();
+}
 
 //bool Test_FilterChainRemoveFilter(FilterChain &chain, const std::string &filterExprToRemove,
 //								  const FilterChain &expectedChain)
