@@ -23,8 +23,7 @@ bool Test_FilterChainCreation(const std::string &inputFile, const std::string &o
 
 bool Test_FilterChainAddFilter(Filter *filter, int filterID);
 
-bool Test_FilterChainRemoveFilter(FilterChain &chain, int filterID, 
-								  const FilterChain &expectedChain);
+bool Test_FilterChainRemoveFilter(FilterChain *chain, int filterID);
 
 bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName);
 

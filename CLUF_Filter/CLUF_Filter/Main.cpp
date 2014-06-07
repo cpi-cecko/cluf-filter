@@ -52,16 +52,13 @@ int main()
 			 << "', '" << index << "')";
 	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainAddFilter, wordFilterThree, index));
 
-	//FilterChain newChain(TEST_FILE_NAME, TEST_FILE_NAME);
-	//FilterChain expectedChain(TEST_FILE_NAME, TEST_FILE_NAME);
-	//expectedChain.AddFilter("room for 'two'");
-	//std::string exprToRem = "saddden";
-	//funcName.str(std::string());
-	//funcName.clear();
-	//funcName << "Test_FilterChainRemoveFilter('" << VectorToString(newChain.GetFilters()) << "', '"  
-	//		 << exprToRem << "', '" << VectorToString(expectedChain.GetFilters()) << "')";
-	//testSuite.AddFunction(funcName.str(), 
-	//				      std::bind(Test_FilterChainRemoveFilter, newChain, exprToRem, expectedChain));
+	FilterChain *newChain = new FilterChain(TEST_FILE_NAME, TEST_FILE_NAME);
+	WordFilter *otherFilter = new WordFilter("block");
+	newChain->AddFilter(otherFilter, index);
+	funcName.str(std::string());
+	funcName.clear();
+	funcName << "Test_FilterChainRemoveFilter('some-chain', '" << index <<  "')";
+	testSuite.AddFunction(funcName.str(), std::bind(Test_FilterChainRemoveFilter, newChain, index));
 
 	//std::string fileName = "testSAD.txt";
 	//funcName.str(std::string());
@@ -89,6 +86,8 @@ int main()
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	testSuite.RunTests();
+
+	delete newChain;
 
 	return 0;
 }

@@ -18,18 +18,21 @@ bool Test_FilterChainAddFilter(Filter *filter, int filterID)
 	FilterChain testChain(TEST_FILE_NAME, TEST_FILE_NAME);
 	testChain.AddFilter(filter, filterID);	
 
-	auto addedFilters = testChain.GetFilters();
+	const auto &addedFilters = testChain.GetFilters();
 	auto foundFilter = addedFilters.find(filterID);
 
 	return foundFilter != addedFilters.end();
 }
 
-//bool Test_FilterChainRemoveFilter(FilterChain &chain, const std::string &filterExprToRemove,
-//								  const FilterChain &expectedChain)
-//{
-//	chain.RemoveFilter(filterExprToRemove);
-//	return chain == expectedChain;
-//}
+bool Test_FilterChainRemoveFilter(FilterChain *chain, int index)
+{
+	chain->RemoveFilter(index);
+
+	const auto &chainFilters = chain->GetFilters();
+	auto foundFilter = chainFilters.find(index);
+
+	return foundFilter == chainFilters.end();
+}
 
 bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName)
 {
