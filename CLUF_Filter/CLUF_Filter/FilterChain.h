@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <vector>
+#include <memory>
 
 #include "Filter.h"
 
@@ -13,7 +14,7 @@ private:
 	std::ofstream outputFile; /// @property outputFile - the file which we'll output the filtered text to
 	std::string inputFileName; /// @property inputFileName - the name of the inputFile
 	std::string outputFileName; /// @property outputFileName - the name of the outputFile
-	std::vector<Filter> filters; /// @property filters - an array of conequentially applied filters
+	std::vector<Filter*> filters; /// @property filters - an array of conequentially applied filters
 
 public:
 	///
@@ -29,7 +30,7 @@ public:
 	///
 	/// @brief Adds a filter to the filter chain.
 	///
-	void AddFilter(const std::string &filterExpression);
+	void AddFilter(Filter *newFilter);
 	/// 
 	/// @brief Removes a filter from the filter chain.
 	///
@@ -38,7 +39,7 @@ public:
 	///
 	/// @brief Returns the chain's filters
 	///
-	const std::vector<Filter>& GetFilters() const;
+	const std::vector<Filter*>& GetFilters() const;
 
 	///
 	/// @brief Serializes the FilterChain instance
@@ -64,44 +65,6 @@ public:
 	///
 	void OpenOutputFile(const std::string &newOutputFileName);
 
-public:
-#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
-	///
-	/// @brief Method to copy the containts of another FilterChain into this FilterChain
-	///
-	void CopyFrom(const FilterChain &other);
-#endif
-
-public:
-	///
-	/// @brief Compares two FilterChains based on their Filters
-	/// @return true if the Filters are equal
-	///
-	bool operator==(const FilterChain &other) const;
-	///
-	/// @brief Compares two FilterChains based on their Filters
-	/// @return true if the Filters are different
-	///
-	bool operator!=(const FilterChain &other) const;
-
-	///
-	/// @brief Adds a filter to filters
-	///
-	FilterChain& operator+=(const Filter &filterToAdd);
-	///
-	/// @brief Removes filters which contain `str' in them
-	///
-	FilterChain& operator-=(const char *str);
-
-	///
-	/// @brief Returns a filter at the given index
-	///
-	Filter operator[](int idx) const;
-	///
-	/// @brief Returns a filter which filters the given string
-	///
-	Filter operator[](const char *str) const;
-
 #ifndef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
 private:
 	/// Locked assignment operator and copy constructor to prevent dangerous initialization of
@@ -120,18 +83,8 @@ public:
 	friend bool Test_FilterChainCreation(const std::string&, const std::string&);
 	friend bool Test_FilterChainSerialization(const FilterChain &chain, const std::string &fileName);
 	friend bool Test_FilterChainProcessThroughFilters(FilterChain &chain, const std::string &expectedOutput);
-	friend bool Test_FilterChainFilterAdd(const Filter &filterToTest);
+	friend bool Test_FilterChainFilterAdd(const Filter *filterToTest);
 };
 
-#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
-///
-/// @brief Adds a Filter to the given FilterChain
-///
-FilterChain operator|(const FilterChain &chain, const Filter &filter);
-///
-/// @brief Concatenates the two given FilterChains. The new FilterChain has unique filters.
-///
-FilterChain operator+(const FilterChain &lhs, const FilterChain &rhs);
-#endif
 
 #endif

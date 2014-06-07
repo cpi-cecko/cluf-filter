@@ -76,10 +76,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CapitalizeFilter.h" />
+    <ClInclude Include="Codec.h" />
+    <ClInclude Include="Escaper.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="FilterChain.h" />
     <ClInclude Include="Tests.h" />
     <ClInclude Include="TestSuite.h" />
+    <ClInclude Include="WordFilter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Filter.cpp" />
@@ -87,6 +91,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Tests.cpp" />
     <ClCompile Include="TestSuite.cpp" />
+    <ClCompile Include="WordFilter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

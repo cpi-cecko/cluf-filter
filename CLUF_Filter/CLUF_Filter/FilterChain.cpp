@@ -13,30 +13,33 @@ FilterChain::~FilterChain()
 {
 	inputFile.close();
 	outputFile.close();
+
+	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	{
+		delete *filter;
+	}
+	filters.clear();
 }
 
-void FilterChain::AddFilter(const std::string &filterExpression)
+void FilterChain::AddFilter(Filter *newFilter)
 {
-	if (std::find(filters.begin(), filters.end(), filterExpression) == filters.end())
-	{
-		filters.push_back(Filter(filterExpression));
-	}
+	filters.push_back(newFilter);
 }
 void FilterChain::RemoveFilter(const std::string &filterExpression)
 {
-	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
-	{
-		if (filter->GetFilterExpression() == filterExpression)
-		{
-			filters.erase(filter);
-			return;
-		}
-	}
+	//for (auto filter = filters.begin(); filter != filters.end(); ++filter)
+	//{
+	//	if ((*filter)->GetFilterExpression() == filterExpression)
+	//	{
+	//		filters.erase(filter);
+	//		return;
+	//	}
+	//}
 
-	std::cerr << "Error: Filter with filter expression `" << filterExpression << "' not found\n";
+	//std::cerr << "Error: Filter with filter expression `" << filterExpression << "' not found\n";
 }
 
-const std::vector<Filter>& FilterChain::GetFilters() const
+const std::vector<Filter*>& FilterChain::GetFilters() const
 {
 	return filters;
 }
@@ -57,10 +60,12 @@ void FilterChain::Serialize(const std::string &fileName) const
 		serializationFile.write((char*)&filtersSize, sizeof(size_t));
 		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 		{
-			std::string filterExpression = filter->GetFilterExpression();
-			size_t filterExpressionLength = filterExpression.length();
-			serializationFile.write((char*)&filterExpressionLength, sizeof(size_t));
-			serializationFile.write(filterExpression.c_str(), filterExpressionLength * sizeof(char));
+			//(*filter)->Serialize(serializationFile);
+
+			//std::string filterExpression = (*filter)->GetFilterExpression();
+			//size_t filterExpressionLength = filterExpression.length();
+			//serializationFile.write((char*)&filterExpressionLength, sizeof(size_t));
+			//serializationFile.write(filterExpression.c_str(), filterExpressionLength * sizeof(char));
 		}
 	}
 	else
@@ -94,11 +99,13 @@ void FilterChain::Deserialize(const std::string &fileName)
 		serializationFile.read((char*)&filtersSize, sizeof(int));
 		for (int i = 0; i < filtersSize; i++)
 		{
-			size_t filterExpressionLength = 0;
-			serializationFile.read((char*)&filterExpressionLength, sizeof(size_t));
-			char filterExpression[100] = "";
-			serializationFile.read((char*)&filterExpression, filterExpressionLength * sizeof(char));
-			AddFilter(filterExpression);
+			//size_t filterExpressionLength = 0;
+			//serializationFile.read((char*)&filterExpressionLength, sizeof(size_t));
+			//char filterExpression[100] = "";
+			//serializationFile.read((char*)&filterExpression, filterExpressionLength * sizeof(char));
+			//AddFilter(filterExpression);
+
+			// Read filter type. Instantiate new filter. Filter->Deserialize(). Push back to vector.
 		}
 	}
 	else
@@ -119,7 +126,7 @@ void FilterChain::ProcessThroughFilters()
 
 		for (auto filter = filters.begin(); filter != filters.end(); ++filter)
 		{
-			filter->FilterText(filteredText);
+			(*filter)->FilterText(filteredText);
 		}
 
 		outputFile << filteredText;
@@ -142,7 +149,7 @@ void FilterChain::CopyFrom(const FilterChain &other)
 		outputFile.open(outputFileName);
 		for (auto filter = other.filters.begin(); filter != other.filters.end(); ++filter)
 		{
-			AddFilter(filter->GetFilterExpression());
+			AddFilter((*filter)->GetFilterExpression());
 		}
 	}
 }
@@ -157,89 +164,5 @@ FilterChain& FilterChain::operator=(const FilterChain &other)
 	CopyFrom(other);
 	
 	return *this;
-}
-#endif
-
-/////////////////
-//  Operators  //
-/////////////////
-
-bool FilterChain::operator==(const FilterChain &other) const
-{
-	if (filters.size() != other.filters.size())
-	{
-		return false;
-	}
-
-	for (size_t idx = 0; idx < filters.size(); ++idx)
-	{
-		if (filters[idx] != other.filters[idx])
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-bool FilterChain::operator!=(const FilterChain &other) const
-{
-	return !(*this == other);
-}
-
-FilterChain& FilterChain::operator+=(const Filter &filterToAdd)
-{
-	AddFilter(filterToAdd.GetFilterExpression());
-	return *this;
-}
-FilterChain& FilterChain::operator-=(const char *str)
-{
-	filters.erase(std::remove_if(std::begin(filters), std::end(filters),
-		[&str](const Filter &filter)
-		{
-			std::string text = str;
-			filter.FilterText(text);
-			return text != str;
-		}),
-		std::end(filters));
-
-	return *this;
-}
-
-Filter FilterChain::operator[](int idx) const
-{
-	return filters[idx];
-}
-Filter FilterChain::operator[](const char *str) const
-{
-	for (auto filter = filters.begin(); filter != filters.end(); ++filter)
-	{
-		std::string text = str;
-		filter->FilterText(text);
-		if (text != str)
-		{
-			return *filter;
-		}
-	}
-
-	return Filter("");
-}
-
-#ifdef BRUTAL_ELEPHANTS_ARE_COMING_TO_TOWN
-FilterChain operator|(const FilterChain &chain, const Filter &filter)
-{
-	FilterChain newFilterChain(chain);
-	newFilterChain.AddFilter(filter.GetFilterExpression());
-	return newFilterChain;
-}
-FilterChain operator+(const FilterChain &lhs, const FilterChain &rhs)
-{
-	FilterChain newFilterChain(lhs);
-	auto otherFilters = rhs.GetFilters();
-	for (auto filter = otherFilters.begin(); filter != otherFilters.end(); ++filter)
-	{
-		newFilterChain.AddFilter(filter->GetFilterExpression());
-	}
-
-	return newFilterChain;
 }
 #endif

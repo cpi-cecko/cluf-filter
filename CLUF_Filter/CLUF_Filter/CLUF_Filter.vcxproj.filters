@@ -27,6 +27,18 @@
     <ClInclude Include="TestSuite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WordFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Codec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Escaper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CapitalizeFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Filter.cpp">
@@ -42,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WordFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
