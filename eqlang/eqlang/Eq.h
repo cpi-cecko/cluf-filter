@@ -5,8 +5,8 @@
 
 struct Operator
 {
-	char token;   /// Operator token, such as 'a', 'b', '-', etc.
-	char symbol;  /// Operator symbol, such as '+', '-', '*', '/'
+	char token;   /// Operator token [a-zA-Z]
+	char symbol;  /// Operator symbol [+-/*]
 	int prio;     /// Operator priority
 	bool fixity;  /// Operator fixity - 1 right, 0 left
 
@@ -15,6 +15,7 @@ struct Operator
 	{
 	}
 };
+
 
 std::vector<Operator> ParseOperators(const char *opsFile);
 
@@ -31,11 +32,24 @@ public:
 	Eq();
 	Eq(const Operator &newOp, int newOperand);
 
-	void CreateContext(const std::vector<Operator> &ops);
-	void CreateEquation(const std::string &equation);
+	Eq(const Eq &other);
+	Eq& operator=(const Eq &other);
+	~Eq();
+
+	void ParseEquation(const std::vector<Operator> &ops, 
+					   // (x:y:rest)@equation -- so much funktionality ^_^
+					   const std::string &x, const std::string &y, const std::vector<std::string> &rest);
 	void EvalEq();
 	
 private:
 	void AddEqLeft(Eq *newLeft);
 	void AddEqRight(Eq *newRight);
+
+	void CopyFrom(const Eq &other);
+	void Destroy();
+
+	static bool TryGetOperand(const std::string &token, int &newOperand);
+	static bool TryGetOperator(const std::vector<Operator> &ops, const std::string &token, Operator &newOp);
+
+	static void CreateOperator(const std::vector<Operator> &ops, Operator &newOperator, char token);
 };
