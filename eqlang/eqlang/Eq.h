@@ -1,5 +1,5 @@
 #include <vector>
-#include <fstream>
+#include <stack>
 #include <string>
 
 
@@ -17,39 +17,20 @@ struct Operator
 };
 
 
-std::vector<Operator> ParseOperators(const char *opsFile);
-
-
-class Eq
+///
+/// @brief Solver of equations defined in an opearator context
+///		   Uses the Shunting Yard algorithm (https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
+///
+class EqSolver
 {
 private:
-	Eq *left;
-	Eq *right;
-	Operator op;
-	int operand;
+	std::vector<Operator> context; // Defines operators
+	std::stack<int> operands;
+	std::stack<Operator> operators;
 
 public:
-	Eq();
-	Eq(const Operator &newOp, int newOperand);
+	EqSolver();
 
-	Eq(const Eq &other);
-	Eq& operator=(const Eq &other);
-	~Eq();
-
-	void ParseEquation(const std::vector<Operator> &ops, 
-					   // (x:y:rest)@equation -- so much funktionality ^_^
-					   const std::string &x, const std::string &y, const std::vector<std::string> &rest);
-	void EvalEq();
-	
-private:
-	void AddEqLeft(Eq *newLeft);
-	void AddEqRight(Eq *newRight);
-
-	void CopyFrom(const Eq &other);
-	void Destroy();
-
-	static bool TryGetOperand(const std::string &token, int &newOperand);
-	static bool TryGetOperator(const std::vector<Operator> &ops, const std::string &token, Operator &newOp);
-
-	static void CreateOperator(const std::vector<Operator> &ops, Operator &newOperator, char token);
+	void Init(const std::string &contextFile);
+	int Solve(const std::string &equation);
 };

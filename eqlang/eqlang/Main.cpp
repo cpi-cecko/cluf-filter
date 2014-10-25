@@ -8,15 +8,11 @@ const char *OPS_FILE = "ops.eq";
 
 int main()
 {
-	std::vector<Operator> ops = ParseOperators(OPS_FILE);
-
-	Eq newEq;
+	EqSolver newEq;
+	newEq.Init(OPS_FILE);
 
 	std::string eq = "31 a 5 b 32 f 10 e -210 c 324 d 17";
-	std::vector<std::string> tokenizedEq = Utils::Tokenize(eq);
-	std::vector<std::string> rest(tokenizedEq.begin() + 2, tokenizedEq.end());
-	newEq.ParseEquation(ops, tokenizedEq[0], tokenizedEq[1], rest);
-	newEq.EvalEq();
+	std::cout << eq << " = " << newEq.Solve(eq) << '\n';
 
 	return 0;
 }

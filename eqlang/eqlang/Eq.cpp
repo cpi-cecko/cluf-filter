@@ -3,9 +3,10 @@
 
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 
-std::vector<Operator> ParseOperators(const char *opsFile)
+std::vector<Operator> ParseOperators(const std::string &opsFile)
 {
 	std::vector<Operator> result;
 
@@ -29,114 +30,21 @@ std::vector<Operator> ParseOperators(const char *opsFile)
 }
 
 
-Eq::Eq()
-	: op(), left(NULL), right(NULL)
-{
-}
-Eq::Eq(const Operator &newOp, int newOperand)
-	: op(newOp), operand(newOperand), left(NULL), right(NULL)
+EqSolver::EqSolver()
+	: context(0), operands(), operators()
 {
 }
 
-Eq::Eq(const Eq &other)
+void EqSolver::Init(const std::string &contextFileName)
 {
-	if (this != &other)
+	context = ParseOperators(contextFileName);
+}
+
+int EqSolver::Solve(const std::string &equation)
+{
+	for (auto op : context)
 	{
-		Destroy();
-		CopyFrom(other);
+		std::cout << op.token << " " << op.symbol << " " << op.fixity << " " << op.prio << '\n';
 	}
-}
-Eq& Eq::operator=(const Eq &other)
-{
-	if (this != &other)
-	{
-		Destroy();
-		CopyFrom(other);
-	}
-
-	return *this;
-}
-Eq::~Eq()
-{
-	Destroy();
-}
-
-
-void Eq::ParseEquation(const std::vector<Operator> &ops,
-					   const std::string &x, const std::string &y, const std::vector<std::string> &equation)
-{
-	if (TryGetOperand(x, operand) && TryGetOperator(ops, y, op))
-	{
-		// Eq *rightLeaf = new Eq();
-		// rightLeaf->ParseEquation(equation[0], equation[1]);
-		// AddEqRight(rightLeaf);
-	}
-	else
-	{
-		std::cerr << "Invalid token\n";
-		// TODO: Invaldate whole operation
-		return;
-	}
-}
-
-void Eq::EvalEq()
-{
-}
-	
-
-void Eq::AddEqLeft(Eq *newLeft)
-{
-}
-
-void Eq::AddEqRight(Eq *newRight)
-{
-}
-
-
-bool Eq::TryGetOperand(const std::string &token, int &newOperand)
-{
-	if (Utils::SafeLexicalCast<std::string, int>(token, newOperand))
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Eq::TryGetOperator(const std::vector<Operator> &ops, const std::string &token, Operator &newOperator)
-{
-	if (token.length() == 1 && 
-		('a' <= token[0] <= 'z' || 'A' <= token[0] <= 'Z'))
-	{
-		CreateOperator(ops, newOperator, token[0]);
-		return true;
-	}
-	return false;
-}
-
-void Eq::CreateOperator(const std::vector<Operator> &ops, Operator &newOperator, char token)
-{
-	for (auto opIt = ops.begin(); opIt != ops.end(); ++opIt)
-	{
-		if (opIt->token == token)
-		{
-			newOperator.token = token;
-			newOperator.symbol = opIt->symbol;
-			newOperator.fixity = opIt->fixity;
-			newOperator.prio = opIt->prio;
-		}
-	}
-}
-
-void Eq::CopyFrom(const Eq &other)
-{
-	this->left = other.left;
-	this->right = other.right;
-	this->op = other.op;
-	this->operand = other.operand;
-}
-
-void Eq::Destroy()
-{
-	delete left;
-	delete right;
+	return 0;
 }
