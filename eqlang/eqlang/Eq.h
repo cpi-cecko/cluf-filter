@@ -25,12 +25,16 @@ class EqSolver
 {
 private:
 	std::vector<Operator> context; // Defines operators
-	std::stack<int> operands;
+	std::stack<double> operands;
 	std::stack<Operator> operators;
 
 public:
 	EqSolver();
 
 	void Init(const std::string &contextFile);
-	int Solve(const std::string &equation);
+	double Solve(const std::string &equation);
+
+private:
+	bool TryParseOperand(const std::string &token, double &operand);
+	bool TryParseOperator(const std::string &token, Operator &op);
 };
