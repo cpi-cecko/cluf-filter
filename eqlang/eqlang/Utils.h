@@ -4,6 +4,8 @@
 
 namespace Utils
 {
+	// Tries to cast a value from Src to Dst
+	// Returns false on failure
 	template <class Src, class Dst>
 	bool SafeLexicalCast(const Src &from, Dst &result)
 	{
@@ -16,6 +18,4 @@ namespace Utils
 
 		return false;
 	}
-
-	std::vector<std::string> Tokenize(const std::string &eq);
 }

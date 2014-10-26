@@ -32,7 +32,7 @@ std::vector<Operator> ParseOperators(const std::string &opsFile)
 
 
 EqSolver::EqSolver()
-	: context(0), operands(), operators()
+	: context(0), operands(), operators(), isValid(true), error("")
 {
 }
 
@@ -63,42 +63,36 @@ double EqSolver::Solve(const std::string &equation)
 				{
 					while (lastOp.token != '(')
 					{
-						double left = operands.top();
-						operands.pop();
-						double right = operands.top();
-						operands.pop();
-
-						double res = PerformOperation(left, lastOp, right);
+						double res = PerformCurrentOperation(lastOp);
+						if ( ! isValid) return 0.0;
 						operands.push(res);
 
 						operators.pop();
-						lastOp = operators.top();
-
 						if (operators.empty())
 						{
-							std::cerr << "Mismatched brackets\n";
-							// TODO: Invalidate equation
+							error = "Mismatched brackets\n";
+							isValid = false;
 							return 0.0;
 						}
+
+						lastOp = operators.top();
 					}
 
 					assert(operators.top().token == '(');
 					operators.pop();
 				}
-
-				while ( ! operators.empty() && op.token != '(' &&
-						op.prio < lastOp.prio || (op.prio == lastOp.prio && op.fixity == 0))
+				else
 				{
-					lastOp = operators.top();
-					double leftOperand = operands.top();
-					operands.pop();
-					double rightOperand = operands.top();
-					operands.pop();
+					while ( ! operators.empty() && op.token != '(' && operators.top().token != '(' &&
+							(op.prio < lastOp.prio || (op.prio == lastOp.prio && op.fixity == 0)))
+					{
+						lastOp = operators.top();
+						double res = PerformCurrentOperation(lastOp);
+						if ( ! isValid) return 0.0;
+						operands.push(res);
 
-					double res = PerformOperation(leftOperand, lastOp, rightOperand);
-					operands.push(res);
-
-					operators.pop();
+						operators.pop();
+					}
 				}
 			}
 
@@ -109,42 +103,42 @@ double EqSolver::Solve(const std::string &equation)
 		}
 		else
 		{
-			std::cerr << "Invalid token '" << token << "'\n";
-			// TODO: Invalidate equation
+			error = "Invalid token '" + token + "'\n";
+			isValid = false;
 			return 0.0;
 		}
 	}
 
 	while ( ! operators.empty())
 	{
-		double left = operands.top();
-		operands.pop();
-		double right = operands.top();
-		operands.pop();
 		Operator currOp = operators.top();
+		if (currOp.token == '(')
+		{
+			error = "Mistmatched brackets\n";
+			isValid = false;
+			return 0.0;
+		}
 		operators.pop();
 
-		double res = PerformOperation(left, currOp, right);
+		double res = PerformCurrentOperation(currOp);
+		if ( ! isValid) return 0.0;
 		operands.push(res);
 	}
-
-	//std::cout << "Operands:\n";
-	//while ( ! operands.empty())
-	//{
-	//	std::cout << operands.top() << '\n';
-	//	operands.pop();
-	//}
-	//std::cout << "Operators:\n";
-	//while ( ! operators.empty())
-	//{
-	//	std::cout << operators.top().token << '\n';
-	//	operators.pop();
-	//}
 
 	return operands.top();
 }
 
-bool EqSolver::TryParseOperand(const std::string &token, double &operand)
+bool EqSolver::IsValid() const
+{
+	return isValid;
+}
+
+std::string EqSolver::GetError() const
+{
+	return error;
+}
+
+bool EqSolver::TryParseOperand(const std::string &token, double &operand) const
 {
 	if (Utils::SafeLexicalCast<std::string, double>(token, operand))
 	{
@@ -154,7 +148,7 @@ bool EqSolver::TryParseOperand(const std::string &token, double &operand)
 	return false;
 }
 
-bool EqSolver::TryParseOperator(const std::string &token, Operator &op)
+bool EqSolver::TryParseOperator(const std::string &token, Operator &op) const
 {
 	assert (token.size() == 1);
 
@@ -178,8 +172,13 @@ bool EqSolver::TryParseOperator(const std::string &token, Operator &op)
 	return false;
 }
 
-double EqSolver::PerformOperation(double left, Operator op, double right)
+double EqSolver::PerformCurrentOperation(Operator op)
 {
+	double right = operands.top();
+	operands.pop();
+	double left = operands.top();
+	operands.pop();
+
 	switch(op.symbol)
 	{
 	case '+':
@@ -191,13 +190,14 @@ double EqSolver::PerformOperation(double left, Operator op, double right)
 	case '/':
 		if (right == 0)
 		{
-			// TODO: Invalidate operation
+			error = "Division by zero\n";
+			isValid = false;
 			return 0.0;
 		}
 		return left / right;
 	default:
-		std::cerr << "Invalid operator\n";
-		// TOOD: Invalidate operation
+		error = "Invalid operator\n";
+		isValid = false;
 		return 0.0;
 	}
 }

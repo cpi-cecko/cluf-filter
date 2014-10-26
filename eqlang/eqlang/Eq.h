@@ -25,18 +25,24 @@ class EqSolver
 {
 private:
 	std::vector<Operator> context; // Defines operators
-	std::stack<double> operands;
-	std::stack<Operator> operators;
+	std::stack<double> operands; // Operand stack
+	std::stack<Operator> operators; // Operator stack
+
+	bool isValid; // Flag to to false if there was error while evaluating/parsing the expression
+	std::string error; // Error raised during evaluation
 
 public:
 	EqSolver();
 
-	void Init(const std::string &contextFile);
-	double Solve(const std::string &equation);
+	void Init(const std::string &contextFile); // Inits operator context
+	double Solve(const std::string &equation); // Solves equation based on context
+
+	bool IsValid() const;
+	std::string GetError() const;
 
 private:
-	bool TryParseOperand(const std::string &token, double &operand);
-	bool TryParseOperator(const std::string &token, Operator &op);
+	bool TryParseOperand(const std::string &token, double &operand) const; // Returns true if the token is an operand
+	bool TryParseOperator(const std::string &token, Operator &op) const; // Returns true if the token is an operator
 
-	double PerformOperation(double left, Operator op, double right);
+	double PerformCurrentOperation(Operator op); // Pops the last two operands and performs the given op on them
 };

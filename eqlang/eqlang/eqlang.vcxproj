@@ -78,7 +78,6 @@
   <ItemGroup>
     <ClCompile Include="Eq.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Eq.h" />
