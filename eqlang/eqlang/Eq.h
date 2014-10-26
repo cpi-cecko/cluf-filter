@@ -37,4 +37,6 @@ public:
 private:
 	bool TryParseOperand(const std::string &token, double &operand);
 	bool TryParseOperator(const std::string &token, Operator &op);
+
+	double PerformOperation(double left, Operator op, double right);
 };

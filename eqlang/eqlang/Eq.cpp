@@ -45,7 +45,6 @@ double EqSolver::Solve(const std::string &equation)
 {
 	std::istringstream eqStream(equation);
 	std::string token;
-	double result = 0.0;
 	while (std::getline(eqStream, token, ' '))
 	{
 		double operand = 0.0;
@@ -56,7 +55,57 @@ double EqSolver::Solve(const std::string &equation)
 		}
 		else if (TryParseOperator(token, op))
 		{
-			operators.push(op);
+			if ( ! operators.empty())
+			{
+				Operator lastOp = operators.top();
+				
+				if (op.token == ')')
+				{
+					while (lastOp.token != '(')
+					{
+						double left = operands.top();
+						operands.pop();
+						double right = operands.top();
+						operands.pop();
+
+						double res = PerformOperation(left, lastOp, right);
+						operands.push(res);
+
+						operators.pop();
+						lastOp = operators.top();
+
+						if (operators.empty())
+						{
+							std::cerr << "Mismatched brackets\n";
+							// TODO: Invalidate equation
+							return 0.0;
+						}
+					}
+
+					assert(operators.top().token == '(');
+					operators.pop();
+				}
+
+				while ( ! operators.empty() && op.token != '(' &&
+						op.prio < lastOp.prio || (op.prio == lastOp.prio && op.fixity == 0))
+				{
+					lastOp = operators.top();
+					double leftOperand = operands.top();
+					operands.pop();
+					double rightOperand = operands.top();
+					operands.pop();
+
+					double res = PerformOperation(leftOperand, lastOp, rightOperand);
+					operands.push(res);
+
+					operators.pop();
+				}
+			}
+
+			if (op.token != ')')
+			{
+				operators.push(op);
+			}
 		}
 		else
 		{
@@ -66,20 +115,33 @@ double EqSolver::Solve(const std::string &equation)
 		}
 	}
 
-	std::cout << "Operands:\n";
-	while ( ! operands.empty())
-	{
-		std::cout << operands.top() << '\n';
-		operands.pop();
-	}
-	std::cout << "Operators:\n";
 	while ( ! operators.empty())
 	{
-		std::cout << operators.top().token << '\n';
+		double left = operands.top();
+		operands.pop();
+		double right = operands.top();
+		operands.pop();
+		Operator currOp = operators.top();
 		operators.pop();
+
+		double res = PerformOperation(left, currOp, right);
+		operands.push(res);
 	}
 
-	return 0.0;
+	//std::cout << "Operands:\n";
+	//while ( ! operands.empty())
+	//{
+	//	std::cout << operands.top() << '\n';
+	//	operands.pop();
+	//}
+	//std::cout << "Operators:\n";
+	//while ( ! operators.empty())
+	//{
+	//	std::cout << operators.top().token << '\n';
+	//	operators.pop();
+	//}
+
+	return operands.top();
 }
 
 bool EqSolver::TryParseOperand(const std::string &token, double &operand)
@@ -114,4 +176,28 @@ bool EqSolver::TryParseOperator(const std::string &token, Operator &op)
 	}
 
 	return false;
+}
+
+double EqSolver::PerformOperation(double left, Operator op, double right)
+{
+	switch(op.symbol)
+	{
+	case '+':
+		return left + right;
+	case '-':
+		return left - right;
+	case '*':
+		return left * right;
+	case '/':
+		if (right == 0)
+		{
+			// TODO: Invalidate operation
+			return 0.0;
+		}
+		return left / right;
+	default:
+		std::cerr << "Invalid operator\n";
+		// TOOD: Invalidate operation
+		return 0.0;
+	}
 }
