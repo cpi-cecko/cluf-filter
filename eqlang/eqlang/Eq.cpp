@@ -6,6 +6,9 @@
 #include <fstream>
 #include <assert.h>
 
+const char LEFT_BRACKET = '(';
+const char RIGHT_BRACKET = ')';
+
 
 std::vector<Operator> ParseOperators(const std::string &opsFile)
 {
@@ -39,10 +42,22 @@ EqSolver::EqSolver()
 void EqSolver::Init(const std::string &contextFileName)
 {
 	context = ParseOperators(contextFileName);
+	if (context.empty())
+	{
+		isValid = false;
+		error = "Context not initialized\n";
+	}
 }
 
 double EqSolver::Solve(const std::string &equation)
 {
+	if (equation.empty())
+	{
+		isValid = false;
+		error = "Empty equation";
+		return 0.0;
+	}
+
 	std::istringstream eqStream(equation);
 	std::string token;
 	while (std::getline(eqStream, token, ' '))
@@ -59,9 +74,9 @@ double EqSolver::Solve(const std::string &equation)
 			{
 				Operator lastOp = operators.top();
 				
-				if (op.token == ')')
+				if (op.token == RIGHT_BRACKET)
 				{
-					while (lastOp.token != '(')
+					while (lastOp.token != LEFT_BRACKET)
 					{
 						double res = PerformCurrentOperation(lastOp);
 						if ( ! isValid) return 0.0;
@@ -78,12 +93,12 @@ double EqSolver::Solve(const std::string &equation)
 						lastOp = operators.top();
 					}
 
-					assert(operators.top().token == '(');
+					assert(operators.top().token == LEFT_BRACKET);
 					operators.pop();
 				}
 				else
 				{
-					while ( ! operators.empty() && op.token != '(' && operators.top().token != '(' &&
+					while ( ! operators.empty() && op.token != LEFT_BRACKET && operators.top().token != LEFT_BRACKET &&
 							(op.prio < lastOp.prio || (op.prio == lastOp.prio && op.fixity == 0)))
 					{
 						lastOp = operators.top();
@@ -96,7 +111,7 @@ double EqSolver::Solve(const std::string &equation)
 				}
 			}
 
-			if (op.token != ')')
+			if (op.token != RIGHT_BRACKET)
 			{
 				operators.push(op);
 			}
@@ -112,7 +127,7 @@ double EqSolver::Solve(const std::string &equation)
 	while ( ! operators.empty())
 	{
 		Operator currOp = operators.top();
-		if (currOp.token == '(')
+		if (currOp.token == RIGHT_BRACKET)
 		{
 			error = "Mistmatched brackets\n";
 			isValid = false;
@@ -162,7 +177,7 @@ bool EqSolver::TryParseOperator(const std::string &token, Operator &op) const
 			op.fixity = opIt->fixity;
 			return true;
 		}
-		else if (token[0] == '(' || token[0] == ')')
+		else if (token[0] == LEFT_BRACKET || token[0] == RIGHT_BRACKET)
 		{
 			op.token = token[0];
 			return true;
@@ -174,8 +189,20 @@ bool EqSolver::TryParseOperator(const std::string &token, Operator &op) const
 
 double EqSolver::PerformCurrentOperation(Operator op)
 {
+	if (operands.empty())
+	{
+		error = "Missing operand; check equation\n";
+		isValid = false;
+		return 0.0;
+	}
 	double right = operands.top();
 	operands.pop();
+	if (operands.empty())
+	{
+		error = "Missing operand; check equation\n";
+		isValid = false;
+		return 0.0;
+	}
 	double left = operands.top();
 	operands.pop();
 

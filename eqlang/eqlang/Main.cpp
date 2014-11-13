@@ -3,15 +3,24 @@
 #include "Eq.h"
 #include "Utils.h"
 
-const char *OPS_FILE = "ops.eq";
 
-
-int main()
+int main(int argc, char **argv)
 {
-	EqSolver newEq;
-	newEq.Init(OPS_FILE);
+	if (argc != 3)
+	{
+		std::cout << "Usage: eqlang <context_file> <equation>\n";
+		return 0;
+	}
 
-	std::string eq = "31 a 5 ( b 32 f 10 e -230 ) c 324 d 17";
+	EqSolver newEq;
+	newEq.Init(argv[1]);
+	if ( ! newEq.IsValid())
+	{
+		std::cout << newEq.GetError();
+		return 0;
+	}
+
+	std::string eq = argv[2];
 	double result = newEq.Solve(eq);
 	
 	if (newEq.IsValid())
