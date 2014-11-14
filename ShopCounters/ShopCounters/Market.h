@@ -88,7 +88,10 @@ private:
 
 	void AddClientsToCashDesk(int cashDeskIndex, ClientState *clients, int howMany);
 
+	void ShuffleClientsToQueues(ClientState *clients, int howMany);
+
 	static void AddClientsToQueue(Queue &queue, ClientState *clients, int howMany);
+	static ClientState* RetrieveLastNClientsFromQueue(Queue *queue, int howMany);
 };
 
 

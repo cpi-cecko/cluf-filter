@@ -60,12 +60,58 @@ void Market::AddClients(Client *clients, int number)
 	// Manipulate clients *evil grin*
 	for (size_t idx = 0; idx < number; ++idx)
 	{
-		if (clients[idx].numberOfGoods <= 3 && 
+		if (clients[idx].numberOfGoods == 0)
+		{
+			continue;
+		}
+		else if (clients[idx].numberOfGoods <= 3 && 
 			marketState.numberOfClientsAtExpressCashDesk < maxClientsPerQueue * 2)
 		{
 			++marketState.numberOfClientsAtExpressCashDesk;
 			ClientState newClientState(cashDesks.size(), cashDesks.back().size() + 1, clients[idx]);
 			cashDesks.back().push_back(newClientState);
+		}
+		else
+		{
+			size_t queueIdx = 0;
+			for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue, ++queueIdx)
+			{
+				size_t queueSize = queue->size();
+				if (queueSize + 1 > maxClientsPerQueue)
+				{
+					ClientState *halfClients = RetrieveLastNClientsFromQueue(&*queue, queueSize / 2);
+					assert (halfClients);
+					ShuffleClientsToQueues(halfClients, queueSize / 2);
+					delete [] halfClients;
+				}
+				else if (queueSize + 1 < maxClientsPerQueue / 10)
+				{
+					CloseCashDesk(queueIdx); // TODO: Could break the precioussss iterators
+				}
+				else // magnificent code follows!
+				{
+					// Yo dawg, I heard you like iterating, so I put and iterator loop inside your iterator loop
+					// so you can iterate while iterating.
+					size_t queueIdx2 = 0;
+					for (QueueList::iterator queue2 = cashDesks.begin(); queue2 != cashDesks.end(); ++queue2)
+					{
+						if (queueIdx != queueIdx2 && 
+							queue->size() - queue2->size() > maxClientsPerQueue / 8)
+						{
+							int diff = queue->size() - queue2->size();
+							Queue *queueToHalve = diff > 0 ? &*queue : &*queue2;
+							ClientState *halfClients = 
+								RetrieveLastNClientsFromQueue(queueToHalve, queueToHalve->size() / 2);
+							assert (halfClients);
+							ShuffleClientsToQueues(halfClients, queueToHalve->size() / 2);
+							delete [] halfClients;
+						}
+					}
+				}
+
+				ClientState newClientState(queueIdx, queueSize, clients[idx]);
+				queue->push_back(newClientState);
+			}
 		}
 
 		++currentClientID;
@@ -199,6 +245,17 @@ ClientState* Market::RetrieveLastNClientsAt(int cashDeskIndex, int howMany)
 	return NULL;
 }
 
+ClientState* Market::RetrieveLastNClientsFromQueue(Queue *queue, int howMany)
+{
+	ClientState *retrieved = new ClientState[howMany];
+	for (size_t idx = 0; idx < howMany; ++idx)
+	{
+		retrieved[idx] = queue->back();
+		queue->pop_back();
+	}
+	return retrieved;
+}
+
 void Market::AddClientsToCashDesk(int cashDeskIndex, ClientState *clients, int howMany)
 {
 	size_t queueIdx = 0;
@@ -212,6 +269,25 @@ void Market::AddClientsToCashDesk(int cashDeskIndex, ClientState *clients, int h
 				queue->push_back(clients[clIdx]);
 			}
 			return;
+		}
+	}
+}
+
+void Market::ShuffleClientsToQueues(ClientState *clients, int howMany)
+{
+	for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue)
+	{
+		if (queue->size() + howMany <= maxClientsPerQueue)
+		{
+			AddClientsToQueue(*queue, clients, howMany);
+			return;
+		}
+		else
+		{
+			int toAddCount = maxClientsPerQueue - queue->size();
+			AddClientsToQueue(*queue, clients, toAddCount);
+			howMany = howMany - toAddCount;
+			clients = &clients[toAddCount];
 		}
 	}
 }
