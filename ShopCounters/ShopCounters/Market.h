@@ -74,7 +74,7 @@ private:
 	// Rearranges clients starting from the queue with the **least** index and moving on.
 	void CloseCashDesk(int cashDeskIndex);
 	void MoveClients(int cashDeskFrom, int cashDeskTo, int howMany);
-	void OpenCashDesk(int cashDeskIndex, Client *clientsToMove, int clientsCount);
+	void OpenCashDesk(int cashDeskIndex, ClientState *clientsToMove, int clientsCount);
 
 	// Returns a **copy** of the clients at the given cash desk
 	// The **calee** owns the array
@@ -83,6 +83,10 @@ private:
 	// Removes a specified number of clients from the cash desk and puts them into an array.
 	// asserts if the howMany is bigger than the queue's size.
 	ClientState* RetrieveLastNClientsAt(int cashDeskIndex, int howMany);
+
+	void AddClientsToCashDesk(int cashDeskIndex, ClientState *clients, int howMany);
+
+	static void AddClientsToQueue(Queue &queue, ClientState *clients, int howMany);
 };
 
 

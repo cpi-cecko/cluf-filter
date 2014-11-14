@@ -115,11 +115,35 @@ void Market::CloseCashDesk(int cashDeskIndex)
 
 	delete [] clientsAtCashDesk;
 
-	marketState.numberOfClientsAtCashDesks[cashDeskIndex] = 0;
+	marketState.numberOfClientsAtCashDesks[cashDeskIndex] = -1;
 }
 
 void Market::MoveClients(int cashDeskFrom, int cashDeskTo, int howMany)
 {
+	ClientState *clientsToMove = new ClientState[howMany];
+	clientsToMove = RetrieveLastNClientsAt(cashDeskFrom, howMany);
+	assert (clientsToMove);
+
+	AddClientsToCashDesk(cashDeskTo, clientsToMove, howMany);
+
+	delete [] clientsToMove;
+}
+
+void Market::OpenCashDesk(int cashDeskIndex, ClientState *clientsToMove, int clientsCount)
+{
+	assert (marketState.numberOfClientsAtCashDesks[cashDeskIndex] == -1); // will crash; add check
+	assert (clientsCount < maxClientsPerQueue);
+	
+	marketState.numberOfClientsAtCashDesks[cashDeskIndex] = clientsCount;
+
+	if (clientState.size() < cashDeskIndex)
+	{
+		Queue newQueue;
+		AddClientsToQueue(newQueue, clientsToMove, clientsCount);
+		return;
+	}
+
+	AddClientsToCashDesk(cashDeskIndex, clientsToMove, clientsCount);
 }
 
 ClientState* Market::GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount) const
@@ -161,6 +185,31 @@ ClientState* Market::RetrieveLastNClientsAt(int cashDeskIndex, int howMany)
 	}
 
 	return NULL;
+}
+
+void Market::AddClientsToCashDesk(int cashDeskIndex, ClientState *clients, int howMany)
+{
+	size_t queueIdx = 0;
+	for (QueueList::iterator queue = clientState.begin(); queue != clientState.end(); ++queue, ++queueIdx)
+	{
+		if (queueIdx == cashDeskIndex)
+		{
+			assert (howMany + queue->size() < maxClientsPerQueue);
+			for (size_t clIdx = 0; clIdx < howMany; ++clIdx)
+			{
+				queue->push_back(clients[clIdx]);
+			}
+			return;
+		}
+	}
+}
+
+void Market::AddClientsToQueue(Queue &queue, ClientState *clients, int howMany)
+{
+	for (size_t clIdx = 0; clIdx < howMany; ++clIdx)
+	{
+		queue.push_back(clients[clIdx]);
+	}
 }
 
 
