@@ -12,13 +12,14 @@ struct Client
 	int numberOfGoods;
 	bool hasCreditCard;
 
-	Client(int newID, int newNumberOfGoods, bool newHasCreditCard);
+	Client();
+	Client(int newNumberOfGoods, bool newHasCreditCard);
 };
 
 struct ClientState
 {
-	int cashDeskPosition;
-	int queuePosition;
+	int cashDeskPosition; // cash desk index
+	int queuePosition; // position in queue
 	Client *client;
 
 	ClientState();
@@ -34,11 +35,11 @@ private:
 
 struct MarketState
 {
-	int numberOfCashDesks;
-	int *numberOfClientsAtCashDesks;
+	int numberOfCashDesks; // number of currently opened ordinary cash desks
+	int *numberOfClientsAtCashDesks; // number of clients at each cash desk
 	int numberOfClientsAtExpressCashDesk;
 
-	MarketState(int newNumberOfCashDesks);
+	MarketState(int allCashDesksCount);
 	MarketState(const MarketState &other);
 	MarketState& operator=(const MarketState &other);
 	~MarketState();
@@ -56,12 +57,28 @@ private:
 	QueueList clientState;
 	MarketState marketState;
 
+	int numberOfAllCashDesks;
+	int maxClientsPerQueue;
+
 public:
-	Market(int newNumberOfAllCashDesks);
+	Market(int newNumberOfAllCashDesks, int newMaxClientsPerQueue);
 	void AddClients(Client *clients, int number);
 	
 	MarketState GetMarketState() const;
 	ClientState GetClientState(int clientID);
+
+private:
+	void AdvanceAllWithOneTick(Queue *clientQueue);
+
+	// Deallocates cash desk queue
+	// Rearranges clients starting from the queue with the **least** index and moving on.
+	void CloseCashDesk(int cashDeskIndex);
+	void MoveClients(int cashDeskFrom, int cashDeskTo, int howMuch);
+	void OpenCashDesk(int cashDeskIndex, Client *clientsToMove, int clientsCount);
+
+	// Returns a **copy** of the clients at the given cash desk
+	// The **calee** owns the array
+	ClientState* GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount);
 };
 
 
