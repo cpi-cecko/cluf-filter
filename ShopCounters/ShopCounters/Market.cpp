@@ -151,7 +151,12 @@ ClientState* Market::RetrieveLastNClientsAt(int cashDeskIndex, int howMany)
 			assert (howMany < queue->size());
 
 			ClientState *queueClients = new ClientState[queue->size()];
-
+			for (size_t clIdx = 0; clIdx < howMany; ++clIdx)
+			{
+				queueClients[clIdx] = queue->back(); 
+				queue->pop_back();
+			}
+			return queueClients;
 		}
 	}
 
