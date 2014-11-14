@@ -14,23 +14,18 @@ MarketState Market::GetMarketState() const
 	return marketState;
 }
 
-ClientState Market::GetClientState(int clientID)
+ClientState Market::GetClientState(int clientID) const
 {
 	ClientState resultClientState;
-	for (QueueList::iterator queue = clientState.begin(); queue != clientState.end(); ++queue)
+	for (QueueList::const_iterator queue = clientState.begin(); queue != clientState.end(); ++queue)
 	{
-		Queue tempQueue;
-		while ( ! queue->empty())
+		for (Queue::const_iterator queueItem = queue->begin(); queueItem != queue->end(); ++queueItem)
 		{
-			ClientState currentClient = queue->front();
-			tempQueue.push(currentClient);
-			queue->pop();
-			if (currentClient.client->id == clientID)
+			if (queueItem->client->id == clientID)
 			{
-				resultClientState = currentClient;
+				return *queueItem;
 			}
 		}
-		(*queue) = tempQueue;
 	}
 	return resultClientState;
 }
@@ -48,7 +43,7 @@ void Market::AddClients(Client *clients, int number)
 		{
 			if (queue->front().client->hasCreditCard)
 			{
-				queue->pop();
+				queue->pop_front();
 			}
 			else
 			{
@@ -70,14 +65,10 @@ void Market::AdvanceAllWithOneTick(Queue *clientQueue)
 	assert (clientQueue);
 
 	// Hack for emulating ticks
-	Queue tempQueue;
-	while ( ! clientQueue->empty())
+	for (Queue::iterator queueItem = clientQueue->begin(); queueItem != clientQueue->end(); ++queueItem)
 	{
-		clientQueue->front().client->hasCreditCard = true;
-		tempQueue.push(clientQueue->front());
-		clientQueue->pop();
+		queueItem->client->hasCreditCard = true;
 	}
-	*clientQueue = tempQueue;
 }
 
 void Market::CloseCashDesk(int cashDeskIndex)
@@ -86,6 +77,7 @@ void Market::CloseCashDesk(int cashDeskIndex)
 	size_t clientsCount = 0;
 	ClientState *clientsAtCashDesk = GetClientsAtCashDesk(cashDeskIndex, clientsCount);
 	assert (clientsAtCashDesk);
+
 	size_t queueIdx = 0;
 	for (QueueList::iterator queue = clientState.begin();
 	     queue != clientState.end() && clientsCount > 0;
@@ -112,36 +104,54 @@ void Market::CloseCashDesk(int cashDeskIndex)
 			{
 				clientsAtCashDesk[clIdx].cashDeskPosition = queueIdx;
 				clientsAtCashDesk[clIdx].queuePosition = queue->size();
-				queue->push(clientsAtCashDesk[clIdx]);
+				queue->push_back(clientsAtCashDesk[clIdx]);
 			}
+		}
+		else
+		{
+			queue->clear();
 		}
 	}
 
 	delete [] clientsAtCashDesk;
 
-	// TODO: Destroy clients at closed cash desk
+	marketState.numberOfClientsAtCashDesks[cashDeskIndex] = 0;
 }
 
-ClientState* Market::GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount)
+void Market::MoveClients(int cashDeskFrom, int cashDeskTo, int howMany)
+{
+}
+
+ClientState* Market::GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount) const
+{
+	size_t queueIdx = 0;
+	for (QueueList::const_iterator queue = clientState.begin(); queue != clientState.end(); ++queue, ++queueIdx)
+	{
+		if (queueIdx == cashDeskIndex)
+		{
+			ClientState *queueClients = new ClientState[queue->size()];
+			for (Queue::const_iterator queueItem = queue->begin(); queueItem != queue->end(); ++queueItem)
+			{
+				queueClients[queueIdx] = *queueItem;
+			}
+			return queueClients;
+		}
+	}
+
+	return NULL;
+}
+
+ClientState* Market::RetrieveLastNClientsAt(int cashDeskIndex, int howMany)
 {
 	size_t queueIdx = 0;
 	for (QueueList::iterator queue = clientState.begin(); queue != clientState.end(); ++queue, ++queueIdx)
 	{
 		if (queueIdx == cashDeskIndex)
 		{
-			ClientState *queueClients = new ClientState[queue->size()];
-			Queue tempQueue;
-			size_t clIdx = 0;
-			while ( ! queue->empty())
-			{
-				queueClients[clIdx] = queue->front();
-				tempQueue.push(queue->front());
-				queue->pop();
-				++clIdx;
-			}
+			assert (howMany < queue->size());
 
-			*queue = tempQueue;
-			return queueClients;
+			ClientState *queueClients = new ClientState[queue->size()];
+
 		}
 	}
 

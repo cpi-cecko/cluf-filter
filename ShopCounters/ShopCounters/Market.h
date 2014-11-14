@@ -3,7 +3,7 @@
 
 
 #include <list> // TODO: Use custom impl
-#include <queue>
+#include <deque>
 
 
 struct Client
@@ -52,7 +52,7 @@ private:
 class Market
 {
 private:
-	typedef std::queue<ClientState> Queue;
+	typedef std::deque<ClientState> Queue;
 	typedef std::list<Queue> QueueList;
 	QueueList clientState;
 	MarketState marketState;
@@ -65,7 +65,7 @@ public:
 	void AddClients(Client *clients, int number);
 	
 	MarketState GetMarketState() const;
-	ClientState GetClientState(int clientID);
+	ClientState GetClientState(int clientID) const;
 
 private:
 	void AdvanceAllWithOneTick(Queue *clientQueue);
@@ -73,12 +73,16 @@ private:
 	// Deallocates cash desk queue
 	// Rearranges clients starting from the queue with the **least** index and moving on.
 	void CloseCashDesk(int cashDeskIndex);
-	void MoveClients(int cashDeskFrom, int cashDeskTo, int howMuch);
+	void MoveClients(int cashDeskFrom, int cashDeskTo, int howMany);
 	void OpenCashDesk(int cashDeskIndex, Client *clientsToMove, int clientsCount);
 
 	// Returns a **copy** of the clients at the given cash desk
 	// The **calee** owns the array
-	ClientState* GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount);
+	ClientState* GetClientsAtCashDesk(int cashDeskIndex, size_t &clientsCount) const;
+
+	// Removes a specified number of clients from the cash desk and puts them into an array.
+	// asserts if the howMany is bigger than the queue's size.
+	ClientState* RetrieveLastNClientsAt(int cashDeskIndex, int howMany);
 };
 
 
