@@ -54,11 +54,13 @@ class Market
 private:
 	typedef std::deque<ClientState> Queue;
 	typedef std::list<Queue> QueueList;
-	QueueList clientState;
+	QueueList cashDesks;
 	MarketState marketState;
 
 	int numberOfAllCashDesks;
 	int maxClientsPerQueue;
+
+	static int currentClientID;
 
 public:
 	Market(int newNumberOfAllCashDesks, int newMaxClientsPerQueue);
