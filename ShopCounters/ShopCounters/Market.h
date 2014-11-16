@@ -14,6 +14,7 @@ struct Client
 
 	Client();
 	Client(int newNumberOfGoods, bool newHasCreditCard);
+	Client(int newID, int newNumberOfGoods, bool newHasCreditCard);
 };
 
 struct ClientState
@@ -38,7 +39,7 @@ private:
 struct MarketState
 {
 	int numberOfCashDesks; // number of currently opened ordinary cash desks
-	int *numberOfClientsAtCashDesks; // number of clients at each cash desk
+	int *numberOfClientsAtCashDesks; // number of clients at each ordinary cash desk
 	int numberOfClientsAtExpressCashDesk;
 
 	MarketState(int allCashDesksCount);
@@ -90,7 +91,7 @@ private:
 
 	void AddClientsToCashDesk(size_t cashDeskIndex, ClientState *clients, size_t howMany);
 
-	void ShuffleClientsToQueues(ClientState *clients, size_t howMany);
+	void ShuffleClientsToQueues(ClientState *clients, size_t howMany, size_t fromQueueIdx);
 
 	static void AddClientsToQueue(Queue &queue, ClientState *clients, size_t howMany);
 	static ClientState* RetrieveLastNClientsFromQueue(Queue &queue, size_t howMany);

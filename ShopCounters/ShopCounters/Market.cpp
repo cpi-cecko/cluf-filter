@@ -8,9 +8,9 @@ int Market::currentClientID = 0;
 
 Market::Market(int newNumberOfAllCashDesks, size_t newMaxClientsPerQueue)
 	: numberOfAllCashDesks(newNumberOfAllCashDesks), maxClientsPerQueue(newMaxClientsPerQueue), 
-	  marketState(numberOfAllCashDesks)
+	  marketState(newNumberOfAllCashDesks-1) // exclude the express cash desk
 {
-	cashDesks.resize(numberOfAllCashDesks);
+	cashDesks.resize(newNumberOfAllCashDesks);
 }
 
 MarketState Market::GetMarketState() const
@@ -41,13 +41,17 @@ void Market::AddClients(Client *clients, int number)
 	assert (number > 0 && clients);
 
 	// Cleans up old clients
-	for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue)
+	size_t queueIdx = 0;
+	for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end();
+		 ++queue, ++queueIdx)
 	{
 		while ( ! queue->empty())
 		{
-			if (queue->front().client->hasCreditCard || queue->front().currentTick > 1)
+			if (queue->front().client->hasCreditCard || queue->front().currentTick >= 1)
 			{
 				queue->pop_front();
+				queueIdx == 0 ? --marketState.numberOfClientsAtExpressCashDesk : 
+								--marketState.numberOfClientsAtCashDesks[queueIdx-1];
 			}
 			else
 			{
@@ -60,28 +64,35 @@ void Market::AddClients(Client *clients, int number)
 	// Manipulate clients *evil grin*
 	for (size_t idx = 0; idx < number; ++idx)
 	{
+		clients[idx].id = currentClientID;
+
 		if (clients[idx].numberOfGoods == 0)
 		{
 			continue;
 		}
 		else if (clients[idx].numberOfGoods <= 3 && 
-			marketState.numberOfClientsAtExpressCashDesk < maxClientsPerQueue * 2)
+				 marketState.numberOfClientsAtExpressCashDesk < maxClientsPerQueue * 2)
 		{
 			++marketState.numberOfClientsAtExpressCashDesk;
-			ClientState newClientState(cashDesks.size(), cashDesks.back().size() + 1, clients[idx]);
-			cashDesks.back().push_back(newClientState);
+			ClientState newClientState(0, cashDesks.front().size(), clients[idx]);
+			cashDesks.front().push_back(newClientState);
 		}
 		else
 		{
 			size_t queueIdx = 0;
-			for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue, ++queueIdx)
+			for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end();
+				 ++queue, ++queueIdx)
 			{
+				if (queueIdx == 0 || // Skip express cash desk
+					queueIdx > marketState.numberOfCashDesks) continue; // Skip closed cash desks
+
 				size_t queueSize = queue->size();
 				if (queueSize + 1 > maxClientsPerQueue)
 				{
-					ClientState *halfClients = RetrieveLastNClientsFromQueue(*queue, queueSize / 2);
+					size_t howMany = queueSize / 2;
+					ClientState *halfClients = RetrieveLastNClientsFromQueue(*queue, howMany);
 					assert (halfClients);
-					ShuffleClientsToQueues(halfClients, queueSize / 2);
+					ShuffleClientsToQueues(halfClients, howMany, queueIdx);
 					delete [] halfClients;
 				}
 				else if (queueSize + 1 < maxClientsPerQueue / 10)
@@ -93,17 +104,21 @@ void Market::AddClients(Client *clients, int number)
 					// Yo dawg, I heard you like iterating, so I put and iterator loop inside your iterator loop
 					// so you can iterate while iterating.
 					size_t queueIdx2 = 0;
-					for (QueueList::iterator queue2 = cashDesks.begin(); queue2 != cashDesks.end(); ++queue2)
+					for (QueueList::iterator queue2 = cashDesks.begin(); queue2 != cashDesks.end();
+						 ++queue2, ++queueIdx2)
 					{
+						if (queueIdx2 == 0 || // Skip express cash desk
+							queueIdx2 > marketState.numberOfCashDesks) continue; // Skip closed cash desks
+
 						if (queueIdx != queueIdx2 && 
 							queue->size() - queue2->size() > maxClientsPerQueue / 8)
 						{
 							int diff = queue->size() - queue2->size();
 							Queue *queueToHalve = diff > 0 ? &*queue : &*queue2;
-							ClientState *halfClients = 
-								RetrieveLastNClientsFromQueue(*queueToHalve, queueToHalve->size() / 2);
+							size_t howMany = queueToHalve->size() / 2;
+							ClientState *halfClients = RetrieveLastNClientsFromQueue(*queueToHalve, howMany);
 							assert (halfClients);
-							ShuffleClientsToQueues(halfClients, queueToHalve->size() / 2);
+							ShuffleClientsToQueues(halfClients, howMany, queueIdx);
 							delete [] halfClients;
 						}
 					}
@@ -111,6 +126,7 @@ void Market::AddClients(Client *clients, int number)
 
 				ClientState newClientState(queueIdx, queueSize, clients[idx]);
 				queue->push_back(newClientState);
+				++marketState.numberOfClientsAtCashDesks[queueIdx - 1]; // The zeroeth queue is express
 			}
 		}
 
@@ -187,19 +203,14 @@ void Market::MoveClients(size_t cashDeskFrom, size_t cashDeskTo, size_t howMany)
 	delete [] clientsToMove;
 }
 
+#include <iostream>
 void Market::OpenCashDesk(size_t cashDeskIndex, ClientState *clientsToMove, size_t clientsCount)
 {
-	assert (marketState.numberOfClientsAtCashDesks[cashDeskIndex] == -1); // will crash; add check
+	assert (marketState.numberOfClientsAtCashDesks[cashDeskIndex-1] == 0); // will crash; add check
 	assert (clientsCount < maxClientsPerQueue);
 	
-	marketState.numberOfClientsAtCashDesks[cashDeskIndex] = clientsCount;
-
-	if (cashDesks.size() < cashDeskIndex)
-	{
-		Queue newQueue;
-		AddClientsToQueue(newQueue, clientsToMove, clientsCount);
-		return;
-	}
+	++marketState.numberOfCashDesks;
+	marketState.numberOfClientsAtCashDesks[cashDeskIndex-1] = clientsCount;
 
 	AddClientsToCashDesk(cashDeskIndex, clientsToMove, clientsCount);
 }
@@ -273,19 +284,36 @@ void Market::AddClientsToCashDesk(size_t cashDeskIndex, ClientState *clients, si
 	}
 }
 
-void Market::ShuffleClientsToQueues(ClientState *clients, size_t howMany)
+void Market::ShuffleClientsToQueues(ClientState *clients, size_t howMany, size_t fromQueueIdx)
 {
-	for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue)
+	size_t queueIdx = 0;
+	for (QueueList::iterator queue = cashDesks.begin(); queue != cashDesks.end(); ++queue, ++queueIdx)
 	{
+		if (queueIdx == 0 || // Skip the express cash desk
+			queueIdx == fromQueueIdx) continue; // Skip queue from which we got clients
+
 		if (queue->size() + howMany <= maxClientsPerQueue)
 		{
-			AddClientsToQueue(*queue, clients, howMany);
+			if (queueIdx > marketState.numberOfCashDesks)
+			{
+				OpenCashDesk(queueIdx, clients, howMany);
+			}
+			else
+			{
+				AddClientsToQueue(*queue, clients, howMany);
+			}
 			return;
 		}
 		else
 		{
 			int toAddCount = maxClientsPerQueue - queue->size();
-			AddClientsToQueue(*queue, clients, toAddCount);
+			if (queueIdx > marketState.numberOfCashDesks)
+			{
+				OpenCashDesk(queueIdx, clients, toAddCount);
+			}
+			{
+				AddClientsToQueue(*queue, clients, toAddCount);
+			}
 			howMany = howMany - toAddCount;
 			clients = &clients[toAddCount];
 		}
@@ -314,6 +342,11 @@ Client::Client(int newNumberOfGoods, bool newHasCreditCard)
 {
 }
 
+Client::Client(int newID, int newNumberOfGoods, bool newHasCreditCard)
+	: id(newID), numberOfGoods(newNumberOfGoods), hasCreditCard(newHasCreditCard)
+{
+}
+
 
 /////////////////
 // ClientState //
@@ -326,7 +359,7 @@ ClientState::ClientState()
 ClientState::ClientState(int newCashDeskPosition, int newQueuePosition, const Client &newClientData)
 	: cashDeskPosition(newCashDeskPosition), queuePosition(newQueuePosition), currentTick(0)
 {
-	client = new Client(newClientData.numberOfGoods, newClientData.hasCreditCard);
+	client = new Client(newClientData.id, newClientData.numberOfGoods, newClientData.hasCreditCard);
 }
 
 ClientState::ClientState(const ClientState &other)
@@ -358,10 +391,6 @@ void ClientState::CopyFrom(const ClientState &other)
 	queuePosition = other.queuePosition;
 	currentTick = other.currentTick;
 	
-	if (client)
-	{
-		delete client;
-	}
 	client = new Client(*other.client);
 }
 
@@ -380,7 +409,7 @@ MarketState::MarketState(int allCashDesksCount)
 	numberOfClientsAtCashDesks = new int[allCashDesksCount];
 	for (size_t i = 0; i < allCashDesksCount; ++i)
 	{
-		numberOfClientsAtCashDesks[i] = -1;
+		numberOfClientsAtCashDesks[i] = 0;
 	}
 }
 
@@ -412,10 +441,6 @@ void MarketState::CopyFrom(const MarketState &other)
 	numberOfCashDesks = other.numberOfCashDesks;
 	numberOfClientsAtExpressCashDesk = other.numberOfClientsAtExpressCashDesk;
 
-	if (numberOfClientsAtCashDesks)
-	{
-		delete [] numberOfClientsAtCashDesks;
-	}
 	numberOfClientsAtCashDesks = new int[numberOfCashDesks];
 	for (size_t i = 0; i < numberOfCashDesks; ++i)
 	{

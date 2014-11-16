@@ -4,6 +4,14 @@
 #include "Market.h"
 
 
+/*
+	Искрено се извинявам, че не използвах собствена имплементация на контейнерите.
+	Не прецених правилно времето, което ще ми отнеме да напиша домашното
+	и като резултат се концентрирах най-вече върху имплементацията.
+	В крайна сметка се е получило нещо горе долу работещо.
+	Note to self: СДП не е толкова лесно. Трябва да отделя повече време.
+*/
+
 #define TEST_TICK(expression, tick) \
 	if ((expression)) \
 	{ \
@@ -18,7 +26,7 @@ void TestTwoCashDesks()
 {
 	std::cout << "\n\nTestTwoCashDesks begins\n\n";
 
-	Market newMarket(2, 10);
+	Market newMarket(3, 10);
 
 	const size_t TICK_ONE_SIZE = 1;
 	Client clientsTickOne[TICK_ONE_SIZE] = { Client(3, false) }; 
@@ -26,7 +34,7 @@ void TestTwoCashDesks()
 
 	MarketState marketState = newMarket.GetMarketState();
 	TEST_TICK (marketState.numberOfCashDesks == 1 && 
-			   marketState.numberOfClientsAtCashDesks[0] == 1 &&
+			   marketState.numberOfClientsAtCashDesks[0] == 0 &&
 			   marketState.numberOfClientsAtExpressCashDesk == 1, "one")
 
 	const size_t TICK_TWO_SIZE = 1;
@@ -44,7 +52,7 @@ void TestTwoCashDesks()
 
 	marketState = newMarket.GetMarketState();
 	TEST_TICK (marketState.numberOfCashDesks == 1 &&
-			   marketState.numberOfClientsAtCashDesks[0] == 0 &&
+			   marketState.numberOfClientsAtCashDesks[0] == 1 &&
 			   marketState.numberOfClientsAtExpressCashDesk == 0, "three")
 
 	const size_t TICK_FOUR_SIZE = 9;
@@ -58,7 +66,7 @@ void TestTwoCashDesks()
 
 	marketState = newMarket.GetMarketState();
 	TEST_TICK (marketState.numberOfCashDesks == 1 &&
-			   marketState.numberOfClientsAtCashDesks[0] == 3 &&
+			   marketState.numberOfClientsAtCashDesks[0] == 4 &&
 			   marketState.numberOfClientsAtExpressCashDesk == 4, "four")
 
 	const size_t TICK_FIVE_SIZE = 10;
@@ -71,8 +79,8 @@ void TestTwoCashDesks()
 
 	marketState = newMarket.GetMarketState();
 	TEST_TICK (marketState.numberOfCashDesks == 2 &&
-			   marketState.numberOfClientsAtCashDesks[0] == 6 && marketState.numberOfClientsAtCashDesks[1] == 5 &&
-			   marketState.numberOfClientsAtExpressCashDesk == 2, "five")
+			   marketState.numberOfClientsAtCashDesks[0] == 6 && marketState.numberOfClientsAtCashDesks[1] == 6 &&
+			   marketState.numberOfClientsAtExpressCashDesk == 3, "five")
 
 	const size_t TICK_SIX_SIZE = 30;
 	Client clientsTickSix[TICK_SIX_SIZE];
