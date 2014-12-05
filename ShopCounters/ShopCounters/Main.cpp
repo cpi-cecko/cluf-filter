@@ -149,6 +149,16 @@ void TestTwoCashDesks()
 
 int main()
 {
+	int a = 10;
+	for (size_t i = 0; i < a; ++i)
+	{
+		i % 2 == 0 ? std::cout << i << " " : std::cout << "a ";
+	}
+
+
+
+
+
 	TestTwoCashDesks();
 
 	return 0;
