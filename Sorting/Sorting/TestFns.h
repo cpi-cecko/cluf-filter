@@ -12,7 +12,16 @@ struct TestData
 	size_t count;
 	unsigned long long sortTime;
 	bool result;
+
+	void InitData(const T *newData, size_t newCount);
 	
+	TestData()
+	{
+		data = NULL;
+		count = 0;
+		sortTime = 0;
+		result = false;
+	}
 	~TestData()
 	{
 		delete [] data;
@@ -20,29 +29,92 @@ struct TestData
 };
 
 template<typename T>
+void TestData<T>::InitData(const T *newData, size_t newCount)
+{
+	count = newCount;
+
+	if (newData == NULL || count == std::numeric_limits<size_t>::max())
+	{
+		data = NULL;
+		return;
+	}
+
+	data = new T[count];
+	for (size_t idx = 0; idx < count; ++idx)
+	{
+		data[idx] = newData[idx];
+	}
+}
+
+
+template<typename T>
 struct Test
 {
 	char *id;		    // ID of test type; used to print a sensible name
-	TestData *allData;
+	TestData<T> *allData;
 	size_t dataCount;
+
+	Test()
+	{
+		id = NULL;
+		allData = NULL;
+		dataCount = 0;
+	}
 
 	~Test()
 	{
-		delete [] id;
 		delete [] allData;
 	}
 };
 
 
 template<typename T>
-void DoTest(Sorter<T> *sorter, Test *test)
+void DoTest(Sorter<T> *sorter, Test<T> *test)
 {
-	for (size_t idx = 0; idx < manyData.dataCount; ++idx)
+	for (size_t idx = 0; idx < test->dataCount; ++idx)
 	{
-		sorter.Sort(manyData.allData[idx].data, manyData.allData[idx].count);
-		manyData.allData[idx].result = IsSorted(manyData.allData[idx].data, manyData.allData[idx].count);
-		manyData.allData[idx].sortTime = sorter.GetSortTime();
+		sorter->Sort(test->allData[idx].data, test->allData[idx].count);
+		test->allData[idx].result = IsSorted(test->allData[idx].data, test->allData[idx].count);
+		test->allData[idx].sortTime = sorter->GetSortTime();
 	}
+}
+
+///
+/// Checks if an array is sorted by ascending order
+///
+template<typename T>
+bool IsSorted(const T *data, size_t count)
+{
+	if (data == NULL || count == std::numeric_limits<size_t>::max())
+	{
+		std::cerr << "NULL DATA " << count << '\n';
+		return true; // For our use-case it is safe to assume that null data is sorted data.
+					 // An assertion would just break our tests. In the real world, though, we may use
+					 // one or use some kind of logging mechanism.
+	}
+
+	for (size_t idx = 0; idx < count-1; ++idx)
+	{
+		if (data[idx] > data[idx+1])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+template<typename T>
+void PrintArray(const T *data, size_t count)
+{
+	if (data == NULL) return;
+
+	std::cout << "{ ";
+	for (size_t idx = 0; idx < count-1; ++idx)
+	{
+		std::cout << data[idx] << ", ";
+	}
+	std::cout << data[count-1];
+	std::cout << " }\n";
 }
 
 
