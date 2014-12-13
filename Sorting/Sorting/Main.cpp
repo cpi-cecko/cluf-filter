@@ -4,7 +4,7 @@
 
 int main()
 {
-	Sorter<int> *sorters = 
+	SorterImplementation<int> *sorters = 
 	{
 		new InsertionSorter<int>()
 	};

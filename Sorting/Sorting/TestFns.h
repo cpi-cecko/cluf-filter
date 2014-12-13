@@ -69,7 +69,7 @@ struct Test
 
 
 template<typename T>
-void DoTest(Sorter<T> *sorter, Test<T> *test)
+void DoTest(SorterImplementation<T> *sorter, Test<T> *test)
 {
 	for (size_t idx = 0; idx < test->dataCount; ++idx)
 	{

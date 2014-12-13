@@ -16,7 +16,7 @@ public:
 	///
 	/// Generates test data and runs sorting tests over each sorting algorithm.
 	///
-	SortTester(Sorter<T> **sorters, size_t count) {}
+	SortTester(SorterImplementation<T> **sorters, size_t count) {}
 
 	///
 	/// Outputs the test results.
@@ -35,7 +35,7 @@ template<typename T>
 class MySortTester : public SortTester<T>
 {
 public:
-	MySortTester(Sorter<T> **sorters, size_t count);
+	MySortTester(SorterImplementation<T> **sorters, size_t count);
 	~MySortTester();
 
 	void GetSummary(std::ostream &out) const;
@@ -49,7 +49,7 @@ private:
 };
 
 template<typename T>
-MySortTester<T>::MySortTester(Sorter<T> **sorters, size_t count) 
+MySortTester<T>::MySortTester(SorterImplementation<T> **sorters, size_t count) 
 	: SortTester<T>(sorters, count)
 {
 	GenerateTestData();
