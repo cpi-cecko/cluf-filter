@@ -103,6 +103,16 @@ void InsertionSorter<T>::DoSort(T *data, size_t count)
 		return;
 	}
 
+	for (size_t i = 1; i < count; ++i)
+	{
+		size_t j = i;
+		while (j > 0 && 
+			   data[j-1] > data[j])
+		{
+			std::swap(data[j-1], data[j]);
+			--j;
+		}
+	}
 }
 
 

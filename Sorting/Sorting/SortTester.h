@@ -96,7 +96,7 @@ MySortTester<T>::~MySortTester()
 template<typename T>
 void MySortTester<T>::GenerateTestData()
 {
-	testsCount = 3;
+	testsCount = 4;
 	testsToRun = new Test<T>[testsCount];
 
 	testsToRun[0].id = "Test Zero Elements";
@@ -133,6 +133,17 @@ void MySortTester<T>::GenerateTestData()
 	testsToRun[2].dataCount = 1;
 	testsToRun[2].allData = new TestData<T>[testsToRun[2].dataCount];
 	testsToRun[2].allData[0].InitData(NULL, -4);
+
+
+	testsToRun[3].id = "Test two elements";
+	testsToRun[3].dataCount = 3;
+	testsToRun[3].allData = new TestData<T>[testsToRun[3].dataCount];
+	T two[] = {3, 2};
+	testsToRun[3].allData[0].InitData(two, 2);
+	T twoSorted[] = {90, 100};
+	testsToRun[3].allData[1].InitData(twoSorted, 2);
+	T twoEqual[] = {1, 1};
+	testsToRun[3].allData[2].InitData(twoEqual, 2);
 }
 
 
