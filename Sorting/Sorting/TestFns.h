@@ -50,12 +50,14 @@ void TestData<T>::InitData(const T *newData, size_t newCount)
 template<typename T>
 struct Test
 {
+	char *sorterId;
 	char *id;		    // ID of test type; used to print a sensible name
 	TestData<T> *allData;
 	size_t dataCount;
 
 	Test()
 	{
+		sorterId = NULL;
 		id = NULL;
 		allData = NULL;
 		dataCount = 0;
@@ -87,7 +89,6 @@ bool IsSorted(const T *data, size_t count)
 {
 	if (data == NULL || count == std::numeric_limits<size_t>::max())
 	{
-		std::cerr << "NULL DATA " << count << '\n';
 		return true; // For our use-case it is safe to assume that null data is sorted data.
 					 // An assertion would just break our tests. In the real world, though, we may use
 					 // one or use some kind of logging mechanism.
@@ -114,7 +115,7 @@ void PrintArray(const T *data, size_t count)
 		std::cout << data[idx] << ", ";
 	}
 	std::cout << data[count-1];
-	std::cout << " }\n";
+	std::cout << " }";
 }
 
 

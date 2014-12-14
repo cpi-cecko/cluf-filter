@@ -4,12 +4,12 @@
 
 int main()
 {
-	SorterImplementation<int> *sorters = 
+	SorterImplementation<int> *sorters[] = 
 	{
-		new InsertionSorter<int>()
+		new QuickSorter<int>()
 	};
 
-	MySortTester<int> myTester(&sorters, 1);
+	MySortTester<int> myTester(sorters, 1);
 	myTester.GetSummary(std::cout);
 
 	return 0;

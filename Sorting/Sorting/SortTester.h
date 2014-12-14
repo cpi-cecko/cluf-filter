@@ -31,6 +31,7 @@ private:
 };
 
 
+// TODO: Make it support testing of more than one algorithm at a time.
 template<typename T>
 class MySortTester : public SortTester<T>
 {
@@ -42,6 +43,7 @@ public:
 
 private:
 	void GenerateTestData();
+	void DeleteTests();
 
 private:
 	Test<T> *testsToRun;
@@ -75,7 +77,9 @@ void MySortTester<T>::GetSummary(std::ostream &out) const
 		{
 			if (testsToRun[testIdx].allData[dataIdx].result)
 			{
-				out << "  passed";
+				out << "  passed; " << "time " << testsToRun[testIdx].allData[dataIdx].sortTime;
+				out << "; data: ";
+				PrintArray(testsToRun[testIdx].allData[dataIdx].data, testsToRun[testIdx].allData[dataIdx].count);
 			}
 			else
 			{
@@ -87,10 +91,16 @@ void MySortTester<T>::GetSummary(std::ostream &out) const
 }
 
 template<typename T>
-MySortTester<T>::~MySortTester()
+void MySortTester<T>::DeleteTests()
 {
 	testsCount = 0;
 	delete [] testsToRun;
+}
+
+template<typename T>
+MySortTester<T>::~MySortTester()
+{
+	DeleteTests();
 }
 
 template<typename T>
