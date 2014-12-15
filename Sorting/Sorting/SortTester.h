@@ -92,10 +92,7 @@ MySortTester<T>::MySortTester(SorterImplementation<T> **sorters, size_t count)
 template<typename T>
 void MySortTester<T>::GetSummary(std::ostream &out) const
 {
-	for (size_t testIdx = 0; testIdx < testsCount; ++testIdx)
-	{
-		out << summary.str();
-	}
+	out << summary.str();
 }
 
 template<typename T>
