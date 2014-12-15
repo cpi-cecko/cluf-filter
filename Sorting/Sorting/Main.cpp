@@ -6,7 +6,7 @@ int main()
 {
 	SorterImplementation<int> *sorters[] = 
 	{
-		new HeapSorter<int>()
+		new SelectionSorter<int>()
 	};
 
 	MySortTester<int> myTester(sorters, 1);

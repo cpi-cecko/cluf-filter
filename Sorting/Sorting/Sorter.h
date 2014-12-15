@@ -355,4 +355,41 @@ void HeapSorter<T>::Sift(T *data, size_t pos, size_t count)
 }
 
 
+//////////////////////
+// Selection Sorter //
+//////////////////////
+template<typename T>
+class SelectionSorter : public SorterImplementation<T>
+{
+public:
+	SelectionSorter();
+
+	void DoSort(T *data, size_t count);
+};
+
+template<typename T>
+SelectionSorter<T>::SelectionSorter()
+	: SorterImplementation("Selection Sort")
+{
+}
+
+template<typename T>
+void SelectionSorter<T>::DoSort(T *data, size_t count)
+{
+	for (size_t idx = 0; idx < count - 1; ++idx)
+	{
+		size_t min = idx;
+
+		for (size_t idxJ = idx + 1; idxJ < count; ++idxJ)
+		{
+			if (data[idxJ] < data[min])
+				min = idxJ;
+		}
+
+		if (data[min] < data[idx])
+			std::swap(data[idx], data[min]);
+	}
+}
+
+
 #endif
