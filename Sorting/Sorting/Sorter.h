@@ -20,6 +20,8 @@ public:
 		: id(newId) 
 	{}
 
+	std::string GetId() const;
+
 protected:
 	std::string id;
 
@@ -33,6 +35,12 @@ void Sorter<T>::swapless(T &fst, T &snd)
 	{
 		std::swap(fst, snd);
 	}
+}
+
+template<typename T>
+std::string Sorter<T>::GetId() const
+{
+	return id;
 }
 
 

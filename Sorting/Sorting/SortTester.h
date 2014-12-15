@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <ostream>
+#include <sstream>
 
 
 template<typename T>
@@ -31,7 +32,6 @@ private:
 };
 
 
-// TODO: Make it support testing of more than one algorithm at a time.
 template<typename T>
 class MySortTester : public SortTester<T>
 {
@@ -48,6 +48,8 @@ private:
 private:
 	Test<T> *testsToRun;
 	size_t testsCount;
+
+	std::stringstream summary;
 };
 
 template<typename T>
@@ -60,10 +62,30 @@ MySortTester<T>::MySortTester(SorterImplementation<T> **sorters, size_t count)
 
 	for (size_t idx = 0; idx < count; ++idx)
 	{
+		summary << sorters[idx]->GetId() << ":\n";
 		for (size_t testIdx = 0; testIdx < testsCount; ++testIdx)
 		{
+			summary << "  " << testsToRun[testIdx].id << '\n';
+
 			DoTest<T>(sorters[idx], &testsToRun[testIdx]);
+
+			for (size_t dataIdx = 0; dataIdx < testsToRun[testIdx].dataCount; ++dataIdx)
+			{
+				if (testsToRun[testIdx].allData[dataIdx].result)
+				{
+					summary << "    passed; " << "time " << testsToRun[testIdx].allData[dataIdx].sortTime;
+					summary << "; data: ";
+					summary << ArrayToString(testsToRun[testIdx].allData[dataIdx].data,
+											 testsToRun[testIdx].allData[dataIdx].count);
+				}
+				else
+				{
+					summary << "    failed";
+				}
+				summary << '\n';
+			}
 		}
+		summary << '\n';
 	}
 }
 
@@ -72,21 +94,7 @@ void MySortTester<T>::GetSummary(std::ostream &out) const
 {
 	for (size_t testIdx = 0; testIdx < testsCount; ++testIdx)
 	{
-		out << testsToRun[testIdx].id << '\n';
-		for (size_t dataIdx = 0; dataIdx < testsToRun[testIdx].dataCount; ++dataIdx)
-		{
-			if (testsToRun[testIdx].allData[dataIdx].result)
-			{
-				out << "  passed; " << "time " << testsToRun[testIdx].allData[dataIdx].sortTime;
-				out << "; data: ";
-				PrintArray(testsToRun[testIdx].allData[dataIdx].data, testsToRun[testIdx].allData[dataIdx].count);
-			}
-			else
-			{
-				out << "  failed";
-			}
-			out << '\n';
-		}
+		out << summary.str();
 	}
 }
 

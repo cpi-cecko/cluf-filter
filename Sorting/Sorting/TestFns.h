@@ -109,13 +109,25 @@ void PrintArray(const T *data, size_t count)
 {
 	if (data == NULL) return;
 
-	std::cout << "{ ";
+	std::cout << ArrayToString(data, count);
+}
+
+template<typename T>
+std::string ArrayToString(const T *data, size_t count)
+{
+	if (data == NULL) return "";
+
+	std::ostringstream arrStream;
+
+	arrStream << "{ ";
 	for (size_t idx = 0; idx < count-1; ++idx)
 	{
-		std::cout << data[idx] << ", ";
+		arrStream << data[idx] << ", ";
 	}
-	std::cout << data[count-1];
-	std::cout << " }";
+	arrStream << data[count-1];
+	arrStream << " }";
+
+	return arrStream.str();
 }
 
 
