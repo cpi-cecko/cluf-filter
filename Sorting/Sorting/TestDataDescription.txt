@@ -1,0 +1,104 @@
+There are four types of tests:
+1. The first tests zero-element arrays.
+2. The second tests different arrays.
+3. The third tests arrays with negative count.
+4. And the fourth tests two-element arrays.
+
+The algorithms are doing quite well, because the input is quite small. The only 
+exception is the negative count, where the value overflows and each algorithm 
+iterates until it reaches its limit.
+
+SortTestser::getSummary output
+==============================
+
+>>> Insertion Sort:
+>>>   Test Zero Elements
+>>>     passed; time 0; data:
+>>>     passed; time 0; data:
+>>>   Test different arrays
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 2, 2, 2, 2 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+>>>     passed; time 0; data: { -15, -5, -3, -1, 0, 4, 4, 15 }
+>>>     passed; time 0; data: { -5, -4, -3, -2, -1, 1, 2, 3, 4, 5 }
+>>>   Test negative count
+>>>     passed; time 0; data:
+>>>   Test two elements
+>>>     passed; time 0; data: { 2, 3 }
+>>>     passed; time 0; data: { 90, 100 }
+>>>     passed; time 0; data: { 1, 1 }
+>>> 
+>>> Quick Sort:
+>>>   Test Zero Elements
+>>>     passed; time 0; data:
+>>>     passed; time 0; data:
+>>>   Test different arrays
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 2, 2, 2, 2 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+>>>     passed; time 0; data: { -15, -5, -3, -1, 0, 4, 4, 15 }
+>>>     passed; time 0; data: { -5, -4, -3, -2, -1, 1, 2, 3, 4, 5 }
+>>>   Test negative count
+>>>     passed; time 0; data:
+>>>   Test two elements
+>>>     passed; time 0; data: { 2, 3 }
+>>>     passed; time 0; data: { 90, 100 }
+>>>     passed; time 0; data: { 1, 1 }
+>>> 
+>>> Merge Sort:
+>>>   Test Zero Elements
+>>>     passed; time 0; data:
+>>>     passed; time 0; data:
+>>>   Test different arrays
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 2, 2, 2, 2 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+>>>     passed; time 0; data: { -15, -5, -3, -1, 0, 4, 4, 15 }
+>>>     passed; time 0; data: { -5, -4, -3, -2, -1, 1, 2, 3, 4, 5 }
+>>>   Test negative count
+>>>     passed; time 0; data:
+>>>   Test two elements
+>>>     passed; time 0; data: { 2, 3 }
+>>>     passed; time 0; data: { 90, 100 }
+>>>     passed; time 0; data: { 1, 1 }
+>>> 
+>>> Heap Sort:
+>>>   Test Zero Elements
+>>>     passed; time 0; data:
+>>>     passed; time 0; data:
+>>>   Test different arrays
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 2, 2, 2, 2 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+>>>     passed; time 0; data: { -15, -5, -3, -1, 0, 4, 4, 15 }
+>>>     passed; time 0; data: { -5, -4, -3, -2, -1, 1, 2, 3, 4, 5 }
+>>>   Test negative count
+>>>     passed; time 0; data:
+>>>   Test two elements
+>>>     passed; time 0; data: { 2, 3 }
+>>>     passed; time 0; data: { 90, 100 }
+>>>     passed; time 0; data: { 1, 1 }
+>>> 
+>>> Selection Sort:
+>>>   Test Zero Elements
+>>>     passed; time 0; data:
+>>>     passed; time 0; data:
+>>>   Test different arrays
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 2, 2, 2, 2 }
+>>>     passed; time 0; data: { 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+>>>     passed; time 0; data: { -15, -5, -3, -1, 0, 4, 4, 15 }
+>>>     passed; time 0; data: { -5, -4, -3, -2, -1, 1, 2, 3, 4, 5 }
+>>>   Test negative count
+>>>     passed; time 0; data:
+>>>   Test two elements
+>>>     passed; time 0; data: { 2, 3 }
+>>>     passed; time 0; data: { 90, 100 }
+>>>     passed; time 0; data: { 1, 1 }
+>>> 
+>>> Press any key to continue . . .
