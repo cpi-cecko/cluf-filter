@@ -287,4 +287,72 @@ void MergeSorter<T>::Merge(T *arrOne, size_t countOne, T *arrTwo, size_t countTw
 }
 
 
+//////////////////
+// Heap Sorter //
+//////////////////
+template<typename T>
+class HeapSorter : public SorterImplementation<T>
+{
+public:
+	HeapSorter();
+
+	void DoSort(T *data, size_t count);
+
+private:
+	void Sift(T *data, size_t pos, size_t count);
+};
+
+template<typename T>
+HeapSorter<T>::HeapSorter()
+	: SorterImplementation("Heap Sort")
+{
+}
+
+template<typename T>
+void HeapSorter<T>::DoSort(T *data, size_t count)
+{
+	if (count == 0)
+		return;
+
+	size_t i = count / 2;
+
+	while (i--)
+	{
+		Sift(data, i, count);
+	}
+
+	i = count;
+
+	while (--i)
+	{
+		std::swap(data[0], data[i]);
+		Sift(data, 0, i);
+	}
+}
+
+template<typename T>
+void HeapSorter<T>::Sift(T *data, size_t pos, size_t count)
+{
+	T elem(data[pos]);
+
+	size_t ni = pos;
+	size_t succ = pos * 2 + 1;
+
+	while (succ < count)
+	{
+		if (succ < count - 1 && data[succ] < data[succ + 1])
+			succ++;
+
+		if (elem > data[succ])
+			break;
+
+		data[ni] = data[succ];
+		ni = succ;
+		succ = succ * 2 + 1;
+	}
+
+	data[ni] = elem;
+}
+
+
 #endif
