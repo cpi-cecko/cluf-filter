@@ -214,4 +214,77 @@ size_t QuickSorter<T>::Partition(T *data, size_t count)
 }
 
 
+//////////////////
+// Merge Sorter //
+//////////////////
+template<typename T>
+class MergeSorter : public SorterImplementation<T>
+{
+public:
+	MergeSorter();
+
+	void DoSort(T *data, size_t count);
+
+private:
+	void MergeSortStep(T *data, size_t count, T *buffer);
+	void Merge(T *arrOne, size_t countOne, T *arrTwo, size_t countTwo, T *result);
+};
+
+template<typename T>
+MergeSorter<T>::MergeSorter()
+	: SorterImplementation("Merge Sort")
+{
+}
+
+template<typename T>
+void MergeSorter<T>::DoSort(T *data, size_t count)
+{
+	if (count == 0)
+		return;
+
+	T *buffer = new T[count];
+
+	MergeSortStep(data, count, buffer);
+
+	delete [] buffer;
+}
+
+template<typename T>
+void MergeSorter<T>::MergeSortStep(T *data, size_t count, T *buffer)
+{
+	if (count <= 1)
+		return;
+
+	size_t middle = count / 2;
+
+	MergeSortStep(data, middle, buffer);
+
+	MergeSortStep(data + middle, count - middle, buffer + middle);
+
+	Merge(data, middle, data + middle, count - middle, buffer);
+
+	for (size_t idx = 0; idx < count; ++idx)
+	{
+		data[idx] = buffer[idx];
+	}
+}
+
+template<typename T>
+void MergeSorter<T>::Merge(T *arrOne, size_t countOne, T *arrTwo, size_t countTwo, T *result)
+{
+	size_t idx = 0;
+	size_t idxOne = 0;
+	size_t idxTwo = 0;
+
+	while (idxOne < countOne && idxTwo < countTwo)
+		result[idx++] = (arrOne[idxOne] < arrTwo[idxTwo]) ? arrOne[idxOne++] : arrTwo[idxTwo++];
+
+	while (idxOne < countOne)
+		result[idx++] = arrOne[idxOne++];
+
+	while (idxTwo < countTwo)
+		result[idx++] = arrTwo[idxTwo++];
+}
+
+
 #endif

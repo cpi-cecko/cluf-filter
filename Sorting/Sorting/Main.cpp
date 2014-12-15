@@ -6,7 +6,7 @@ int main()
 {
 	SorterImplementation<int> *sorters[] = 
 	{
-		new QuickSorter<int>()
+		new MergeSorter<int>()
 	};
 
 	MySortTester<int> myTester(sorters, 1);
