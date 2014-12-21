@@ -2,6 +2,7 @@
 
 
 #include <vector>
+#include <list>
 
 
 template <class VAL_TYPE>
@@ -55,7 +56,28 @@ public:
 
 	bool IsEmpty() const;
 
+public:
+	Tree() {}
+
+	~Tree()
+	{
+		for (std::list<Tree*>::iterator child = children.begin();
+			 child != children.end(); ++child)
+		{
+			delete (*child);
+		}
+		children.clear();
+	}
+
 private:
+	Tree(const Tree &other);
+	Tree &operator=(const Tree &other);
+
+private:
+	KEY_TYPE key;
+	VAL_TYPE val;
+
+	std::list<Tree*> children;
 };
 
 template <class KEY_TYPE, class VAL_TYPE>
@@ -73,7 +95,11 @@ bool Tree<KEY_TYPE, VAL_TYPE>::Remove(KEY_TYPE key)
 template <class KEY_TYPE, class VAL_TYPE>
 Result<VAL_TYPE> Tree<KEY_TYPE, VAL_TYPE>::At(KEY_TYPE key) const
 {
-	return Result<VAL_TYPE>(false);
+	Result <VAL_TYPE> result(false);
+
+	result.val.resize(1);
+
+	return result;
 }
 
 template <class KEY_TYPE, class VAL_TYPE>
