@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMLParser", "XMLParser\XMLParser.vcxproj", "{B4D228B8-215B-4735-A054-CE9B2F7D4F3C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMLTests", "XMLTests\XMLTests.vcxproj", "{9757CB21-B840-49A6-B057-9F322E543DD6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tree", "Tree\Tree.vcxproj", "{A9189B41-6B02-4D59-BA05-0AC038437963}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +17,14 @@ Global
 		{B4D228B8-215B-4735-A054-CE9B2F7D4F3C}.Debug|Win32.Build.0 = Debug|Win32
 		{B4D228B8-215B-4735-A054-CE9B2F7D4F3C}.Release|Win32.ActiveCfg = Release|Win32
 		{B4D228B8-215B-4735-A054-CE9B2F7D4F3C}.Release|Win32.Build.0 = Release|Win32
+		{9757CB21-B840-49A6-B057-9F322E543DD6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9757CB21-B840-49A6-B057-9F322E543DD6}.Debug|Win32.Build.0 = Debug|Win32
+		{9757CB21-B840-49A6-B057-9F322E543DD6}.Release|Win32.ActiveCfg = Release|Win32
+		{9757CB21-B840-49A6-B057-9F322E543DD6}.Release|Win32.Build.0 = Release|Win32
+		{A9189B41-6B02-4D59-BA05-0AC038437963}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A9189B41-6B02-4D59-BA05-0AC038437963}.Debug|Win32.Build.0 = Debug|Win32
+		{A9189B41-6B02-4D59-BA05-0AC038437963}.Release|Win32.ActiveCfg = Release|Win32
+		{A9189B41-6B02-4D59-BA05-0AC038437963}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
