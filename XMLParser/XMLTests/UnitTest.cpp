@@ -58,9 +58,64 @@ namespace XMLTests
 		#pragma endregion 
 
 		[TestMethod]
+		void TestParseKey()
+		{
+			// Simple key
+			std::string simpleKey = "/root/my";
+			std::string _key;
+			std::string rest;
+			Tree<int>::ParseKey(simpleKey, _key, rest);
+
+			Assert::IsTrue(_key == "root");
+			Assert::IsTrue(rest == "my");
+
+			// Single key
+			std::string singleKey = "root";
+			_key = rest = "";
+			Tree<int>::ParseKey(singleKey, _key, rest);
+
+			Assert::IsTrue(_key == "root");
+			Assert::IsTrue(rest == "");
+
+			// Single key, trailing slash
+			std::string singleKeyTrail = "root/";
+			_key = rest = "";
+			Tree<int>::ParseKey(singleKeyTrail, _key, rest);
+
+			Assert::IsTrue(_key == "root");
+			Assert::IsTrue(rest == "");
+
+			// Longer key
+			std::string longerKey = "root/123/my/13/";
+			_key = rest = "";
+			Tree<int>::ParseKey(longerKey, _key, rest);
+
+			Assert::IsTrue(_key == "root");
+			Assert::IsTrue(rest == "123/my/13/");
+
+			std::string restTwo = _key = "";
+			Tree<int>::ParseKey(rest, _key, restTwo);
+
+			Assert::IsTrue(_key == "123");
+			Assert::IsTrue(restTwo == "my/13/");
+
+			std::string restThree = _key = "";
+			Tree<int>::ParseKey(restTwo, _key, restThree);
+
+			Assert::IsTrue(_key == "my");
+			Assert::IsTrue(restThree == "13/");
+
+			std::string restFour = _key = "";
+			Tree<int>::ParseKey(restThree, _key, restFour);
+
+			Assert::IsTrue(_key == "13");
+			Assert::IsTrue(restFour == "");
+		}
+
+		[TestMethod]
 		void TestTreeInsert()
 		{
-			Tree<std::string, int> testTree;
+			Tree<int> testTree;
 
 			// Simple insertion
 			testTree.Insert("root", 5);
@@ -106,7 +161,7 @@ namespace XMLTests
 		[TestMethod]
 		void TestTreeRemove()
 		{
-			Tree<std::string, double> testTree;
+			Tree<double> testTree;
 
 			testTree.Insert("root", 2.5);
 			testTree.Insert("my/number", 13.4);
