@@ -58,6 +58,20 @@ namespace XMLTests
 		#pragma endregion 
 
 		[TestMethod]
+		void TestIsKeyValid()
+		{
+			Assert::IsTrue(Tree<int>::IsKeyValid("/root/my"));
+			Assert::IsTrue(Tree<int>::IsKeyValid("root"));
+			Assert::IsTrue(Tree<int>::IsKeyValid("123/gosho"));
+			Assert::IsTrue(Tree<int>::IsKeyValid("123"));
+
+			Assert::IsFalse(Tree<int>::IsKeyValid("pesho//"));
+			Assert::IsFalse(Tree<int>::IsKeyValid("//root///gosho/123/"));
+			Assert::IsFalse(Tree<int>::IsKeyValid("///"));
+			Assert::IsFalse(Tree<int>::IsKeyValid("/root/123/exodia////14"));
+		}
+
+		[TestMethod]
 		void TestParseKey()
 		{
 			// Simple key
@@ -110,6 +124,14 @@ namespace XMLTests
 
 			Assert::IsTrue(_key == "13");
 			Assert::IsTrue(restFour == "");
+
+			// Single slash
+			std::string singleSlash = "/";
+			_key = rest = "";
+			Tree<int>::ParseKey(singleSlash, _key, rest);
+
+			Assert::IsTrue(_key == "");
+			Assert::IsTrue(rest == "");
 		}
 
 		[TestMethod]

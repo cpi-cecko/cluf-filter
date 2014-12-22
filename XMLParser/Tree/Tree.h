@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <list>
+#include <string>
+#include <algorithm>
+#include <cctype>
 
 
 template <class VAL_TYPE>
@@ -45,6 +48,7 @@ public:
 	// If the key contains invalid characters, returns `false`.
 	// If the insertion is successful, returns `true`.
 	bool Insert(const std::string &atKey, VAL_TYPE newVal);
+
 	// Removes **all** keys which are equal to `atKey`.
 	bool Remove(const std::string &atKey);
 
@@ -56,9 +60,18 @@ public:
 
 	bool IsEmpty() const;
 
-	static void ParseKey(const std::string &_key, std::string &current, std::string &rest);
-private:
+public: // public because of UnitTest
+
+	// A valid key only contains ASCII characters [/a-zA-Z0-9] and
+	// doesn't have more than one consequentive '/' (forward slash)
 	static bool IsKeyValid(const std::string &_key);
+
+	// Separates a key into a current part and a rest part using the forward slash as a
+	// delimiter.
+	// The current part contains only ASCII chars from [a-zA-Z0-9].
+	// The rest part never begins with a '/' (forward slash) and contains the rest of the
+	// key or nothing.
+	static void ParseKey(const std::string &_key, std::string &current, std::string &rest);
 
 public:
 	Tree() 
@@ -66,7 +79,7 @@ public:
 	{}
 
 	Tree(const std::string &newKey)
-		: key(newKey)
+		: key(newKey), isEmpty(true)
 	{}
 
 	~Tree()
@@ -79,6 +92,17 @@ public:
 		children.clear();
 	}
 
+
+	const std::string &GetKey() const
+	{
+		return key;
+	}
+
+	VAL_TYPE GetVal() const
+	{
+		return val;
+	}
+
 private:
 	Tree(const Tree &other);
 	Tree &operator=(const Tree &other);
@@ -88,32 +112,36 @@ private:
 	VAL_TYPE val;
 
 	std::list<Tree*> children;
+
+	bool isEmpty;
 };
 
 template <class VAL_TYPE>
 bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 {
+	if ( ! IsKeyValid(atKey)) return false;
+
 	std::string _key;
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
-	std::string _keyTwo;
-	std::string restTwo;
-	ParseKey(rest, _keyTwo, restTwo);
+	if (key == _key && rest == "")
+	{
+		val = newVal;
+		return true;
+	}
 
-	std::string _keyThree;
-	std::string restThree;
-	ParseKey(restTwo, _keyThree, restThree);
+	for (std::list<Tree*>::iterator child = children.begin();
+		 child != children.end(); ++child)
+	{
+		if ((*child)->GetKey() == _key)
+		{
+			(*child)->Insert(rest, newVal);
+		}
+	}
 
-	std::string _keyFour;
-	std::string restFour;
-	ParseKey(restThree, _keyFour, restFour);
-
-	std::string _keyFive;
-	std::string restFive;
-	ParseKey(restFour, _keyFive, restFive);
-
-	return false;
+	isEmpty = false;
+	return true;
 }
 
 template <class VAL_TYPE>
@@ -135,7 +163,7 @@ Result<VAL_TYPE> Tree<VAL_TYPE>::At(const std::string &atKey) const
 template <class VAL_TYPE>
 bool Tree<VAL_TYPE>::IsEmpty() const
 {
-	return true;
+	return isEmpty;
 }
 
 template <class VAL_TYPE>
@@ -162,6 +190,19 @@ void Tree<VAL_TYPE>::ParseKey(const std::string &_key, std::string &current, std
 	current.insert(current.begin(),
 				   _key.begin() + begIdx, _key.end());
 	rest = "";
+}
+
+template <class VAL_TYPE>
+bool Tree<VAL_TYPE>::IsKeyValid(const std::string &_key)
+{
+	bool hasValidCharacters = std::all_of(_key.begin(), _key.end(),
+										  [](int i) 
+										  {
+										      return std::isalnum(i) || i == (int)'/'; 
+										  });
+	bool hasConsequentiveSlashes = _key.find("//") != std::string::npos;
+
+	return hasValidCharacters && ! hasConsequentiveSlashes;
 }
 
 
