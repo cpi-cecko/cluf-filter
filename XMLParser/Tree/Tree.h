@@ -82,6 +82,10 @@ public:
 		: key(newKey), isEmpty(true)
 	{}
 
+	Tree(const std::string &newKey, const VAL_TYPE &newVal)
+		: key(newKey), val(newVal), isEmpty(false)
+	{}
+
 	~Tree()
 	{
 		for (std::list<Tree*>::iterator child = children.begin();
@@ -125,9 +129,10 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
-	if ((atKey == "" || key == _key) && rest == "")
+	if (key == _key && rest == "")
 	{
 		val = newVal;
+		isEmpty = false;
 		return true;
 	}
 
@@ -138,8 +143,16 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 					 })
 		== children.end())
 	{
-		Tree *newChild = new Tree(_key);
-		newChild->Insert(rest, newVal);
+		Tree *newChild;
+		if (rest != "")
+		{
+			newChild = new Tree(_key);
+			newChild->Insert(rest, newVal);
+		}
+		else
+		{
+			newChild = new Tree(_key, newVal);
+		}
 		children.push_back(newChild);
 
 		isEmpty = false;
@@ -149,9 +162,15 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 	for (std::list<Tree*>::iterator child = children.begin();
 		 child != children.end(); ++child)
 	{
-		if ((*child)->GetKey() == _key)
+		if ((*child)->GetKey() == _key && rest != "")
 		{
 			(*child)->Insert(rest, newVal);
+		}
+		else if ((*child)->GetKey() == _key)
+		{
+			Tree *newChild = new Tree(_key, newVal);
+			children.push_back(newChild);
+			break;
 		}
 	}
 
@@ -168,9 +187,33 @@ bool Tree<VAL_TYPE>::Remove(const std::string &atKey)
 template <class VAL_TYPE>
 Result<VAL_TYPE> Tree<VAL_TYPE>::At(const std::string &atKey) const
 {
-	Result <VAL_TYPE> result(false);
+	if ( ! IsKeyValid(atKey)) return Result<VAL_TYPE>(false);
 
-	result.val.resize(1);
+	std::string _key;
+	std::string rest;
+	ParseKey(atKey, _key, rest);
+
+	Result<VAL_TYPE> result(false);
+
+	if (_key == key && rest == "")
+	{
+		result.val.push_back(val);
+		result.isValid = true;
+		return result;
+	}
+
+	for (std::list<Tree*>::const_iterator child = children.begin();
+		 child != children.end(); ++child)
+	{
+		if ((*child)->GetKey() == _key)
+		{
+			Result<VAL_TYPE> childRes = (*child)->At(rest);
+			if (childRes.isValid)
+			{
+				result = childRes;
+			}
+		}
+	}
 
 	return result;
 }
