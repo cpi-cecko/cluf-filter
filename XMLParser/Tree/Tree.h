@@ -125,9 +125,24 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
-	if (key == _key && rest == "")
+	if ((atKey == "" || key == _key) && rest == "")
 	{
 		val = newVal;
+		return true;
+	}
+
+	if (std::find_if(children.begin(), children.end(),
+					 [&_key](const Tree *child)
+					 {
+						 return child->GetKey() == _key;
+					 })
+		== children.end())
+	{
+		Tree *newChild = new Tree(_key);
+		newChild->Insert(rest, newVal);
+		children.push_back(newChild);
+
+		isEmpty = false;
 		return true;
 	}
 
