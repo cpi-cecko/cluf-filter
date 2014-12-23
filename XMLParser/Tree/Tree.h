@@ -129,13 +129,6 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
-	if (key == _key && rest == "")
-	{
-		val = newVal;
-		isEmpty = false;
-		return true;
-	}
-
 	if (std::find_if(children.begin(), children.end(),
 					 [&_key](const Tree *child)
 					 {
@@ -195,23 +188,21 @@ Result<VAL_TYPE> Tree<VAL_TYPE>::At(const std::string &atKey) const
 
 	Result<VAL_TYPE> result(false);
 
-	if (_key == key && rest == "")
-	{
-		result.val.push_back(val);
-		result.isValid = true;
-		return result;
-	}
-
 	for (std::list<Tree*>::const_iterator child = children.begin();
 		 child != children.end(); ++child)
 	{
-		if ((*child)->GetKey() == _key)
+		if ((*child)->GetKey() == _key && rest != "")
 		{
 			Result<VAL_TYPE> childRes = (*child)->At(rest);
 			if (childRes.isValid)
 			{
 				result = childRes;
 			}
+		}
+		else if ((*child)->GetKey() == _key)
+		{
+			result.val.push_back((*child)->GetVal());
+			result.isValid = true;
 		}
 	}
 
@@ -260,7 +251,9 @@ bool Tree<VAL_TYPE>::IsKeyValid(const std::string &_key)
 										  });
 	bool hasConsequentiveSlashes = _key.find("//") != std::string::npos;
 
-	return hasValidCharacters && ! hasConsequentiveSlashes;
+	return hasValidCharacters && 
+			! hasConsequentiveSlashes &&
+			! _key.empty();
 }
 
 

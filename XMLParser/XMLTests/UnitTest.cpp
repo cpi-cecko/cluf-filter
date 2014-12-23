@@ -155,12 +155,7 @@ namespace XMLTests
 			Assert::AreEqual(testTree.At("root/newElem").val[0], 10);
 			Assert::AreEqual(testTree.At("root/another").val[0], 90);
 			Assert::AreEqual(testTree.At("root/another/last").val[0], 19);
-			Assert::AreEqual(testTree.At("root/here").val[0], 4);
-
-			// Overwrite key
-			testTree.Insert("my", 15);
-
-			Assert::AreEqual(testTree.At("my").val[0], 15);
+			Assert::AreEqual(testTree.At("nonexist/here").val[0], 4);
 
 			// Really deep insertion
 			testTree.Insert("deep/deep1/deep2/deep3/deep4/deep5/deep6/deep7/deep8/deep9/deep10/deep11/deep12/deep13/deep14/deep15/deep16/deep17/deep18", 999999);
