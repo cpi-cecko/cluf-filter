@@ -198,6 +198,7 @@ namespace XMLTests
 			Assert::IsFalse(testTree.At("root/E").isValid);
 			Assert::IsFalse(testTree.At("root/PI/PISq").isValid);
 
+			Assert::IsTrue(testTree.Remove("my"));
 			Assert::IsTrue(testTree.IsEmpty());
 
 			// Removing non-existent val

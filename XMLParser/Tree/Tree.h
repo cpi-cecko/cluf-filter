@@ -174,6 +174,40 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
 template <class VAL_TYPE>
 bool Tree<VAL_TYPE>::Remove(const std::string &atKey)
 {
+	if ( ! IsKeyValid(atKey)) return false;
+
+	std::string _key;
+	std::string rest;
+	ParseKey(atKey, _key, rest);
+
+	// If rest is empty, then try to remove children with keys equal to `_key`.
+	if (rest == "")
+	{
+		auto iterRem = std::remove_if(children.begin(), children.end(),
+							          [&_key](const Tree *child)
+								      {
+								          return child->GetKey() == _key;
+								      });
+		if (iterRem == children.end())
+		{
+			return false;
+		}
+
+		children.erase(iterRem, children.end());
+		isEmpty = children.empty();
+		return true;
+	}
+
+	// Navigate to the key end
+	for (std::list<Tree*>::iterator child = children.begin();
+		 child != children.end(); ++child)
+	{
+		if ((*child)->GetKey() == _key && rest != "")
+		{
+			return (*child)->Remove(rest);
+		}
+	}
+
 	return false;
 }
 
@@ -215,6 +249,9 @@ bool Tree<VAL_TYPE>::IsEmpty() const
 	return isEmpty;
 }
 
+///////////////////////
+// Utility Functions //
+///////////////////////
 template <class VAL_TYPE>
 void Tree<VAL_TYPE>::ParseKey(const std::string &_key, std::string &current, std::string &rest)
 {
