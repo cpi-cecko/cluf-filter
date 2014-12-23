@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../Tree/Tree.h"
+#include "../XMLLib/XMLDoc.h"
 
 using namespace System;
 using namespace System::Text;
@@ -57,6 +58,9 @@ namespace XMLTests
 		//
 		#pragma endregion 
 
+		////////////////
+		// Tree Tests //
+		////////////////
 		[TestMethod]
 		void TestIsKeyValid()
 		{
@@ -235,33 +239,202 @@ namespace XMLTests
 			Assert::IsFalse(testTree.Update("slash/guns/", 10));
 		}
 
-		// Optional
-		/*
+		//////////////////
+		// XMLDoc Tests //
+		//////////////////
 		[TestMethod]
-		void TestTreeFind()
+		void TestXMLAddTag()
 		{
-			Tree<std::string, std::string> testTree;
+			XMLDoc testDoc;
 
-			testTree.Insert("root/person/name", "One");
-			testTree.Insert("root/person/name", "Something");
-			testTree.Insert("root/person/name", "Two");
-			testTree.Insert("root/person/email", "example@example.com");
+			XMLTag testTag;
+			Assert::IsTrue(testDoc.AddTag("root/mdc", testTag));
+			Assert::IsTrue(testDoc.HasTagAt("root/mdc"));
 
-			// Getting existant vals
-			Assert::IsTrue(testTree.Find("name").isValid);
-			std::vector<std::string> names = testTree.Find("name").val;
-			Assert::IsFalse(names.empty());
-			Assert::IsTrue(names.size() == 3);
-			
-			// Getting non-existant vals
-			Assert::IsFalse(testTree.Find("job").isValid);
+			Assert::IsFalse(testDoc.AddTag("", testTag));
+			Assert::IsFalse(testDoc.AddTag("/", testTag));
 
-			// One val, part of path
-			Assert::IsTrue(testTree.Find("person/email").isValid);
-			std::vector<std::string> emails = testTree.Find("person/email").val;
-			Assert::IsFalse(emails.empty());
-			Assert::IsTrue(emails.size() == 1);
-		};
-		*/
+			Assert::IsFalse(testDoc.AddTag("//coolio/", testTag));
+
+			Assert::IsFalse(testDoc.AddTag("/badN@()/", testTag));
+
+			Assert::IsTrue(testDoc.AddTag("len/len/len/len/len/len/len/len/len/len/len/len/len/len/len/len",
+										  testTag));
+			Assert::IsTrue(testDoc.HasTagAt("len/len/len/len/len/len/len/len/len/len/len/len/len/len/len/len"));
+		}
+
+		[TestMethod]
+		void TestXMLDeleteTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+			testDoc.AddTag("mdc/beta", testTag);
+			testDoc.AddTag("mdc/gold", testTag);
+
+			Assert::IsTrue(testDoc.DeleteTag("mdc/beta"));
+			Assert::IsFalse(testDoc.HasTagAt("mdc/beta"));
+
+			Assert::IsFalse(testDoc.DeleteTag("mdc/alpha"));
+
+			Assert::IsFalse(testDoc.DeleteTag("niamame"));
+
+			Assert::IsFalse(testDoc.DeleteTag("/"));
+			Assert::IsFalse(testDoc.DeleteTag(""));
+		}
+
+		[TestMethod]
+		void TestXMLModifyDataAtTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+			testTag.AddData("Hallo!!!");
+
+			testDoc.AddTag("hello/there/mister", testTag);
+
+			XMLTag newTag;
+			newTag.AddData("mashala");
+			Assert::IsTrue(testDoc.ModifyTag("hello/there/mister", newTag));
+			Assert::IsTrue(testDoc.GetTagsAt("hello/there/mister")[0].GetData() == "mashala");
+
+			testDoc.AddTag("hi", testTag);
+			testDoc.AddTag("turk", newTag);
+			Assert::IsTrue(testDoc.ModifyTag("turk", testTag));
+			Assert::IsTrue(testDoc.GetTagsAt("turk")[0].GetData() == "Hallo!!!");
+
+			testDoc.AddTag("hi", newTag);
+			testDoc.AddTag("hi", newTag);
+			Assert::IsTrue(testDoc.ModifyTag("hi", newTag));
+			std::vector<XMLTag> tags = testDoc.GetTagsAt("hi");
+			Assert::IsTrue(tags.size() == 3);
+			Assert::IsTrue((tags[0].GetData() == tags[1].GetData()) == (tags[2].GetData() == "mashala"));
+
+			testTag.ModifyData(" There!!!");
+			Assert::IsFalse(testDoc.ModifyTag("no/there/is/not/tag", testTag));
+		}
+
+		[TestMethod]
+		void TestXMLDeleteDataAtTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+			testTag.AddData("test!!!");
+
+			testDoc.AddTag("test", testTag);
+			Assert::IsTrue(testDoc.DeleteDataAtTag("test"));
+			Assert::IsFalse(testDoc.GetTagsAt("test")[0].HasData());
+
+			XMLTag manyTag;
+			manyTag.AddData("many");
+			testDoc.AddTag("many", manyTag);
+			testDoc.AddTag("many", manyTag);
+			testDoc.AddTag("many", manyTag);
+			Assert::IsTrue(testDoc.DeleteDataAtTag("many"));
+			std::vector<XMLTag> manyTags = testDoc.GetTagsAt("many");
+			Assert::IsTrue(! manyTags[0].HasData() && ! manyTags[1].HasData() && ! manyTags[2].HasData());
+
+			Assert::IsFalse(testDoc.DeleteDataAtTag("no"));
+			Assert::IsFalse(testDoc.DeleteDataAtTag(""));
+		}
+
+		[TestMethod]
+		void TestXMLAddDataAtTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+			testDoc.AddTag("test", testTag);
+
+			testDoc.GetTagsAt("test")[0].AddData("sad");
+			Assert::IsTrue(testDoc.HasDataAt("test"));
+			Assert::IsTrue(testDoc.GetTagsAt("test")[0].GetData() == "sad");
+
+			// Empty data is no data.
+			testDoc.GetTagsAt("test")[0].AddData("");
+			Assert::IsFalse(testDoc.HasDataAt("test"));
+			Assert::IsFalse(testDoc.GetTagsAt("test")[0].GetData() == "sad");
+		}
+
+		[TestMethod]
+		void TestXMLAddAttribToTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+
+			XMLAttrib testAttr;
+			testAttr.attribKey = "sad";
+			testAttr.attribVal = "123";
+			Assert::IsFalse(testDoc.AddAttrib("niama/me", testAttr));
+
+			testDoc.AddTag("ima/me", testTag);
+			Assert::IsTrue(testDoc.AddAttrib("ima/me", testAttr));
+			Assert::IsTrue(testDoc.HasAttribAt("ima/me", "sad"));
+		}
+
+		[TestMethod]
+		void TestXMLModifyAttribAtTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+
+			XMLAttrib testAttr;
+			testAttr.attribKey = "sad";
+			testAttr.attribVal = "123";
+
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddAttrib("ima/me", testAttr);
+
+			Assert::IsTrue(testDoc.ModifyAttrib("ima/me", "sad", "567"));
+			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad").attribVal == "567");
+			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad").attribKey == "sad");
+
+			Assert::IsFalse(testDoc.ModifyAttrib("nima", "ico", "petroff"));
+			Assert::IsFalse(testDoc.ModifyAttrib("ima/me", "yuri", "gagarin"));
+
+
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddAttrib("ima/me", testAttr);
+			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
+			Assert::IsTrue(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&
+						   testTags[2].HasAttribAt("sad"));
+
+			testDoc.ModifyAttrib("ima/me", "sad", "666");
+			testTags = testDoc.GetTagsAt("ima/me");
+			Assert::IsTrue((testTags[0].GetAttribWithKey("sad").attribVal ==
+							testTags[1].GetAttribWithKey("sad").attribVal) ==
+						   (testTags[2].GetAttribWithKey("sad").attribVal == "666"));
+		}
+
+		[TestMethod]
+		void TestXMLDeleteAttribAtTag()
+		{
+			XMLDoc testDoc;
+
+			XMLTag testTag;
+
+			XMLAttrib testAttr;
+			testAttr.attribKey = "sad";
+			testAttr.attribVal = "123";
+
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddAttrib("ima/me", testAttr);
+
+			Assert::IsTrue(testDoc.DeleteAttrib("ima/me", "sad"));
+			Assert::IsFalse(testDoc.HasAttribAt("ima/me", "sad"));
+			Assert::IsFalse(testDoc.DeleteAttrib("niama/me", "incognito"));
+
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddTag("ima/me", testTag);
+			testDoc.AddAttrib("ima/me", testAttr);
+			testDoc.DeleteAttrib("ima/me", "sad");
+			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
+			Assert::IsFalse(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&
+						    testTags[2].HasAttribAt("sad"));
+		}
 	};
 }

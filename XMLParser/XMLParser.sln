@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMLTests", "XMLTests\XMLTes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tree", "Tree\Tree.vcxproj", "{A9189B41-6B02-4D59-BA05-0AC038437963}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMLLib", "XMLLib\XMLLib.vcxproj", "{9B7A5660-F375-4F68-AE71-B0833C2C220B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +27,10 @@ Global
 		{A9189B41-6B02-4D59-BA05-0AC038437963}.Debug|Win32.Build.0 = Debug|Win32
 		{A9189B41-6B02-4D59-BA05-0AC038437963}.Release|Win32.ActiveCfg = Release|Win32
 		{A9189B41-6B02-4D59-BA05-0AC038437963}.Release|Win32.Build.0 = Release|Win32
+		{9B7A5660-F375-4F68-AE71-B0833C2C220B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9B7A5660-F375-4F68-AE71-B0833C2C220B}.Debug|Win32.Build.0 = Debug|Win32
+		{9B7A5660-F375-4F68-AE71-B0833C2C220B}.Release|Win32.ActiveCfg = Release|Win32
+		{9B7A5660-F375-4F68-AE71-B0833C2C220B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
