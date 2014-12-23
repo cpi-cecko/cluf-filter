@@ -47,7 +47,7 @@ public:
 	// If the key already exists, creates a new key and adds the value to it.
 	// If the key contains invalid characters, returns `false`.
 	// If the insertion is successful, returns `true`.
-	bool Insert(const std::string &atKey, VAL_TYPE newVal);
+	bool Insert(const std::string &atKey, const VAL_TYPE &newVal);
 
 	// Removes **all** keys which are equal to `atKey`.
 	bool Remove(const std::string &atKey);
@@ -57,6 +57,9 @@ public:
 	// Returns a _Result_ containing `isValid=false` if there is
 	// no value at `key`.
 	Result<VAL_TYPE> At(const std::string &atKey) const;
+
+	// Updates a value at a specific key
+	bool Update(const std::string &atKey, const VAL_TYPE &newVal);
 
 	bool IsEmpty() const;
 
@@ -106,6 +109,10 @@ public:
 	{
 		return val;
 	}
+	void SetVal(const VAL_TYPE &newVal)
+	{
+		val = newVal;
+	}
 
 private:
 	Tree(const Tree &other);
@@ -121,7 +128,7 @@ private:
 };
 
 template <class VAL_TYPE>
-bool Tree<VAL_TYPE>::Insert(const std::string &atKey, VAL_TYPE newVal)
+bool Tree<VAL_TYPE>::Insert(const std::string &atKey, const VAL_TYPE &newVal)
 {
 	if ( ! IsKeyValid(atKey)) return false;
 
@@ -237,6 +244,34 @@ Result<VAL_TYPE> Tree<VAL_TYPE>::At(const std::string &atKey) const
 		{
 			result.val.push_back((*child)->GetVal());
 			result.isValid = true;
+		}
+	}
+
+	return result;
+}
+
+template <class VAL_TYPE>
+bool Tree<VAL_TYPE>::Update(const std::string &atKey, const VAL_TYPE &newVal)
+{
+	if ( ! IsKeyValid(atKey)) return false;
+
+	std::string _key;
+	std::string rest;
+	ParseKey(atKey, _key, rest);
+
+	bool result = false;
+
+	for (std::list<Tree*>::iterator child = children.begin();
+		 child != children.end(); ++child)
+	{
+		if ((*child)->GetKey() == _key && rest != "")
+		{
+			result = (*child)->Update(rest, newVal);
+		}
+		else if ((*child)->GetKey() == _key)
+		{
+			(*child)->SetVal(newVal);
+			result = true;
 		}
 	}
 

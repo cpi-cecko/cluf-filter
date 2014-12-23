@@ -211,6 +211,30 @@ namespace XMLTests
 			Assert::IsFalse(testTree.IsEmpty());
 		};
 
+		[TestMethod]
+		void TestTreeUpdate()
+		{
+			Tree<int> testTree;
+
+			// Updating several children
+			testTree.Insert("slash/person/name", 15);
+			testTree.Insert("slash/person/name", 10);
+			testTree.Insert("slash/person/name", 11);
+
+			Assert::IsTrue(testTree.Update("slash/person/name", 999));
+			Result<int> atName = testTree.At("slash/person/name");
+			Assert::IsTrue(atName.isValid);
+			Assert::AreEqual(atName.val[0], 999);
+			Assert::AreEqual(atName.val[1], 999);
+			Assert::AreEqual(atName.val[2], 999);
+
+			// Updating a parent node
+			Assert::IsTrue(testTree.Update("slash", 15));
+
+			// Updating non-existent node
+			Assert::IsFalse(testTree.Update("slash/guns/", 10));
+		}
+
 		// Optional
 		/*
 		[TestMethod]
