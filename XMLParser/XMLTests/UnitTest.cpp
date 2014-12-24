@@ -364,13 +364,10 @@ namespace XMLTests
 
 			XMLTag testTag;
 
-			XMLAttrib testAttr;
-			testAttr.attribKey = "sad";
-			testAttr.attribVal = "123";
-			Assert::IsFalse(testDoc.AddAttrib("niama/me", testAttr));
+			Assert::IsFalse(testDoc.AddAttrib("niama/me", "sad", "123"));
 
 			testDoc.AddTag("ima/me", testTag);
-			Assert::IsTrue(testDoc.AddAttrib("ima/me", testAttr));
+			Assert::IsTrue(testDoc.AddAttrib("ima/me", "sad", "123"));
 			Assert::IsTrue(testDoc.HasAttribAt("ima/me", "sad"));
 		}
 
@@ -381,16 +378,12 @@ namespace XMLTests
 
 			XMLTag testTag;
 
-			XMLAttrib testAttr;
-			testAttr.attribKey = "sad";
-			testAttr.attribVal = "123";
-
 			testDoc.AddTag("ima/me", testTag);
-			testDoc.AddAttrib("ima/me", testAttr);
+			testDoc.AddAttrib("ima/me", "sad", "123");
 
 			Assert::IsTrue(testDoc.ModifyAttrib("ima/me", "sad", "567"));
-			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad").attribVal == "567");
-			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad").attribKey == "sad");
+			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad") == "567");
+			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad") == "sad");
 
 			Assert::IsFalse(testDoc.ModifyAttrib("nima", "ico", "petroff"));
 			Assert::IsFalse(testDoc.ModifyAttrib("ima/me", "yuri", "gagarin"));
@@ -398,16 +391,15 @@ namespace XMLTests
 
 			testDoc.AddTag("ima/me", testTag);
 			testDoc.AddTag("ima/me", testTag);
-			testDoc.AddAttrib("ima/me", testAttr);
+			testDoc.AddAttrib("ima/me", "sad", "123");
 			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
 			Assert::IsTrue(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&
 						   testTags[2].HasAttribAt("sad"));
 
 			testDoc.ModifyAttrib("ima/me", "sad", "666");
 			testTags = testDoc.GetTagsAt("ima/me");
-			Assert::IsTrue((testTags[0].GetAttribWithKey("sad").attribVal ==
-							testTags[1].GetAttribWithKey("sad").attribVal) ==
-						   (testTags[2].GetAttribWithKey("sad").attribVal == "666"));
+			Assert::IsTrue((testTags[0].GetAttribWithKey("sad") == testTags[1].GetAttribWithKey("sad")) ==
+						   (testTags[2].GetAttribWithKey("sad") == "666"));
 		}
 
 		[TestMethod]
@@ -417,12 +409,8 @@ namespace XMLTests
 
 			XMLTag testTag;
 
-			XMLAttrib testAttr;
-			testAttr.attribKey = "sad";
-			testAttr.attribVal = "123";
-
 			testDoc.AddTag("ima/me", testTag);
-			testDoc.AddAttrib("ima/me", testAttr);
+			testDoc.AddAttrib("ima/me", "sad", "123");
 
 			Assert::IsTrue(testDoc.DeleteAttrib("ima/me", "sad"));
 			Assert::IsFalse(testDoc.HasAttribAt("ima/me", "sad"));
@@ -430,7 +418,7 @@ namespace XMLTests
 
 			testDoc.AddTag("ima/me", testTag);
 			testDoc.AddTag("ima/me", testTag);
-			testDoc.AddAttrib("ima/me", testAttr);
+			testDoc.AddAttrib("ima/me", "sad", "123");
 			testDoc.DeleteAttrib("ima/me", "sad");
 			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
 			Assert::IsFalse(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&

@@ -3,15 +3,9 @@
 
 #include "../Tree/Tree.h"
 
-#include <vector>
+#include <map>
 #include <string>
 
-
-struct XMLAttrib
-{
-	std::string attribKey;
-	std::string attribVal;
-};
 
 typedef std::string XMLData;
 
@@ -31,18 +25,18 @@ public:
 	bool DeleteAttrib(const std::string &attribKey);
 	void DeleteData();
 
-	void AddAttrib(const XMLAttrib &newAttrib);
+	void AddAttrib(const std::string &attribKey, const std::string &attribVal);
 	void AddData(const XMLData &newData);
 
 	bool HasData() const;
 	bool HasAttribAt(const std::string &key) const;
 
 	const XMLData& GetData() const;
-	std::vector<XMLAttrib> GetAttribs() const;
-	const XMLAttrib& GetAttribWithKey(const std::string &key) const;
+	std::map<std::string, std::string> GetAttribs() const;
+	std::string GetAttribWithKey(const std::string &key) const;
 
 private:
-	std::vector<XMLAttrib> attribs;
+	std::map<std::string, std::string> attribs;
 
 	XMLData data;
 };
@@ -58,7 +52,8 @@ public:
 	bool AddTag(const std::string &path, const XMLTag &newTag);
 	// Adds `newAttrib` at all tags corresponding to `pathToTag`.
 	// If no such tags are found, returns _false_.
-	bool AddAttrib(const std::string &pathToTag, const XMLAttrib &newAttrib);
+	bool AddAttrib(const std::string &pathToTag, 
+				   const std::string &attribKey, const std::string &attribVal);
 
 	// Updates the tags at the given path with the contents of `modifiedTag`.
 	// If no such tags are found, returns _false_.

@@ -11,47 +11,58 @@ XMLTag::XMLTag()
 
 void XMLTag::ModifyData(const XMLData &dataToAppend)
 {
+	data.append(dataToAppend);
 }
 bool XMLTag::ModifyAttrib(const std::string &attribKey, const std::string &attribVal)
 {
+	auto attrib = attribs.find(attribKey);
+	if (attrib != attribs.end())
+	{
+		attrib->second = attribVal;
+		return true;
+	}
 	return false;
 }
 
 bool XMLTag::DeleteAttrib(const std::string &attribKey)
 {
-	return false;
+	return attribs.erase(attribKey) != 0;
 }
 void XMLTag::DeleteData()
 {
+	data = "";
 }
 
-void XMLTag::AddAttrib(const XMLAttrib &newAttrib)
+void XMLTag::AddAttrib(const std::string &attribKey, const std::string &attribVal)
 {
+	attribs.insert(std::make_pair(attribKey, attribVal));
 }
 void XMLTag::AddData(const XMLData &newData)
 {
+	data = newData;
 }
 
 bool XMLTag::HasData() const
 {
-	return false;
+	return ! data.empty();
 }
 bool XMLTag::HasAttribAt(const std::string &key) const
 {
-	return false;
+	return attribs.find(key) != attribs.end();
 }
 
 const XMLData& XMLTag::GetData() const
 {
 	return data;
 }
-std::vector<XMLAttrib> XMLTag::GetAttribs() const
+std::map<std::string, std::string> XMLTag::GetAttribs() const
 {
 	return attribs;
 }
-const XMLAttrib& XMLTag::GetAttribWithKey(const std::string &key) const
+std::string XMLTag::GetAttribWithKey(const std::string &key) const
 {
-	return attribs[0];
+	auto attrib = attribs.find(key);
+	return attrib->second;
 }
 
 
@@ -66,7 +77,8 @@ bool XMLDoc::AddTag(const std::string &path, const XMLTag &newTag)
 {
 	return false;
 }
-bool XMLDoc::AddAttrib(const std::string &pathToTag, const XMLAttrib &newAttrib)
+bool XMLDoc::AddAttrib(const std::string &pathToTag, 
+					   const std::string &attribKey, const std::string &attribVal)
 {
 	return false;
 }
