@@ -147,8 +147,8 @@ namespace XMLTests
 			testTree.Insert("root", 5);
 			testTree.Insert("my", 10);
 
-			Assert::AreEqual(testTree.At("root").val[0], 5);
-			Assert::AreEqual(testTree.At("my").val[0], 10);
+			Assert::AreEqual(*testTree.At("root").val[0], 5);
+			Assert::AreEqual(*testTree.At("my").val[0], 10);
 
 			// Child nodes insertion
 			testTree.Insert("root/newElem", 10);
@@ -156,15 +156,15 @@ namespace XMLTests
 			testTree.Insert("root/another/last", 19);
 			testTree.Insert("nonexist/here", 4);
 
-			Assert::AreEqual(testTree.At("root/newElem").val[0], 10);
-			Assert::AreEqual(testTree.At("root/another").val[0], 90);
-			Assert::AreEqual(testTree.At("root/another/last").val[0], 19);
-			Assert::AreEqual(testTree.At("nonexist/here").val[0], 4);
+			Assert::AreEqual(*testTree.At("root/newElem").val[0], 10);
+			Assert::AreEqual(*testTree.At("root/another").val[0], 90);
+			Assert::AreEqual(*testTree.At("root/another/last").val[0], 19);
+			Assert::AreEqual(*testTree.At("nonexist/here").val[0], 4);
 
 			// Really deep insertion
 			testTree.Insert("deep/deep1/deep2/deep3/deep4/deep5/deep6/deep7/deep8/deep9/deep10/deep11/deep12/deep13/deep14/deep15/deep16/deep17/deep18", 999999);
 
-			Assert::AreEqual(testTree.At("deep/deep1/deep2/deep3/deep4/deep5/deep6/deep7/deep8/deep9/deep10/deep11/deep12/deep13/deep14/deep15/deep16/deep17/deep18").val[0], 999999);
+			Assert::AreEqual(*testTree.At("deep/deep1/deep2/deep3/deep4/deep5/deep6/deep7/deep8/deep9/deep10/deep11/deep12/deep13/deep14/deep15/deep16/deep17/deep18").val[0], 999999);
 
 			// Keys with bad characters
 			Assert::IsFalse(testTree.Insert("gosho:pesho()", 10));
@@ -172,7 +172,7 @@ namespace XMLTests
 
 			// Keys begining with '/' (slash)
 			testTree.Insert("/root", 10);
-			Assert::AreEqual(testTree.At("/root").val[0], testTree.At("root").val[0]);
+			Assert::AreEqual(*testTree.At("/root").val[0], *testTree.At("root").val[0]);
 
 			// Insert at empty key
 			Assert::IsFalse(testTree.Insert("", 5));
@@ -226,11 +226,11 @@ namespace XMLTests
 			testTree.Insert("slash/person/name", 11);
 
 			Assert::IsTrue(testTree.Update("slash/person/name", 999));
-			Result<int> atName = testTree.At("slash/person/name");
+			Result<int*> atName = testTree.At("slash/person/name");
 			Assert::IsTrue(atName.isValid);
-			Assert::AreEqual(atName.val[0], 999);
-			Assert::AreEqual(atName.val[1], 999);
-			Assert::AreEqual(atName.val[2], 999);
+			Assert::AreEqual(*atName.val[0], 999);
+			Assert::AreEqual(*atName.val[1], 999);
+			Assert::AreEqual(*atName.val[2], 999);
 
 			// Updating a parent node
 			Assert::IsTrue(testTree.Update("slash", 15));
@@ -296,19 +296,19 @@ namespace XMLTests
 			XMLTag newTag;
 			newTag.AddData("mashala");
 			Assert::IsTrue(testDoc.ModifyTag("hello/there/mister", newTag));
-			Assert::IsTrue(testDoc.GetTagsAt("hello/there/mister")[0].GetData() == "mashala");
+			Assert::IsTrue(testDoc.GetTagsAt("hello/there/mister")[0]->GetData() == "mashala");
 
 			testDoc.AddTag("hi", testTag);
 			testDoc.AddTag("turk", newTag);
 			Assert::IsTrue(testDoc.ModifyTag("turk", testTag));
-			Assert::IsTrue(testDoc.GetTagsAt("turk")[0].GetData() == "Hallo!!!");
+			Assert::IsTrue(testDoc.GetTagsAt("turk")[0]->GetData() == "Hallo!!!");
 
 			testDoc.AddTag("hi", newTag);
 			testDoc.AddTag("hi", newTag);
 			Assert::IsTrue(testDoc.ModifyTag("hi", newTag));
-			std::vector<XMLTag> tags = testDoc.GetTagsAt("hi");
+			std::vector<XMLTag*> tags = testDoc.GetTagsAt("hi");
 			Assert::IsTrue(tags.size() == 3);
-			Assert::IsTrue((tags[0].GetData() == tags[1].GetData()) == (tags[2].GetData() == "mashala"));
+			Assert::IsTrue((tags[0]->GetData() == tags[1]->GetData()) == (tags[2]->GetData() == "mashala"));
 
 			testTag.ModifyData(" There!!!");
 			Assert::IsFalse(testDoc.ModifyTag("no/there/is/not/tag", testTag));
@@ -324,7 +324,7 @@ namespace XMLTests
 
 			testDoc.AddTag("test", testTag);
 			Assert::IsTrue(testDoc.DeleteDataAtTag("test"));
-			Assert::IsFalse(testDoc.GetTagsAt("test")[0].HasData());
+			Assert::IsFalse(testDoc.GetTagsAt("test")[0]->HasData());
 
 			XMLTag manyTag;
 			manyTag.AddData("many");
@@ -332,8 +332,8 @@ namespace XMLTests
 			testDoc.AddTag("many", manyTag);
 			testDoc.AddTag("many", manyTag);
 			Assert::IsTrue(testDoc.DeleteDataAtTag("many"));
-			std::vector<XMLTag> manyTags = testDoc.GetTagsAt("many");
-			Assert::IsTrue(! manyTags[0].HasData() && ! manyTags[1].HasData() && ! manyTags[2].HasData());
+			std::vector<XMLTag*> manyTags = testDoc.GetTagsAt("many");
+			Assert::IsTrue(! manyTags[0]->HasData() && ! manyTags[1]->HasData() && ! manyTags[2]->HasData());
 
 			Assert::IsFalse(testDoc.DeleteDataAtTag("no"));
 			Assert::IsFalse(testDoc.DeleteDataAtTag(""));
@@ -347,14 +347,14 @@ namespace XMLTests
 			XMLTag testTag;
 			testDoc.AddTag("test", testTag);
 
-			testDoc.GetTagsAt("test")[0].AddData("sad");
+			testDoc.GetTagsAt("test")[0]->AddData("sad");
 			Assert::IsTrue(testDoc.HasDataAt("test"));
-			Assert::IsTrue(testDoc.GetTagsAt("test")[0].GetData() == "sad");
+			Assert::IsTrue(testDoc.GetTagsAt("test")[0]->GetData() == "sad");
 
 			// Empty data is no data.
-			testDoc.GetTagsAt("test")[0].AddData("");
+			testDoc.GetTagsAt("test")[0]->AddData("");
 			Assert::IsFalse(testDoc.HasDataAt("test"));
-			Assert::IsFalse(testDoc.GetTagsAt("test")[0].GetData() == "sad");
+			Assert::IsFalse(testDoc.GetTagsAt("test")[0]->GetData() == "sad");
 		}
 
 		[TestMethod]
@@ -382,8 +382,7 @@ namespace XMLTests
 			testDoc.AddAttrib("ima/me", "sad", "123");
 
 			Assert::IsTrue(testDoc.ModifyAttrib("ima/me", "sad", "567"));
-			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad") == "567");
-			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0].GetAttribWithKey("sad") == "sad");
+			Assert::IsTrue(testDoc.GetTagsAt("ima/me")[0]->GetAttribWithKey("sad") == "567");
 
 			Assert::IsFalse(testDoc.ModifyAttrib("nima", "ico", "petroff"));
 			Assert::IsFalse(testDoc.ModifyAttrib("ima/me", "yuri", "gagarin"));
@@ -392,14 +391,14 @@ namespace XMLTests
 			testDoc.AddTag("ima/me", testTag);
 			testDoc.AddTag("ima/me", testTag);
 			testDoc.AddAttrib("ima/me", "sad", "123");
-			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
-			Assert::IsTrue(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&
-						   testTags[2].HasAttribAt("sad"));
+			std::vector<XMLTag*> testTags = testDoc.GetTagsAt("ima/me");
+			Assert::IsTrue(testTags[0]->HasAttribAt("sad") && testTags[1]->HasAttribAt("sad") &&
+						   testTags[2]->HasAttribAt("sad"));
 
 			testDoc.ModifyAttrib("ima/me", "sad", "666");
 			testTags = testDoc.GetTagsAt("ima/me");
-			Assert::IsTrue((testTags[0].GetAttribWithKey("sad") == testTags[1].GetAttribWithKey("sad")) ==
-						   (testTags[2].GetAttribWithKey("sad") == "666"));
+			Assert::IsTrue((testTags[0]->GetAttribWithKey("sad") == testTags[1]->GetAttribWithKey("sad")) ==
+						   (testTags[2]->GetAttribWithKey("sad") == "666"));
 		}
 
 		[TestMethod]
@@ -420,9 +419,9 @@ namespace XMLTests
 			testDoc.AddTag("ima/me", testTag);
 			testDoc.AddAttrib("ima/me", "sad", "123");
 			testDoc.DeleteAttrib("ima/me", "sad");
-			std::vector<XMLTag> testTags = testDoc.GetTagsAt("ima/me");
-			Assert::IsFalse(testTags[0].HasAttribAt("sad") && testTags[1].HasAttribAt("sad") &&
-						    testTags[2].HasAttribAt("sad"));
+			std::vector<XMLTag*> testTags = testDoc.GetTagsAt("ima/me");
+			Assert::IsFalse(testTags[0]->HasAttribAt("sad") && testTags[1]->HasAttribAt("sad") &&
+						    testTags[2]->HasAttribAt("sad"));
 		}
 	};
 }

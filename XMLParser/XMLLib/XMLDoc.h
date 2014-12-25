@@ -73,11 +73,11 @@ public:
 	// Returns _false_ if `path` doesn't exist.
 	bool DeleteDataAtTag(const std::string &pathToTag);
 
-	bool HasDataAt(const std::string &path) const;
-	bool HasAttribAt(const std::string &path, const std::string &key) const;
-	bool HasTagAt(const std::string &path) const;
+	bool HasDataAt(const std::string &path);
+	bool HasAttribAt(const std::string &path, const std::string &key);
+	bool HasTagAt(const std::string &path);
 
-	std::vector<XMLTag> GetTagsAt(const std::string &path) const;
+	std::vector<XMLTag*> GetTagsAt(const std::string &path);
 
 private:
 	Tree<XMLTag> xmlTree;

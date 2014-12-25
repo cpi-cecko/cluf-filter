@@ -75,51 +75,99 @@ XMLDoc::XMLDoc()
 
 bool XMLDoc::AddTag(const std::string &path, const XMLTag &newTag)
 {
-	return false;
+	return xmlTree.Insert(path, newTag);
 }
 bool XMLDoc::AddAttrib(const std::string &pathToTag, 
 					   const std::string &attribKey, const std::string &attribVal)
 {
+	// TODO: Tree::At should return a reference to the elements.
+	Result<XMLTag*> atKey = xmlTree.At(pathToTag);
+	if (atKey.isValid)
+	{
+		for (XMLTag *val : atKey.val)
+		{
+			val->AddAttrib(attribKey, attribVal);
+		}
+		return true;
+	}
 	return false;
 }
 
 bool XMLDoc::ModifyTag(const std::string &path, const XMLTag &modifiedTag)
 {
-	return false;
+	return xmlTree.Update(path, modifiedTag);
 }
 bool XMLDoc::ModifyAttrib(const std::string &pathToTag,
-				  const std::string &attribKey, const std::string &attribVal)
+				          const std::string &attribKey, const std::string &attribVal)
 {
+	Result<XMLTag*> atKey = xmlTree.At(pathToTag);
+	if (atKey.isValid)
+	{
+		for (XMLTag *val : atKey.val)
+		{
+			if ( ! val->ModifyAttrib(attribKey, attribVal))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	return false;
 }
 
 bool XMLDoc::DeleteTag(const std::string &path)
 {
-	return false;
+	return xmlTree.Remove(path);
 }
 bool XMLDoc::DeleteAttrib(const std::string &pathToTag, const std::string &key)
 {
-	return false;
+	Result<XMLTag*> atKey = xmlTree.At(pathToTag);
+	if (atKey.isValid)
+	{
+		for (XMLTag *val : atKey.val)
+		{
+			if ( ! val->DeleteAttrib(key))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 bool XMLDoc::DeleteDataAtTag(const std::string &pathToTag)
 {
+	Result<XMLTag*> atKey = xmlTree.At(pathToTag);
+	if (atKey.isValid)
+	{
+		for (XMLTag *val : atKey.val)
+		{
+			val->DeleteData();
+		}
+		return true;
+	}
 	return false;
 }
 
-bool XMLDoc::HasDataAt(const std::string &path) const
+bool XMLDoc::HasDataAt(const std::string &path)
 {
-	return false;
+	Result<XMLTag*> atKey = xmlTree.At(path);
+	return atKey.isValid && atKey.val[0]->HasData();
 }
-bool XMLDoc::HasAttribAt(const std::string &path, const std::string &key) const
+bool XMLDoc::HasAttribAt(const std::string &path, const std::string &key)
 {
-	return false;
+	Result<XMLTag*> atKey = xmlTree.At(path);
+	return atKey.isValid && atKey.val[0]->HasAttribAt(key);
 }
-bool XMLDoc::HasTagAt(const std::string &path) const
+bool XMLDoc::HasTagAt(const std::string &path)
 {
-	return false;
+	return xmlTree.At(path).isValid;
 }
 
-std::vector<XMLTag> XMLDoc::GetTagsAt(const std::string &path) const
+std::vector<XMLTag*> XMLDoc::GetTagsAt(const std::string &path)
 {
-	return std::vector<XMLTag>();
+	return xmlTree.At(path).val;
 }

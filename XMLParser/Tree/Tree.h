@@ -56,7 +56,7 @@ public:
 	// _vector_ of values if there are keys equal to `atKey`
 	// Returns a _Result_ containing `isValid=false` if there is
 	// no value at `key`.
-	Result<VAL_TYPE> At(const std::string &atKey) const;
+	Result<VAL_TYPE*> At(const std::string &atKey);
 
 	// Updates a value at a specific key
 	bool Update(const std::string &atKey, const VAL_TYPE &newVal);
@@ -100,14 +100,14 @@ public:
 	}
 
 
-	const std::string &GetKey() const
+	const std::string& GetKey() const
 	{
 		return key;
 	}
 
-	VAL_TYPE GetVal() const
+	VAL_TYPE* GetVal()
 	{
-		return val;
+		return &val;
 	}
 	void SetVal(const VAL_TYPE &newVal)
 	{
@@ -219,22 +219,22 @@ bool Tree<VAL_TYPE>::Remove(const std::string &atKey)
 }
 
 template <class VAL_TYPE>
-Result<VAL_TYPE> Tree<VAL_TYPE>::At(const std::string &atKey) const
+Result<VAL_TYPE*> Tree<VAL_TYPE>::At(const std::string &atKey)
 {
-	if ( ! IsKeyValid(atKey)) return Result<VAL_TYPE>(false);
+	if ( ! IsKeyValid(atKey)) return Result<VAL_TYPE*>(false);
 
 	std::string _key;
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
-	Result<VAL_TYPE> result(false);
+	Result<VAL_TYPE*> result(false);
 
 	for (std::list<Tree*>::const_iterator child = children.begin();
 		 child != children.end(); ++child)
 	{
 		if ((*child)->GetKey() == _key && rest != "")
 		{
-			Result<VAL_TYPE> childRes = (*child)->At(rest);
+			Result<VAL_TYPE*> childRes = (*child)->At(rest);
 			if (childRes.isValid)
 			{
 				result = childRes;
@@ -322,9 +322,11 @@ bool Tree<VAL_TYPE>::IsKeyValid(const std::string &_key)
 										      return std::isalnum(i) || i == (int)'/'; 
 										  });
 	bool hasConsequentiveSlashes = _key.find("//") != std::string::npos;
+	bool hasOnlyOneSlash = _key.size() == 1 && _key[0] == '/';
 
 	return hasValidCharacters && 
 			! hasConsequentiveSlashes &&
+			! hasOnlyOneSlash &&
 			! _key.empty();
 }
 
