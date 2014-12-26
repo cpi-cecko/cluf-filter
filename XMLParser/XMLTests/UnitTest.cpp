@@ -239,6 +239,51 @@ namespace XMLTests
 			Assert::IsFalse(testTree.Update("slash/guns/", 10));
 		}
 
+
+		////////////////////////
+		// TreeIterator Tests //
+		////////////////////////
+		[TestMethod]
+		void TestTreeIterator()
+		{
+			Tree<int> testTree;
+			testTree.Insert("parent/1", 1);
+			testTree.Insert("parent/2", 2);
+			testTree.Insert("parent/3", 3);
+			testTree.Insert("parent/3", 3);
+			testTree.Insert("parent/1/2/3", 123);
+			testTree.Insert("parent/2/3/4", 234);
+			testTree.Insert("parent/4", 4);
+
+			testTree.Insert("another/deep1", 1);
+			testTree.Insert("another/deep1/deep2", 12);
+			testTree.Insert("another/deep2", 2);
+			testTree.Insert("another/deep3/deep4/deeper", 4);
+
+			testTree.Insert("contact/person/name", 1);
+			testTree.Insert("contact/person/name", 2);
+			testTree.Insert("contact/person/email", 3);
+			testTree.Insert("contact/person", 1);
+			testTree.Insert("contact/person/name", 5);
+			testTree.Insert("contact/person/email", 3);
+
+			TreeIterator<int> iter = testTree.GetBeginIter().Child(); // we pass the "/" (root parent)
+
+			Assert::IsTrue(iter.Child().HasChild()); // parent/1 has got a child
+			iter.Reset();
+			Assert::IsFalse(iter.Child().Next().Next().HasChild()); // parent/3 hasn't got a child
+			iter.Reset();
+			Assert::IsFalse(iter.Next().Next().HasNext()); // we have only three nodes after ("/")
+
+			iter.Reset();
+			Assert::IsFalse(iter.Next().Next().Deref()->HasVal()); // contact/ doesn't have a value
+			iter.Reset();
+			Assert::IsTrue(iter.Next().Child().Deref()->HasVal()); // another/deep1 has value
+			iter.Reset();
+			Assert::IsTrue(iter.Child().Next().Next().Deref()->HasVal()); // parent/3 has value
+		}
+
+
 		//////////////////
 		// XMLDoc Tests //
 		//////////////////
