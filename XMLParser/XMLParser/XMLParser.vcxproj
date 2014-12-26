@@ -78,6 +78,14 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tree\Tree.vcxproj">
+      <Project>{a9189b41-6b02-4d59-ba05-0ac038437963}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\XMLLib\XMLLib.vcxproj">
+      <Project>{9b7a5660-f375-4f68-ae71-b0833c2c220b}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

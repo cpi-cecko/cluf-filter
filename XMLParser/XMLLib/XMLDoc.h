@@ -79,6 +79,8 @@ public:
 
 	std::vector<XMLTag*> GetTagsAt(const std::string &path);
 
+	TreeIterator<XMLTag> GetIterator();
+
 private:
 	Tree<XMLTag> xmlTree;
 };

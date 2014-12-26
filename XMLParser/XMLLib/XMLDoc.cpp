@@ -171,3 +171,8 @@ std::vector<XMLTag*> XMLDoc::GetTagsAt(const std::string &path)
 {
 	return xmlTree.At(path).val;
 }
+
+TreeIterator<XMLTag> XMLDoc::GetIterator()
+{
+	return xmlTree.GetBeginIter().Child();
+}
