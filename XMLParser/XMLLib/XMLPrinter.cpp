@@ -6,7 +6,7 @@
 
 void PrettyPrintH(TreeIterator<XMLTag> &iter, size_t depth);
 
-void XMLPrinter::PrettyPrint(TreeIterator<XMLTag> iter)
+void XMLPrinter::PrettyPrint(TreeIterator<XMLTag> &iter)
 {
 	PrettyPrintH(iter, 0);
 }
@@ -50,7 +50,7 @@ std::string Spaces(size_t depth)
 }
 
 
-void XMLPrinter::CompactPrint(TreeIterator<XMLTag> iter)
+void XMLPrinter::CompactPrint(TreeIterator<XMLTag> &iter)
 {
 	Tree<XMLTag> *current = iter.Deref();
 	if ( ! current) return;

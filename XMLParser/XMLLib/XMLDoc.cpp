@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XMLDoc.h"
 
+#include <assert.h>
+
 
 ////////////
 // XMLTag //
@@ -55,15 +57,19 @@ const XMLData& XMLTag::GetData() const
 {
 	return data;
 }
-std::map<std::string, std::string> XMLTag::GetAttribs() const
+const std::map<std::string, std::string>& XMLTag::GetAttribs() const
 {
 	return attribs;
 }
-std::string XMLTag::GetAttribWithKey(const std::string &key) const
+#ifdef TEST_BUILD
+const std::string& XMLTag::GetAttribWithKey(const std::string &key) const
 {
 	auto attrib = attribs.find(key);
+	assert(attrib != attribs.end());
+
 	return attrib->second;
 }
+#endif
 
 
 ////////////
@@ -80,7 +86,6 @@ bool XMLDoc::AddTag(const std::string &path, const XMLTag &newTag)
 bool XMLDoc::AddAttrib(const std::string &pathToTag, 
 					   const std::string &attribKey, const std::string &attribVal)
 {
-	// TODO: Tree::At should return a reference to the elements.
 	Result<XMLTag*> atKey = xmlTree.At(pathToTag);
 	if (atKey.isValid)
 	{
@@ -167,10 +172,15 @@ bool XMLDoc::HasTagAt(const std::string &path)
 	return xmlTree.At(path).isValid;
 }
 
+#ifdef TEST_BUILD
 std::vector<XMLTag*> XMLDoc::GetTagsAt(const std::string &path)
 {
-	return xmlTree.At(path).val;
+	auto atPath = xmlTree.At(path);
+	assert(atPath.isValid);
+
+	return atPath.val;
 }
+#endif
 
 TreeIterator<XMLTag> XMLDoc::GetIterator()
 {

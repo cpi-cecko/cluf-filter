@@ -7,6 +7,9 @@
 #include <string>
 
 
+#define TEST_BUILD
+
+
 typedef std::string XMLData;
 
 class XMLTag
@@ -32,8 +35,12 @@ public:
 	bool HasAttribAt(const std::string &key) const;
 
 	const XMLData& GetData() const;
-	std::map<std::string, std::string> GetAttribs() const;
-	std::string GetAttribWithKey(const std::string &key) const;
+	const std::map<std::string, std::string>& GetAttribs() const;
+
+#ifdef TEST_BUILD
+	// Unsafe. Used only for testing.
+	const std::string& GetAttribWithKey(const std::string &key) const;
+#endif
 
 private:
 	std::map<std::string, std::string> attribs;
@@ -77,7 +84,11 @@ public:
 	bool HasAttribAt(const std::string &path, const std::string &key);
 	bool HasTagAt(const std::string &path);
 
+#ifdef TEST_BUILD
+	// Asserts if there ain't tags at this position.
+	// The user should check HasTagAt first. Used only for testing.
 	std::vector<XMLTag*> GetTagsAt(const std::string &path);
+#endif
 
 	TreeIterator<XMLTag> GetIterator();
 
