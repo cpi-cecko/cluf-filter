@@ -182,12 +182,13 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, const VAL_TYPE &newVal)
 		return true;
 	}
 
-	for (std::list<Tree*>::iterator child = children.begin();
-		 child != children.end(); ++child)
+	for (std::list<Tree*>::reverse_iterator child = children.rbegin();
+		 child != children.rend(); ++child)
 	{
 		if ((*child)->GetKey() == _key && rest != "")
 		{
 			(*child)->Insert(rest, newVal);
+			break;
 		}
 		else if ((*child)->GetKey() == _key)
 		{

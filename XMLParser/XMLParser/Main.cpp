@@ -47,6 +47,8 @@ int main()
 	testDoc.AddTag("another/one/two", oneTwoDig);
 	testDoc.AddTag("another/one/two/three", oneTwoThreeDig);
 	testDoc.AddTag("another/one/two/three/four", oneTwoThreeFourDig);
+	testDoc.AddTag("another/one", oneDig);
+	testDoc.AddTag("another/one/two", oneTwoDig);
 
 
 	TreeIterator<XMLTag> docIter = testDoc.GetIterator();
