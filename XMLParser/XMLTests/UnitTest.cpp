@@ -178,6 +178,19 @@ namespace XMLTests
 			// Insert at empty key
 			Assert::IsFalse(testTree.Insert("", 5));
 			Assert::IsFalse(testTree.At("").isValid);
+
+			// Equal keys
+			testTree.Insert("parent", 1);
+			testTree.Insert("parent/person", 1);
+			testTree.Insert("parent/person/name", 3);
+			testTree.Insert("parent/person/name", 3);
+			testTree.Insert("parent/person", 2);
+			testTree.Insert("parent/person/name", 2);
+			testTree.Insert("parent/person/email", 4);
+
+			auto nameVal = testTree.At("parent/person/name");
+			Assert::IsTrue(nameVal.val.size() == 3);
+			Assert::IsTrue(*nameVal.val[0] == 3 && *nameVal.val[1] == 3 && *nameVal.val[2] == 2);
 		};
 
 		[TestMethod]

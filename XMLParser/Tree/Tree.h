@@ -281,7 +281,15 @@ Result<VAL_TYPE*> Tree<VAL_TYPE>::At(const std::string &atKey)
 			Result<VAL_TYPE*> childRes = (*child)->At(rest);
 			if (childRes.isValid)
 			{
-				result = childRes;
+				if (result.isValid)
+				{
+					// Don't overwrite contents if we've already accumulated something.
+					result.val.insert(result.val.end(), childRes.val.begin(), childRes.val.end());
+				}
+				else
+				{
+					result = childRes;
+				}
 			}
 		}
 		else if ((*child)->GetKey() == _key)
