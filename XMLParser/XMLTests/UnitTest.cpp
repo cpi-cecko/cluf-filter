@@ -5,6 +5,7 @@
 
 #include "../Tree/Tree.h"
 #include "../XMLLib/XMLDoc.h"
+#include "../XMLLib/XMLTag.h"
 
 using namespace System;
 using namespace System::Text;

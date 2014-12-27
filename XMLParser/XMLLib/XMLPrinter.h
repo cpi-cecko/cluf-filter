@@ -2,6 +2,7 @@
 
 
 #include "XMLDoc.h"
+#include "XMLTag.h"
 
 
 class XMLPrinter
