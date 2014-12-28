@@ -24,7 +24,7 @@ void PrettyPrintH(TreeIterator<XMLTag> &iter, size_t depth)
 		auto attribs = current->GetVal()->GetAttribs();
 		for (auto attrib = attribs.begin(); attrib != attribs.end(); ++attrib)
 		{
-			std::cout << " \"" << attrib->first << "\"=\"" << attrib->second << "\"";
+			std::cout << " " << attrib->first << "=\"" << attrib->second << "\"";
 		}
 		std::cout << ">\n";
 		if (current->GetVal()->HasData())

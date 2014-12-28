@@ -113,5 +113,7 @@ std::vector<XMLTag*> XMLDoc::GetTagsAt(const std::string &path)
 
 TreeIterator<XMLTag> XMLDoc::GetIterator()
 {
+	assert(xmlTree.GetBeginIter().HasChild());
+
 	return xmlTree.GetBeginIter().Child();
 }
