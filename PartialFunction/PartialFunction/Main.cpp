@@ -27,8 +27,14 @@ std::function<optional<C>(A)> compose(std::function<optional<B>(A)> m1,
 			auto c = m2(b.value());
 			return c;
 		}
-		return optional<C>();
+		return b;
 	};
+}
+
+template<class A>
+optional<A> identity(A x)
+{
+	return optional<A>(x);
 }
 
 
@@ -38,11 +44,17 @@ optional<double> safe_root(double x)
 	else return optional<double>();
 }
 
+optional<double> safe_reciprocal(double x)
+{
+	if (x != 0) return optional<double>(1 / x);
+	else return optional<double>();
+}
+
 
 int main()
 {
 	double x = 9;
-	auto res = compose<double, double, double>(safe_root, safe_root)(x);
+	auto res = compose<double, double, double>(safe_root, safe_reciprocal)(x);
 	if (res.isValid())
 	{
 		std::cout << "Val: " << res.value() << '\n';
