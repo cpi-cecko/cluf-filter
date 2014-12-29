@@ -4,6 +4,7 @@
 #include "XMLDoc.h"
 
 #include <fstream>
+#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <locale>
@@ -15,8 +16,6 @@
 // Utility Functions //
 ///////////////////////
 bool IsPostfixOf(const std::string &substr, const std::string &str);
-bool IsInfixOf(const std::string &substr, const std::string &str);
-void TrimLeft(std::string &line);
 
 bool IsFileNameValid(const std::string &xmlFileName);
 // Removes last part of an xmlPath.
@@ -25,16 +24,20 @@ bool IsFileNameValid(const std::string &xmlFileName);
 void RemoveLastPartOfPath(std::string &path);
 // Appends a child to the path.
 void AppendPath(std::string &path, const std::string &toAppend);
-// Extracts a key from a tag.
-// <Name> => Name
-std::string GetKey(const std::string &tag);
-// Extracts all the attribs from a tag.
-// <PurchaseOrder PurchaseOrderNumber="99503" OrderDate="1999-10-20">
-// => [("PurchaseOrderNumber", "99503"), ("OrderDate", "1999-10-20")]
-std::map<std::string, std::string> GetAttribs(const std::string &tag);
-// Extracts data from a tag. **Doesn't handle the case where the data may be on a separate line!**
-// <City>Mill Valley</City> => Mill Valley
-std::string GetData(const std::string &tag);
+
+void AddTagWithPath(XMLDoc *doc, XMLTag &currentTag, std::string &accPath, 
+					std::ifstream &xmlFile, char &ch);
+
+
+void ReadUntil(int (*pred)(int), std::ifstream &file, char &ch);
+std::string ReadUntilAccum(int (*pred)(int), std::ifstream &file, char &ch);
+
+int istagbeg(int ch);
+int istagend(int ch);
+int isemptytag(int ch);
+int iseq(int ch);
+int isquot(int ch);
+int isspaceORtagend(int ch);
 
 
 ///////////////////////////
@@ -51,34 +54,100 @@ bool XMLReader::ReadInto(XMLDoc *doc, const std::string &inputFile)
 	std::ifstream xmlFile(inputFile);
 	if (xmlFile.is_open())
 	{
-		std::string line;
+		char ch;
 		std::string accPath = "";
-		while (std::getline(xmlFile, line))
+		XMLTag currentTag;
+		while (xmlFile >> std::noskipws >> ch)
 		{
-			TrimLeft(line);
-
-			if (IsInfixOf("<?", line) || ! IsInfixOf("<", line)) continue;
-
-			if (IsInfixOf("</", line))
+			if (isspace(ch))
 			{
-				RemoveLastPartOfPath(accPath);
 				continue;
 			}
 
-			AppendPath(accPath, GetKey(line));
-
-			XMLTag newTag;
-			newTag.AddData(GetData(line));
-			auto attribs = GetAttribs(line);
-			for (auto attrib : attribs)
+			// Parse a new tag.
+			if (istagbeg(ch))
 			{
-				newTag.AddAttrib(attrib.first, attrib.second);
+				xmlFile >> std::noskipws >> ch;
+				if (ch == '?')
+				{
+					ReadUntil(istagend, xmlFile, ch);
+					continue;
+				}
+				else if (ch == '/')
+				{
+					AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+					continue;
+				}
+				else if (isspace(ch) || isalnum(ch))
+				{
+					if (isspace(ch))
+					{
+						ReadUntil(isalnum, xmlFile, ch);
+					}
+
+					if (isalnum(ch))
+					{
+						std::string tagName = "";
+						tagName += ch;
+						tagName +=
+							ReadUntilAccum([](int ch) { return (int)(isspace(ch) || 
+																     istagend(ch) ||
+																	 isemptytag(ch));
+													  },
+										   xmlFile, ch);
+						AppendPath(accPath, tagName);
+						while ( ! istagend(ch))
+						{
+							if (isspace(ch))
+							{
+								ReadUntil(isalnum, xmlFile, ch);
+								std::string key = "";
+								key += ch;
+								key += ReadUntilAccum(iseq, xmlFile, ch);
+								ReadUntil(isquot, xmlFile, ch);
+								std::string val = ReadUntilAccum(isquot, xmlFile, ch);
+								currentTag.AddAttrib(key, val);
+								
+								xmlFile >> std::noskipws >> ch;
+							}
+
+							if (isemptytag(ch))
+							{
+								AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+							}
+						}
+
+						continue;
+					}
+				}
+				else 
+				{
+					std::cerr << "Invalid character in xml doc\n";
+					return false;
+				}
 			}
-			doc->AddTag(accPath, newTag);
-
-			if (line.find("</") != std::string::npos)
+			
+			// End parsing new tag.
+			if (isemptytag(ch))
 			{
-				RemoveLastPartOfPath(accPath);
+				AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+				continue;
+			}
+
+			// Parse data.
+			if (! istagbeg(ch) && (isspace(ch) || istagend(ch) || isalnum(ch)))
+			{
+				std::string data = "";
+				if (isalnum(ch))
+				{
+					data += ch;
+					data += ReadUntilAccum(istagbeg, xmlFile, ch);
+				}
+
+				if (istagbeg(ch))
+				{
+					currentTag.AddData(data);
+				}
 			}
 		}
 
@@ -99,21 +168,6 @@ bool IsPostfixOf(const std::string &substr, const std::string &str)
 		return str.compare(str.length() - substrLen, substrLen, substr) == 0;
 	}
 	else return false;
-}
-
-bool IsInfixOf(const std::string &substr, const std::string &str)
-{
-	if (str.length() > substr.length())
-	{
-		return str.compare(0, substr.length(), substr) == 0;
-	}
-	else return false;
-}
-
-void TrimLeft(std::string &line)
-{
-	line.erase(line.begin(), 
-			   std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,56 +202,65 @@ void AppendPath(std::string &path, const std::string &toAppend)
 	path += toAppend;
 }
 
-std::string GetKey(const std::string &tag)
+void AddTagWithPath(XMLDoc *doc, XMLTag &currentTag, std::string &accPath, 
+					std::ifstream &xmlFile, char &ch)
 {
-	std::string result;
-	size_t end = tag.find(' ') > tag.find('>') ? tag.find('>') : tag.find(' ');
-	result.insert(result.begin(), tag.begin() + 1, tag.begin() + end);
-	return result;
+	doc->AddTag(accPath, currentTag);
+	currentTag.Clear();
+	RemoveLastPartOfPath(accPath);
+	ReadUntil(istagend, xmlFile, ch);
 }
 
-std::map<std::string, std::string> GetAttribs(const std::string &tag)
+
+void ReadUntil(int (*pred)(int), std::ifstream &file, char &ch)
 {
-	size_t beg = tag.find(' ');
-	size_t end = tag.find(' ', beg + 1);
-	size_t endTwo = tag.find('>');
-	if (end > endTwo ||
-		end == std::string::npos && beg != std::string::npos)
+	file >> std::noskipws >> ch;
+	while ( ! pred(ch))
 	{
-		end = endTwo;
+		file >> std::noskipws >> ch;
 	}
-
-	std::map<std::string, std::string> attribs;
-	if (end < beg) // Found a space in the data.
-	{
-		return attribs;
-	}
-
-	while (end != std::string::npos && beg != std::string::npos)
-	{
-		size_t eq = tag.find('=', beg+1);
-		std::string name(tag.begin() + beg + 1, tag.begin() + eq);
-		std::string val(tag.begin() + eq + 2, tag.begin() + end - 1);
-		attribs.insert(std::make_pair(name, val));
-
-		beg = tag.find(' ', beg + 1);
-		end = tag.find(' ', beg + 1);
-		if (end == std::string::npos && beg != std::string::npos)
-		{
-			end = tag.find('>');
-		}
-	}
-	return attribs;
 }
 
-std::string GetData(const std::string &tag)
+std::string ReadUntilAccum(int (*pred)(int), std::ifstream &file, char &ch)
 {
-	size_t beg = tag.find('>');
-	size_t end = tag.find('<', beg + 1);
-	if (beg != std::string::npos && end != std::string::npos)
+	std::string res = "";
+	file >> std::noskipws >> ch;
+	while ( ! pred(ch))
 	{
-		std::string result(tag.begin() + beg + 1, tag.begin() + end);
-		return result;
+		res += ch;
+		file >> std::noskipws >> ch;
 	}
-	return "";
+
+	return res;
+}
+
+
+int istagbeg(int ch)
+{
+	return ch == '<';
+}
+
+int istagend(int ch)
+{
+	return ch == '>';
+}
+
+int isemptytag(int ch)
+{
+	return ch == '/';
+}
+
+int iseq(int ch)
+{
+	return ch == '=';
+}
+
+int isquot(int ch)
+{
+	return ch == '\"';
+}
+
+int isspaceORtagend(int ch)
+{
+	return isspace(ch) || istagend(ch);
 }

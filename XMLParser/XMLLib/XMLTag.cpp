@@ -68,3 +68,8 @@ const std::string& XMLTag::GetAttribWithKey(const std::string &key) const
 }
 #endif
 
+void XMLTag::Clear()
+{
+	DeleteData();
+	attribs.clear();
+}

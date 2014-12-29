@@ -40,6 +40,8 @@ public:
 	const std::string& GetAttribWithKey(const std::string &key) const;
 #endif
 
+	void Clear();
+
 private:
 	std::map<std::string, std::string> attribs;
 

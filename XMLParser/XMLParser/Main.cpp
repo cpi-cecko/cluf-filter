@@ -8,7 +8,7 @@ int main()
 {
 	XMLReader reader;
 	XMLDoc testDoc;
-	if (reader.ReadInto(&testDoc, "../sample.xml"))
+	if (reader.ReadInto(&testDoc, "../compact.xml"))
 	{
 		TreeIterator<XMLTag> docIter = testDoc.GetIterator();
 		XMLPrinter::PrettyPrint(docIter);

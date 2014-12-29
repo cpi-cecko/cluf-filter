@@ -26,17 +26,25 @@ void PrettyPrintH(TreeIterator<XMLTag> &iter, size_t depth)
 		{
 			std::cout << " " << attrib->first << "=\"" << attrib->second << "\"";
 		}
-		std::cout << ">\n";
+		std::cout << ">";
 		if (current->GetVal()->HasData())
 		{
-			std::cout << Spaces(depth + 1) << current->GetVal()->GetData() << "\n";
+			std::cout << current->GetVal()->GetData();
+		}
+		else
+		{
+			std::cout << "\n";
 		}
 	}
 	if (iter.HasChild())
 	{
 		PrettyPrintH(iter.Child(), depth+1);
 	}
-	std::cout << Spaces(depth) << "</" << current->GetKey() << ">\n";
+	if ( ! current->GetVal()->HasData())
+	{
+		std::cout << Spaces(depth);
+	}
+	std::cout << "</" << current->GetKey() << ">\n";
 
 	while (iter.HasNext())
 	{
