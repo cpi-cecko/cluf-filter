@@ -6,6 +6,12 @@
 
 int main()
 {
+	// Look at the tests to see how this stuff works.
+
+
+	/*
+	// I was a bit adventurous and tried to develop an XML parser.
+	// Sadly, I didn't have the time/nerves to finish it.
 	XMLReader reader;
 	XMLDoc testDoc;
 	if (reader.ReadInto(&testDoc, "../compact.xml"))
@@ -13,7 +19,7 @@ int main()
 		TreeIterator<XMLTag> docIter = testDoc.GetIterator();
 		XMLPrinter::PrettyPrint(docIter);
 	}
-
+	*/
 
 	return 0;
 }

@@ -25,6 +25,8 @@ void RemoveLastPartOfPath(std::string &path);
 // Appends a child to the path.
 void AppendPath(std::string &path, const std::string &toAppend);
 
+std::string GetLastPartOfPath(const std::string &path);
+
 void AddTagWithPath(XMLDoc *doc, XMLTag &currentTag, std::string &accPath, 
 					std::ifstream &xmlFile, char &ch);
 
@@ -54,107 +56,98 @@ bool XMLReader::ReadInto(XMLDoc *doc, const std::string &inputFile)
 	std::ifstream xmlFile(inputFile);
 	if (xmlFile.is_open())
 	{
-		char ch;
-		std::string accPath = "";
-		XMLTag currentTag;
-		while (xmlFile >> std::noskipws >> ch)
+		std::string accPath;
+		bool result = this->ReadIntoH(doc, accPath, xmlFile);
+
+		xmlFile.close();
+		return result;
+	}
+	else return false;
+}
+
+bool XMLReader::ReadIntoH(XMLDoc *doc, std::string &accPath, std::ifstream &xmlFile)
+{
+	char ch;
+	XMLTag currentTag;
+	while (xmlFile >> std::noskipws >> ch)
+	{
+		if (isspace(ch))
 		{
-			if (isspace(ch))
+			continue;
+		}
+
+		// Parse a new tag.
+		if (istagbeg(ch))
+		{
+			xmlFile >> ch;
+			if (ch == '?')
 			{
+				ReadUntil(istagend, xmlFile, ch);
 				continue;
 			}
-
-			// Parse a new tag.
-			if (istagbeg(ch))
+			else if (isalnum(ch))
 			{
-				xmlFile >> std::noskipws >> ch;
-				if (ch == '?')
-				{
-					ReadUntil(istagend, xmlFile, ch);
-					continue;
-				}
-				else if (ch == '/')
-				{
-					AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
-					continue;
-				}
-				else if (isspace(ch) || isalnum(ch))
+				std::string tagName = "";
+				tagName += ch;
+				tagName +=
+					ReadUntilAccum([](int ch) { return (int)(isspace(ch) || 
+															 istagend(ch) ||
+															 isemptytag(ch));
+											  },
+								   xmlFile, ch);
+				AppendPath(accPath, tagName);
+				while ( ! istagend(ch))
 				{
 					if (isspace(ch))
 					{
 						ReadUntil(isalnum, xmlFile, ch);
+						std::string key = "";
+						key += ch;
+						key += ReadUntilAccum(iseq, xmlFile, ch);
+						ReadUntil(isquot, xmlFile, ch);
+						std::string val = ReadUntilAccum(isquot, xmlFile, ch);
+						currentTag.AddAttrib(key, val);
+						
+						xmlFile >> std::noskipws >> ch;
 					}
 
-					if (isalnum(ch))
+					if (isemptytag(ch))
 					{
-						std::string tagName = "";
-						tagName += ch;
-						tagName +=
-							ReadUntilAccum([](int ch) { return (int)(isspace(ch) || 
-																     istagend(ch) ||
-																	 isemptytag(ch));
-													  },
-										   xmlFile, ch);
-						AppendPath(accPath, tagName);
-						while ( ! istagend(ch))
-						{
-							if (isspace(ch))
-							{
-								ReadUntil(isalnum, xmlFile, ch);
-								std::string key = "";
-								key += ch;
-								key += ReadUntilAccum(iseq, xmlFile, ch);
-								ReadUntil(isquot, xmlFile, ch);
-								std::string val = ReadUntilAccum(isquot, xmlFile, ch);
-								currentTag.AddAttrib(key, val);
-								
-								xmlFile >> std::noskipws >> ch;
-							}
-
-							if (isemptytag(ch))
-							{
-								AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
-							}
-						}
-
-						continue;
+						AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+						return true;
 					}
 				}
-				else 
-				{
-					std::cerr << "Invalid character in xml doc\n";
-					return false;
-				}
 			}
-			
-			// End parsing new tag.
-			if (isemptytag(ch))
+			else 
 			{
-				AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
-				continue;
-			}
-
-			// Parse data.
-			if (! istagbeg(ch) && (isspace(ch) || istagend(ch) || isalnum(ch)))
-			{
-				std::string data = "";
-				if (isalnum(ch))
-				{
-					data += ch;
-					data += ReadUntilAccum(istagbeg, xmlFile, ch);
-				}
-
-				if (istagbeg(ch))
-				{
-					currentTag.AddData(data);
-				}
+				std::cerr << "Invalid character in xml doc\n";
+				return false;
 			}
 		}
 
-		xmlFile.close();
-		return true;
+		ch = xmlFile.peek();
+
+		// Have data.
+		if (isalnum(ch))
+		{
+			xmlFile >> ch;
+			std::string data;
+			data += ch;
+			data += ReadUntilAccum(istagbeg, xmlFile, ch);
+			currentTag.AddData(data);
+
+			AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+			ReadUntil(isspace, xmlFile, ch);
+		}
+		else if (istagbeg(ch))
+		{
+			// Begin parsing subtree
+			AddTagWithPath(doc, currentTag, accPath, xmlFile, ch);
+			return ReadIntoH(doc, accPath, xmlFile);
+		}
 	}
-	else return false;
+
+	return true;
 }
 
 
@@ -202,6 +195,19 @@ void AppendPath(std::string &path, const std::string &toAppend)
 	path += toAppend;
 }
 
+std::string GetLastPartOfPath(const std::string &path)
+{
+	size_t lastSlashPos = path.find_last_of('/');
+	if (lastSlashPos != std::string::npos)
+	{
+		return std::string(path.begin() + lastSlashPos, path.end());
+	}
+	else
+	{
+		return "";
+	}
+}
+
 void AddTagWithPath(XMLDoc *doc, XMLTag &currentTag, std::string &accPath, 
 					std::ifstream &xmlFile, char &ch)
 {
@@ -214,11 +220,11 @@ void AddTagWithPath(XMLDoc *doc, XMLTag &currentTag, std::string &accPath,
 
 void ReadUntil(int (*pred)(int), std::ifstream &file, char &ch)
 {
-	file >> std::noskipws >> ch;
-	while ( ! pred(ch))
+	do
 	{
 		file >> std::noskipws >> ch;
 	}
+	while ( ! pred(ch));
 }
 
 std::string ReadUntilAccum(int (*pred)(int), std::ifstream &file, char &ch)

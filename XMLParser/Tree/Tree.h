@@ -154,6 +154,7 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, const VAL_TYPE &newVal)
 	std::string rest;
 	ParseKey(atKey, _key, rest);
 
+	// Create a new tree of children if we don't have one
 	if (std::find_if(children.begin(), children.end(),
 					 [&_key](const Tree *child)
 					 {
@@ -187,11 +188,13 @@ bool Tree<VAL_TYPE>::Insert(const std::string &atKey, const VAL_TYPE &newVal)
 	{
 		if ((*child)->GetKey() == _key && rest != "")
 		{
+			// Recursively eat-up the key
 			(*child)->Insert(rest, newVal);
 			break;
 		}
 		else if ((*child)->GetKey() == _key)
 		{
+			// We've eaten all of the key, insert here
 			Tree *newChild = new Tree(_key, newVal);
 			newChild->parent = this;
 			if ( ! children.empty())
@@ -428,7 +431,7 @@ public:
 
 private:
 	Tree<VAL_TYPE> *currentNode;
-	// We shouldn't go through nodes which are already walked.
+	// We shouldn't go through nodes which have already been walked.
 	std::vector<Tree<VAL_TYPE>*> walked;
 };
 
@@ -494,6 +497,11 @@ Tree<VAL_TYPE>* TreeIterator<VAL_TYPE>::Deref()
 	To make sure that the element exists, the user should first check `isValid`.
 	If `isValid` is `true`, the user can safely query `val`. Otherwise the behavior is
 	undefined.
+
+	Note that we can add composition function for functions returning such results
+	in order to simplify chaining. Even more, we can implement Haskell's bind (>>=) and
+	double our wins! (op1.Bind(op2).Bind(op3).Bind(op4) or op4.Compose(op3).Compose(op2).Compose(op1))
+	Functional Programming rulzzz!
 */
 template <class VAL_TYPE>
 struct Result

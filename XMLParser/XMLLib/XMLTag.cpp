@@ -58,6 +58,16 @@ const std::map<std::string, std::string>& XMLTag::GetAttribs() const
 {
 	return attribs;
 }
+
+const std::string& XMLTag::GetName() const
+{
+	return name;
+}
+void XMLTag::SetName(const std::string &newName)
+{
+	name = newName;
+}
+
 #ifdef TEST_BUILD
 const std::string& XMLTag::GetAttribWithKey(const std::string &key) const
 {
@@ -72,4 +82,5 @@ void XMLTag::Clear()
 {
 	DeleteData();
 	attribs.clear();
+	name = "";
 }

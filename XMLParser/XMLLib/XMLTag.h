@@ -35,6 +35,9 @@ public:
 	const XMLData& GetData() const;
 	const std::map<std::string, std::string>& GetAttribs() const;
 
+	const std::string& GetName() const;
+	void SetName(const std::string &newName);
+
 #ifdef TEST_BUILD
 	// Unsafe. Used only for testing.
 	const std::string& GetAttribWithKey(const std::string &key) const;
@@ -46,5 +49,7 @@ private:
 	std::map<std::string, std::string> attribs;
 
 	XMLData data;
+
+	std::string name;
 };
 

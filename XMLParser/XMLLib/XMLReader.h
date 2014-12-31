@@ -2,6 +2,7 @@
 
 
 #include <string>
+#include <fstream>
 
 
 class XMLDoc;
@@ -11,4 +12,7 @@ class XMLReader
 {
 public:
 	bool ReadInto(XMLDoc *doc, const std::string &inputFile);
+
+private:
+	bool ReadIntoH(XMLDoc *doc, std::string &accPath, std::ifstream &xmlFile);
 };
