@@ -24,6 +24,8 @@
 *.sdf
 *.opensdf
 *.unsuccessfulbuild
+*.sln
+*.vsxproj
 ipch/
 [Oo]bj/
 [Bb]in
