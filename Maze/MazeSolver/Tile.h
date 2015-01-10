@@ -1,7 +1,7 @@
 #pragma once
 
 
-enum DIRS
+enum Dir
 {
 	DIR_LEFT,
 	DIR_RIGHT,

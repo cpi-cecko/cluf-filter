@@ -24,6 +24,10 @@ public:
 
 	bool LoadMap(const std::string &mapFileName);
 	void DebugPrintMap() const;
+	
+public:
+	const Tile* GetStartTile() const;
+	const Tile* GetExitTile() const;
 
 private:
 	Tile** AllocateTiles(int rows, int cols);

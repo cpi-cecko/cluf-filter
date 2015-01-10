@@ -27,6 +27,34 @@ void Map::DebugPrintMap() const
 	}
 }
 
+const Tile* Map::GetStartTile() const
+{
+	for (int row = 0; row < rowsCount; ++row)
+	{
+		for (int col = 0; col < colsCount; ++col)
+		{
+			if (map[row][col].IsStart())
+				return &map[row][col];
+		}
+	}
+
+	return NULL;
+}
+
+const Tile* Map::GetExitTile() const
+{
+	for (int row = 0; row < rowsCount; ++row)
+	{
+		for (int col = 0; col < colsCount; ++col)
+		{
+			if (map[row][col].IsExit())
+				return &map[row][col];
+		}
+	}
+
+	return NULL;
+}
+
 bool Map::LoadMap(const std::string &mapFileName)
 {
 	std::ifstream mapFile(mapFileName);
