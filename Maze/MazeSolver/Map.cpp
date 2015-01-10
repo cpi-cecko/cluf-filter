@@ -6,7 +6,7 @@
 
 
 Map::Map()
-	: map(NULL), rowsCount(0), colsCount(0)
+	: map(NULL), keyDoorPairs(NULL), rowsCount(0), colsCount(0)
 {
 }
 
@@ -19,6 +19,11 @@ void Map::DebugPrintMap() const
 			std::cout << map[row][col].GetSymbol();
 		}
 		std::cout << '\n';
+	}
+
+	for (int idx = 0; idx < keyDoorPairsCount; ++idx)
+	{
+		std::cout << "(" << keyDoorPairs[idx].door << ", " << keyDoorPairs[idx].key << ")\n";
 	}
 }
 
@@ -35,8 +40,9 @@ bool Map::LoadMap(const std::string &mapFileName)
 
 	int rows = 0;
 	int cols = 0;
+	int pairsCount = 0;
 
-	if ( ! ReadMapSize(mapFile, rows, cols))
+	if ( ! ReadMapKeysSize(mapFile, rows, cols, pairsCount))
 	{
 		std::cerr << "Failed to get map size\n";
 		return false;
@@ -51,16 +57,27 @@ bool Map::LoadMap(const std::string &mapFileName)
 	}
 
 	FreeMap(map, rowsCount);
-
 	map = newMap;
 	rowsCount = rows;
 	colsCount = cols;
+
+	KeyPair *keyPairs = AllocateKeyDoorPairs(pairsCount);
+
+	if ( ! ReadKeys(mapFile, keyPairs))
+	{
+		std::cerr << "Failed to read keys\n";
+		return false;
+	}
+
+	FreeKeys(keyDoorPairs);
+	keyDoorPairs = keyPairs;
+	keyDoorPairsCount = pairsCount;
 
 	mapFile.close();
 	return true;
 }
 
-bool Map::ReadMapSize(std::ifstream &mapFile, int &rowsRead, int &colsRead)
+bool Map::ReadMapKeysSize(std::ifstream &mapFile, int &rowsRead, int &colsRead, int &pairsCount)
 {
 	mapFile.clear();
 	mapFile.seekg(0, std::ios::beg);
@@ -68,8 +85,11 @@ bool Map::ReadMapSize(std::ifstream &mapFile, int &rowsRead, int &colsRead)
 
 	int rows = 0;
 	int cols = 0;
-	int counter = 0;
+	int pairs = 0;
+	int colCounter = 0; // used to validate column count
+	int keyCounter = 0; // used to validate key parts count
 	char ch;
+	bool isReadingKeys = false;
 
 	while (mapFile.get(ch) && ch != '\n')
 			++cols;
@@ -82,24 +102,56 @@ bool Map::ReadMapSize(std::ifstream &mapFile, int &rowsRead, int &colsRead)
 		{
 			if (ch == '\n')
 			{
-				if (counter != cols)
+				if (colCounter == 0 && ! isReadingKeys)
 				{
-					std::cerr << "Uneven number of columns in map\n";
-					return false;
+					isReadingKeys = true;
+					continue;
 				}
 
-				++rows;
-				counter = 0;
+				if (isReadingKeys)
+				{
+					if (keyCounter != 2)
+					{
+						std::cerr << "Bad keys\n";
+						return false;
+					}
+
+					++pairs;
+					keyCounter = 0;
+				}
+				else
+				{
+					if (colCounter != cols)
+					{
+						std::cerr << "Uneven number of columns in map\n";
+						return false;
+					}
+
+					++rows;
+					colCounter = 0;
+				}
 			}
 			else
 			{
-				++counter;
+				isReadingKeys ? ++keyCounter : ++colCounter;
 			}
+		}
+
+		if (ch != '\n' && isReadingKeys)
+		{
+			if (keyCounter != 2)
+			{
+				std::cerr << "Bad keys\n";
+				return false;
+			}
+
+			++pairs;
 		}
 	}
 
 	rowsRead = rows;
 	colsRead = cols;
+	pairsCount = pairs;
 
 	return true;
 }
@@ -124,8 +176,63 @@ bool Map::ReadMap(std::ifstream &mapFile, Tile **inMap)
 		}
 		else
 		{
-			++row;
-			col = 0;
+			if (col == 0) // switch to reading keys
+			{
+				break;
+			}
+			else
+			{
+				++row;
+				col = 0;
+			}
+		}
+	}
+
+
+	return true;
+}
+
+bool Map::ReadKeys(std::ifstream &mapFile, KeyPair *inKeyDoorPairs)
+{
+	mapFile.clear();
+	mapFile.seekg(0, std::ios::beg);
+
+
+	int currentPairIdx = 0;
+	int cols = 0;
+	char ch;
+	bool isReadingKeys = false;
+	bool isOnDoor = false;
+
+	while (mapFile.get(ch))
+	{
+		if (isReadingKeys && ch != '\n')
+		{
+			if (isOnDoor)
+			{
+				inKeyDoorPairs[currentPairIdx].door = ch;
+				isOnDoor = false;
+			}
+			else
+			{
+				inKeyDoorPairs[currentPairIdx].key = ch;
+				isOnDoor = true;
+				// only increment pair idx if we've read a whole key line
+				++currentPairIdx;
+			}
+		}
+		else
+		{
+			if (ch != '\n')
+			{
+				++cols;
+			}
+			else
+			{
+				isReadingKeys = cols == 0;
+				isOnDoor = isReadingKeys;
+				cols = 0;
+			}
 		}
 	}
 
@@ -147,7 +254,7 @@ Tile** Map::AllocateTiles(int rows, int cols)
 			newMap[row] = new Tile[cols];
 		}
 	}
-	catch (std::bad_alloc)
+	catch (std::bad_alloc&)
 	{
 		FreeMap(newMap, rows);
 	}
@@ -171,6 +278,22 @@ void Map::SetAsOwnerFor(Tile **newMap, int rows, int cols)
 	}
 }
 
+KeyPair* Map::AllocateKeyDoorPairs(int size)
+{
+	KeyPair *newPairs = NULL;
+
+	try
+	{
+		newPairs = new KeyPair[size];
+	}
+	catch (std::bad_alloc&)
+	{
+		FreeKeys(newPairs);
+	}
+
+	return newPairs;
+}
+
 void Map::FreeMap(Tile **&toFree, int rowsCount)
 {
 	if ( ! toFree)
@@ -187,7 +310,14 @@ void Map::FreeMap(Tile **&toFree, int rowsCount)
 	map = NULL;
 }
 
+void Map::FreeKeys(KeyPair *toFree)
+{
+	delete [] toFree;
+	toFree = NULL;
+}
+
 Map::~Map()
 {
 	FreeMap(map, rowsCount);
+	FreeKeys(keyDoorPairs);
 }
