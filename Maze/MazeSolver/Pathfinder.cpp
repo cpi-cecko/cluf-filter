@@ -2,7 +2,16 @@
 #include "Pathfinder.h"
 
 
-Dir* Pathfinder::FindPath(const Map *inMap, const Tile *start, const Tile *end)
+#include <iostream>
+
+
+std::vector<Dir> Pathfinder::FindPath(Tile *start, Tile *end)
 {
-	return DoFindPath(inMap, start, end);
+	if ( ! start || ! end)
+	{
+		std::cerr << "Null pointer to FindPath\n";
+		return std::vector<Dir>();
+	}
+
+	return DoFindPath(start, end);
 }

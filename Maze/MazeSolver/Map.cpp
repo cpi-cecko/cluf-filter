@@ -27,7 +27,7 @@ void Map::DebugPrintMap() const
 	}
 }
 
-const Tile* Map::GetStartTile() const
+Tile* Map::GetStartTile() const
 {
 	for (int row = 0; row < rowsCount; ++row)
 	{
@@ -41,7 +41,7 @@ const Tile* Map::GetStartTile() const
 	return NULL;
 }
 
-const Tile* Map::GetExitTile() const
+Tile* Map::GetExitTile() const
 {
 	for (int row = 0; row < rowsCount; ++row)
 	{
@@ -53,6 +53,16 @@ const Tile* Map::GetExitTile() const
 	}
 
 	return NULL;
+}
+
+int Map::GetCols() const
+{
+	return colsCount;
+}
+
+int Map::GetRows() const
+{
+	return rowsCount;
 }
 
 bool Map::LoadMap(const std::string &mapFileName)

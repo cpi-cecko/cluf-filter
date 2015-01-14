@@ -3,11 +3,14 @@
 
 #include "Tile.h"
 
+#include <vector>
+
+
 class Pathfinder
 {
 public:
-	Dir* FindPath(const Map *inMap, const Tile *start, const Tile *end);
+	std::vector<Dir> FindPath(Tile *start, Tile *end);
 
 private:
-	virtual Dir* DoFindPath(const Map *inMap, const Tile *start, const Tile *end) = 0;
+	virtual std::vector<Dir> DoFindPath(Tile *start, Tile *end) = 0;
 };

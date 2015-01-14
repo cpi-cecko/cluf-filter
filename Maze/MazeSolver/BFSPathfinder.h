@@ -3,9 +3,18 @@
 
 #include "Pathfinder.h"
 
+#include <vector>
+#include <queue>
+
 
 class BFSPathfinder : public Pathfinder
 {
 private:
-	virtual Dir* DoFindPath(const Map *inMap, const Tile *start, const Tile *end);
+	virtual std::vector<Dir> DoFindPath(Tile *start, Tile *end);
+
+	void AddIfPassable(Tile *currentTile, Dir dir);
+
+private:
+	std::queue<Tile*> walkedTiles;
+	std::vector<Dir> path;
 };

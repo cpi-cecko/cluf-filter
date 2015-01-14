@@ -26,8 +26,11 @@ public:
 	void DebugPrintMap() const;
 	
 public:
-	const Tile* GetStartTile() const;
-	const Tile* GetExitTile() const;
+	Tile* GetStartTile() const;
+	Tile* GetExitTile() const;
+
+	int GetCols() const;
+	int GetRows() const;
 
 private:
 	Tile** AllocateTiles(int rows, int cols);
@@ -44,6 +47,8 @@ private:
 private:
 	Map(const Map &other);
 	Map& operator=(const Map &other);
+
+	friend class Tile;
 };
 
 

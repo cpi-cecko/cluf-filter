@@ -11,7 +11,7 @@ int main()
 	newMap.DebugPrintMap();
 
 	Pathfinder *bfsFinder = new BFSPathfinder();
-	bfsFinder->FindPath(&newMap, newMap.GetStartTile(), newMap.GetExitTile());
+	std::vector<Dir> path = bfsFinder->FindPath(newMap.GetStartTile(), newMap.GetExitTile());
 
 	return 0;
 }
