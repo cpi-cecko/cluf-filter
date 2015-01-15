@@ -4,6 +4,8 @@
 #include <iostream>
 
 
+Dir GetDir(Tile *current, Tile *neighbour);
+
 std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 {
 	while ( ! walkedTiles.empty())
@@ -14,38 +16,67 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 	Tile *current = NULL;
 	walkedTiles.push(start);
 
+	bestNeighbourForNode.resize(start->GetMazeSize());
+
 	while ( ! walkedTiles.empty())
 	{
 		current = walkedTiles.front();
 		current->SetVisited(true);
-		if (current->GetDir() != DIR_COUNT)
-		{
-			path.push_back(current->GetDir());
-		}
 		walkedTiles.pop();
 		
 		if (current == end)
 		{
+			while (current != start)
+			{
+				Tile *bestNeighbour = bestNeighbourForNode[current->GetTileIdx()];
+				Dir bestDir = GetDir(current, bestNeighbour);
+				if (bestDir != DIR_COUNT)
+				{
+					path.push_back(bestDir);
+				}
+				current = bestNeighbour;
+			}
 			return path;
 		}
 		else
 		{
-			AddIfPassable(current->GetUpTile(), DIR_UP);
-			AddIfPassable(current->GetDownTile(), DIR_DOWN);
-			AddIfPassable(current->GetLeftTile(), DIR_LEFT);
-			AddIfPassable(current->GetRightTile(), DIR_RIGHT);
+			AddIfPassable(current->GetUpTile(), current);
+			AddIfPassable(current->GetDownTile(), current);
+			AddIfPassable(current->GetLeftTile(), current);
+			AddIfPassable(current->GetRightTile(), current);
 		}
 	}
 
 	return path;
 }
 
-void BFSPathfinder::AddIfPassable(Tile *currentTile, Dir dir)
+Dir GetDir(Tile *current, Tile *neighbour)
+{
+	if (current->GetLeftTile() == neighbour)
+	{
+		return DIR_RIGHT;
+	}
+	else if (current->GetRightTile() == neighbour)
+	{
+		return DIR_LEFT;
+	}
+	else if (current->GetUpTile() == neighbour)
+	{
+		return DIR_DOWN;
+	}
+	else if (current->GetDownTile() == neighbour)
+	{
+		return DIR_UP;
+	}
+	return DIR_COUNT;
+}
+
+void BFSPathfinder::AddIfPassable(Tile *currentTile, Tile *parent)
 {
 	if (currentTile && currentTile->IsWalkable() && ! currentTile->IsVisited())
 	{
 		currentTile->SetVisited(true);
-		currentTile->SetDir(dir);
 		walkedTiles.push(currentTile);
+		bestNeighbourForNode[currentTile->GetTileIdx()] = parent;
 	}
 }

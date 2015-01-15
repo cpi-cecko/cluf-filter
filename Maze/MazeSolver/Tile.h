@@ -13,16 +13,16 @@ enum Dir
 
 struct Position
 {
-	int x;
-	int y;
+	int row;
+	int col;
 
 	Position()
-		: x(), y()
+		: row(), col()
 	{
 	}
 
-	Position(int newX, int newY)
-		: x(newX), y(newY)
+	Position(int newRow, int newCol)
+		: row(newRow), col(newCol)
 	{
 	}
 };
@@ -46,6 +46,9 @@ public:
 	Tile* GetDownTile() const;
 	Tile* GetRightTile() const;
 	Tile* GetLeftTile() const;
+
+	int GetMazeSize() const;
+	int GetTileIdx() const;
 
 	Dir GetDir() const;
 

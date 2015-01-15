@@ -30,33 +30,42 @@ char Tile::GetSymbol() const
 	return symbol;
 }
 
+int Tile::GetMazeSize() const
+{
+	return owner->GetCols() * owner->GetRows();
+}
+int Tile::GetTileIdx() const
+{
+	return pos.col + pos.row * owner->GetCols();
+}
+
 Tile* Tile::GetUpTile() const
 {
-	if (pos.y <= 0)
+	if (pos.row < 0)
 		return NULL;
 
-	return &owner->map[pos.x][pos.y-1];
+	return &owner->map[pos.row - 1][pos.col];
 }
 Tile* Tile::GetDownTile() const
 {
-	if (pos.y >= owner->GetRows())
+	if (pos.row >= owner->GetRows())
 		return NULL;
 
-	return &owner->map[pos.x][pos.y+1];
+	return &owner->map[pos.row + 1][pos.col];
 }
 Tile* Tile::GetRightTile() const
 {
-	if (pos.x <= 0)
+	if (pos.col >= owner->GetCols())
 		return NULL;
 
-	return &owner->map[pos.x-1][pos.y];
+	return &owner->map[pos.row][pos.col + 1];
 }
 Tile* Tile::GetLeftTile() const
 {
-	if (pos.x >= owner->GetCols())
+	if (pos.col < 0)
 		return NULL;
 
-	return &owner->map[pos.x+1][pos.y];
+	return &owner->map[pos.row][pos.col - 1];
 }
 
 Dir Tile::GetDir() const
