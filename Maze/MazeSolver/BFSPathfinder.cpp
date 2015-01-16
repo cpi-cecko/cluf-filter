@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-Dir GetDir(Tile *current, Tile *neighbour);
+static Dir GetDir(Tile *current, Tile *neighbour);
 
 std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 {
@@ -50,7 +50,7 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 	return path;
 }
 
-Dir GetDir(Tile *current, Tile *neighbour)
+static Dir GetDir(Tile *current, Tile *neighbour)
 {
 	if (current->GetLeftTile() == neighbour)
 	{
