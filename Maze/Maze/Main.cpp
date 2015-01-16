@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "../MazeSolver/Map.h"
-#include "../MazeSolver/BFSPathfinder.h"
+#include "../MazeSolver/Solver.h"
 
 
 int main()
@@ -10,8 +10,8 @@ int main()
 	newMap.LoadMap("lab1.txt");
 	newMap.DebugPrintMap();
 
-	Pathfinder *bfsFinder = new BFSPathfinder();
-	std::vector<Dir> path = bfsFinder->FindPath(newMap.GetStartTile(), newMap.GetExitTile());
+	Solver newSolver;
+	newSolver.SolveMaze(&newMap);
 
 	return 0;
 }

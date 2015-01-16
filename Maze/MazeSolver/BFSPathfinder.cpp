@@ -36,6 +36,7 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 				}
 				current = bestNeighbour;
 			}
+			std::reverse(path.begin(), path.end());
 			return path;
 		}
 		else
