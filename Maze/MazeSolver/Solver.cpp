@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-static void PrintPath(const std::vector<Dir> &path);
+static void PrintPath(const PathInfo &path);
 
 void Solver::SolveMaze(Map *mazeMap)
 {
@@ -27,12 +27,19 @@ void Solver::FindPathsToDoors(Map *mazeMap)
 	Tile *start = mazeMap->GetStartTile();
 	Tile *end = mazeMap->GetExitTile();
 
+	PathInfo found;
 	for (size_t idx = 0; idx < doors.size(); ++idx)
 	{
 		mazeMap->UnsetTilesVisited();
-		pathsToDoors.push_back(bfsFinder->FindPath(start, doors[idx]));
+		found.path = bfsFinder->FindPath(start, doors[idx]);
+		found.start = start;
+		found.end = doors[idx];
+		pathsToDoors.push_back(found);
 		mazeMap->UnsetTilesVisited();
-		pathsToDoors.push_back(bfsFinder->FindPath(doors[idx], end));
+		found.path = bfsFinder->FindPath(doors[idx], end);
+		found.start = doors[idx];
+		found.end = end;
+		pathsToDoors.push_back(found);
 	}
 
 	for (size_t idx = 0; idx < doors.size(); ++idx)
@@ -40,20 +47,27 @@ void Solver::FindPathsToDoors(Map *mazeMap)
 		for (size_t idx2 = idx + 1; idx2 < doors.size(); ++idx2)
 		{
 			mazeMap->UnsetTilesVisited();
-			pathsToDoors.push_back(bfsFinder->FindPath(doors[idx], doors[idx2]));
+			found.path = bfsFinder->FindPath(doors[idx], doors[idx2]);
+			found.start = doors[idx];
+			found.end = doors[idx2];
+			pathsToDoors.push_back(found);
 		}
 	}
 
 	mazeMap->UnsetTilesVisited();
-	pathsToDoors.push_back(bfsFinder->FindPath(start, end));
+	found.path = bfsFinder->FindPath(start, end);
+	found.start = start;
+	found.end = end;
+	pathsToDoors.push_back(found);
 
 	pathsToDoors.erase(std::remove_if(pathsToDoors.begin(), pathsToDoors.end(), 
-					   [](std::vector<Dir> path) {return path.empty();}), pathsToDoors.end());
+					   [](PathInfo info) {return info.path.empty();}), pathsToDoors.end());
 }
 
-static void PrintPath(const std::vector<Dir> &path)
+static void PrintPath(const PathInfo &info)
 {
-	for (auto dirIt = path.begin(); dirIt != path.end(); ++dirIt)
+	std::cout << "(" << info.start->GetSymbol() << ", " << info.end->GetSymbol() << ") ";
+	for (auto dirIt = info.path.begin(); dirIt != info.path.end(); ++dirIt)
 	{
 		switch ((*dirIt))
 		{

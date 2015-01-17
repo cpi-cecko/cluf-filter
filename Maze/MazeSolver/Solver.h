@@ -4,7 +4,9 @@
 #include <vector>
 
 class Map;
+class Tile;
 enum Dir;
+struct PathInfo;
 
 class Solver
 {
@@ -15,5 +17,12 @@ private:
 	void FindPathsToDoors(Map *mazeMap);
 
 private:
-	std::vector<std::vector<Dir>> pathsToDoors;
+	std::vector<PathInfo> pathsToDoors;
+};
+
+struct PathInfo
+{
+	std::vector<Dir> path;
+	Tile *start;
+	Tile *end;
 };
