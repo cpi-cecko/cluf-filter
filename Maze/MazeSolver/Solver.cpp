@@ -13,6 +13,7 @@ void Solver::SolveMaze(Map *mazeMap)
 {
 	Pathfinder *bfsFinder = new BFSPathfinder();
 	std::vector<Dir> path = bfsFinder->FindPath(mazeMap->GetStartTile(), mazeMap->GetExitTile());
+	std::vector<Tile*> doors = mazeMap->GetDoorTiles();
 
 	PrintPath(path);
 }

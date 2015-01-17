@@ -55,6 +55,24 @@ Tile* Map::GetExitTile() const
 	return NULL;
 }
 
+std::vector<Tile*> Map::GetDoorTiles() const
+{
+	std::vector<Tile*> result;
+
+	for (int row = 0; row < rowsCount; ++row)
+	{
+		for (int col = 0; col < colsCount; ++col)
+		{
+			if (IsDoor(map[row][col].symbol))
+			{
+				result.push_back(&map[row][col]);
+			}
+		}
+	}
+
+	return result;
+}
+
 int Map::GetCols() const
 {
 	return colsCount;
@@ -63,6 +81,44 @@ int Map::GetCols() const
 int Map::GetRows() const
 {
 	return rowsCount;
+}
+
+bool Map::IsDoorUnlocked(char doorSymbol) const
+{
+	for (int pairIdx = 0; pairIdx < keyDoorPairsCount; ++pairIdx)
+	{
+		if (keyDoorPairs[pairIdx].door == doorSymbol && 
+			! keyDoorPairs[pairIdx].isDoorLocked)
+		{
+			return true;
+		}
+		else return false;
+	}
+	return false;
+}
+
+bool Map::IsDoor(char symbol) const
+{
+	for (int pairIdx = 0; pairIdx < keyDoorPairsCount; ++pairIdx)
+	{
+		if (keyDoorPairs[pairIdx].door == symbol)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Map::IsKey(char symbol) const
+{
+	for (int pairIdx = 0; pairIdx < keyDoorPairsCount; ++pairIdx)
+	{
+		if (keyDoorPairs[pairIdx].key == symbol)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 bool Map::LoadMap(const std::string &mapFileName)
@@ -249,14 +305,15 @@ bool Map::ReadKeys(std::ifstream &mapFile, KeyPair *inKeyDoorPairs)
 			if (isOnDoor)
 			{
 				inKeyDoorPairs[currentPairIdx].door = ch;
+				inKeyDoorPairs[currentPairIdx].isDoorLocked = true;
 				isOnDoor = false;
+				// only increment pair idx if we've read a whole key line
+				++currentPairIdx;
 			}
 			else
 			{
 				inKeyDoorPairs[currentPairIdx].key = ch;
 				isOnDoor = true;
-				// only increment pair idx if we've read a whole key line
-				++currentPairIdx;
 			}
 		}
 		else
@@ -268,7 +325,6 @@ bool Map::ReadKeys(std::ifstream &mapFile, KeyPair *inKeyDoorPairs)
 			else
 			{
 				isReadingKeys = cols == 0;
-				isOnDoor = isReadingKeys;
 				cols = 0;
 			}
 		}

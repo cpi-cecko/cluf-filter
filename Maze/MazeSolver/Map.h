@@ -4,6 +4,7 @@
 #include "Tile.h"
 
 #include <string>
+#include <vector>
 
 
 struct KeyPair;
@@ -28,9 +29,14 @@ public:
 public:
 	Tile* GetStartTile() const;
 	Tile* GetExitTile() const;
+	std::vector<Tile*> GetDoorTiles() const;
 
 	int GetCols() const;
 	int GetRows() const;
+
+	bool IsDoorUnlocked(char doorSymbol) const;
+	bool IsDoor(char symbol) const;
+	bool IsKey(char symbol) const;
 
 private:
 	Tile** AllocateTiles(int rows, int cols);
@@ -56,4 +62,5 @@ struct KeyPair
 {
 	char key;
 	char door;
+	bool isDoorLocked;
 };

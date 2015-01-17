@@ -41,7 +41,7 @@ int Tile::GetTileIdx() const
 
 Tile* Tile::GetUpTile() const
 {
-	if (pos.row < 0)
+	if (pos.row <= 0)
 		return NULL;
 
 	return &owner->map[pos.row - 1][pos.col];
@@ -62,7 +62,7 @@ Tile* Tile::GetRightTile() const
 }
 Tile* Tile::GetLeftTile() const
 {
-	if (pos.col < 0)
+	if (pos.col <= 0)
 		return NULL;
 
 	return &owner->map[pos.row][pos.col - 1];
@@ -91,11 +91,19 @@ bool Tile::IsBlock() const
 }
 bool Tile::IsWalkable() const
 {
-	return ! IsBlock();
+	return ! IsBlock() && owner->IsDoorUnlocked(symbol);
 }
 bool Tile::IsVisited() const
 {
 	return isVisited;
+}
+bool Tile::IsKey() const
+{
+	return owner->IsKey(symbol);
+}
+bool Tile::IsDoor() const
+{
+	return owner->IsDoor(symbol);
 }
 
 void Tile::SetVisited(bool newIsVisited)

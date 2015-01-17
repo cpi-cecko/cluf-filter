@@ -58,6 +58,8 @@ public:
 	bool IsBlock() const;
 	bool IsWalkable() const;
 	bool IsVisited() const;
+	bool IsKey() const;
+	bool IsDoor() const;
 
 	void SetVisited(bool newIsVisited);
 	void SetDir(Dir newDir);
