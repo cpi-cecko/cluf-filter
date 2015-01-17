@@ -38,6 +38,8 @@ public:
 	bool IsDoor(char symbol) const;
 	bool IsKey(char symbol) const;
 
+	void UnsetTilesVisited();
+
 private:
 	Tile** AllocateTiles(int rows, int cols);
 	KeyPair* AllocateKeyDoorPairs(int size);

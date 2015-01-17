@@ -16,6 +16,7 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 	Tile *current = NULL;
 	walkedTiles.push(start);
 
+	path.clear();
 	bestNeighbourForNode.resize(start->GetMazeSize());
 
 	while ( ! walkedTiles.empty())
@@ -41,10 +42,10 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 		}
 		else
 		{
-			AddIfPassable(current->GetUpTile(), current);
-			AddIfPassable(current->GetDownTile(), current);
-			AddIfPassable(current->GetLeftTile(), current);
-			AddIfPassable(current->GetRightTile(), current);
+			AddIfPassable(current->GetUpTile(), current, end);
+			AddIfPassable(current->GetDownTile(), current, end);
+			AddIfPassable(current->GetLeftTile(), current, end);
+			AddIfPassable(current->GetRightTile(), current, end);
 		}
 	}
 
@@ -72,9 +73,10 @@ static Dir GetDir(Tile *current, Tile *neighbour)
 	return DIR_COUNT;
 }
 
-void BFSPathfinder::AddIfPassable(Tile *currentTile, Tile *parent)
+void BFSPathfinder::AddIfPassable(Tile *currentTile, Tile *parent, Tile *end)
 {
-	if (currentTile && currentTile->IsWalkable() && ! currentTile->IsVisited())
+	if (currentTile && (currentTile == end || ! currentTile->IsDoor()) && 
+		currentTile->IsWalkable() && ! currentTile->IsVisited())
 	{
 		currentTile->SetVisited(true);
 		walkedTiles.push(currentTile);

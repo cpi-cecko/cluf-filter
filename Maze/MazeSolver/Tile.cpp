@@ -48,14 +48,14 @@ Tile* Tile::GetUpTile() const
 }
 Tile* Tile::GetDownTile() const
 {
-	if (pos.row >= owner->GetRows())
+	if (pos.row >= owner->GetRows() - 1)
 		return NULL;
 
 	return &owner->map[pos.row + 1][pos.col];
 }
 Tile* Tile::GetRightTile() const
 {
-	if (pos.col >= owner->GetCols())
+	if (pos.col >= owner->GetCols() - 1)
 		return NULL;
 
 	return &owner->map[pos.row][pos.col + 1];
@@ -91,7 +91,7 @@ bool Tile::IsBlock() const
 }
 bool Tile::IsWalkable() const
 {
-	return ! IsBlock() && owner->IsDoorUnlocked(symbol);
+	return ! IsBlock();
 }
 bool Tile::IsVisited() const
 {

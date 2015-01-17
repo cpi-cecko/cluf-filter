@@ -121,6 +121,17 @@ bool Map::IsKey(char symbol) const
 	return false;
 }
 
+void Map::UnsetTilesVisited()
+{
+	for (int row = 0; row < rowsCount; ++row)
+	{
+		for (int col = 0; col < colsCount; ++col)
+		{
+			map[row][col].isVisited = false;
+		}
+	}
+}
+
 bool Map::LoadMap(const std::string &mapFileName)
 {
 	std::ifstream mapFile(mapFileName);
