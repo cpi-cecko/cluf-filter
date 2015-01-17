@@ -31,14 +31,10 @@ void Solver::FindPathsToDoors(Map *mazeMap)
 	for (size_t idx = 0; idx < doors.size(); ++idx)
 	{
 		mazeMap->UnsetTilesVisited();
-		found.path = bfsFinder->FindPath(start, doors[idx]);
-		found.start = start;
-		found.end = doors[idx];
+		found = bfsFinder->FindPath(start, doors[idx]);
 		pathsToDoors.push_back(found);
 		mazeMap->UnsetTilesVisited();
-		found.path = bfsFinder->FindPath(doors[idx], end);
-		found.start = doors[idx];
-		found.end = end;
+		found = bfsFinder->FindPath(doors[idx], end);
 		pathsToDoors.push_back(found);
 	}
 
@@ -47,17 +43,13 @@ void Solver::FindPathsToDoors(Map *mazeMap)
 		for (size_t idx2 = idx + 1; idx2 < doors.size(); ++idx2)
 		{
 			mazeMap->UnsetTilesVisited();
-			found.path = bfsFinder->FindPath(doors[idx], doors[idx2]);
-			found.start = doors[idx];
-			found.end = doors[idx2];
+			found = bfsFinder->FindPath(doors[idx], doors[idx2]);
 			pathsToDoors.push_back(found);
 		}
 	}
 
 	mazeMap->UnsetTilesVisited();
-	found.path = bfsFinder->FindPath(start, end);
-	found.start = start;
-	found.end = end;
+	found = bfsFinder->FindPath(start, end);
 	pathsToDoors.push_back(found);
 
 	pathsToDoors.erase(std::remove_if(pathsToDoors.begin(), pathsToDoors.end(), 

@@ -10,7 +10,7 @@
 class BFSPathfinder : public Pathfinder
 {
 private:
-	virtual std::vector<Dir> DoFindPath(Tile *start, Tile *end);
+	virtual PathInfo DoFindPath(Tile *start, Tile *end);
 
 	void AddIfPassable(Tile *currentTile, Tile *parent, Tile *end);
 

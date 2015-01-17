@@ -2,11 +2,11 @@
 
 
 #include <vector>
+#include "PathInfo.h"
 
 class Map;
 class Tile;
 enum Dir;
-struct PathInfo;
 
 class Solver
 {
@@ -18,11 +18,4 @@ private:
 
 private:
 	std::vector<PathInfo> pathsToDoors;
-};
-
-struct PathInfo
-{
-	std::vector<Dir> path;
-	Tile *start;
-	Tile *end;
 };

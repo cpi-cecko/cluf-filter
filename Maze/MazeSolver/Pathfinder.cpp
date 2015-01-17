@@ -5,12 +5,12 @@
 #include <iostream>
 
 
-std::vector<Dir> Pathfinder::FindPath(Tile *start, Tile *end)
+PathInfo Pathfinder::FindPath(Tile *start, Tile *end)
 {
 	if ( ! start || ! end)
 	{
 		std::cerr << "Null pointer to FindPath\n";
-		return std::vector<Dir>();
+		return PathInfo();
 	}
 
 	return DoFindPath(start, end);

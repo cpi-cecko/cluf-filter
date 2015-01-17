@@ -4,13 +4,14 @@
 #include "Tile.h"
 
 #include <vector>
+#include "PathInfo.h"
 
 
 class Pathfinder
 {
 public:
-	std::vector<Dir> FindPath(Tile *start, Tile *end);
+	PathInfo FindPath(Tile *start, Tile *end);
 
 private:
-	virtual std::vector<Dir> DoFindPath(Tile *start, Tile *end) = 0;
+	virtual PathInfo DoFindPath(Tile *start, Tile *end) = 0;
 };

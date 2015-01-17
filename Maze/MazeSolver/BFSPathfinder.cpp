@@ -6,7 +6,7 @@
 
 static Dir GetDir(Tile *current, Tile *neighbour);
 
-std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
+PathInfo BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 {
 	while ( ! walkedTiles.empty())
 	{
@@ -38,7 +38,7 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 				current = bestNeighbour;
 			}
 			std::reverse(path.begin(), path.end());
-			return path;
+			return PathInfo(path, start, end);
 		}
 		else
 		{
@@ -49,7 +49,7 @@ std::vector<Dir> BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 		}
 	}
 
-	return path;
+	return PathInfo();
 }
 
 static Dir GetDir(Tile *current, Tile *neighbour)
