@@ -55,6 +55,50 @@ Tile* Map::GetExitTile() const
 	return NULL;
 }
 
+Tile* Map::GetFirstTileWithSymbol(char symbol) const
+{
+	for (int row = 0; row < rowsCount; ++row)
+	{
+		for (int col = 0; col < colsCount; ++col)
+		{
+			if (map[row][col].symbol == symbol)
+				return &map[row][col];
+		}
+	}
+
+	return NULL;
+}
+
+Tile* Map::GetKeyForDoor(char symbol) const
+{
+	auto keyDoorPairs = GetKeyDoorPairs();
+
+	for (size_t idx = 0; idx < keyDoorPairs.size(); ++idx)
+	{
+		if (keyDoorPairs[idx].second->symbol == symbol)
+		{
+			return keyDoorPairs[idx].first;
+		}
+	}
+
+	return NULL;
+}
+
+Tile* Map::GetDoorForKey(char symbol) const
+{
+	auto keyDoorPairs = GetKeyDoorPairs();
+
+	for (size_t idx = 0; idx < keyDoorPairs.size(); ++idx)
+	{
+		if (keyDoorPairs[idx].first->symbol == symbol)
+		{
+			return keyDoorPairs[idx].second;
+		}
+	}
+
+	return NULL;
+}
+
 std::vector<Tile*> Map::GetDoorTiles() const
 {
 	std::vector<Tile*> result;
@@ -73,6 +117,20 @@ std::vector<Tile*> Map::GetDoorTiles() const
 	return result;
 }
 
+std::vector<std::pair<Tile*, Tile*>> Map::GetKeyDoorPairs() const
+{
+	std::vector<std::pair<Tile*, Tile*>> result;
+
+	for (int idx = 0; idx < keyDoorPairsCount; ++idx)
+	{
+		Tile *key = GetFirstTileWithSymbol(keyDoorPairs[idx].key);
+		Tile *door = GetFirstTileWithSymbol(keyDoorPairs[idx].door);
+		result.push_back(std::make_pair(key, door));
+	}
+
+	return result;
+}
+
 int Map::GetCols() const
 {
 	return colsCount;
@@ -83,12 +141,12 @@ int Map::GetRows() const
 	return rowsCount;
 }
 
-bool Map::IsDoorUnlocked(char doorSymbol) const
+bool Map::IsDoorLocked(char doorSymbol) const
 {
 	for (int pairIdx = 0; pairIdx < keyDoorPairsCount; ++pairIdx)
 	{
 		if (keyDoorPairs[pairIdx].door == doorSymbol && 
-			! keyDoorPairs[pairIdx].isDoorLocked)
+			keyDoorPairs[pairIdx].isDoorLocked)
 		{
 			return true;
 		}
@@ -119,6 +177,56 @@ bool Map::IsKey(char symbol) const
 		}
 	}
 	return false;
+}
+
+bool Map::IsKeyRetrieved(char symbol) const
+{
+	for (int pairIdx = 0; pairIdx < keyDoorPairsCount; ++pairIdx)
+	{
+		if (keyDoorPairs[pairIdx].key == symbol)
+		{
+			return ! keyDoorPairs[pairIdx].isDoorLocked;
+		}
+	}
+	return false;
+}
+
+void Map::UnlockDoors()
+{
+	for (int idx = 0; idx < keyDoorPairsCount; ++idx)
+	{
+		keyDoorPairs[idx].isDoorLocked = false;
+	}
+}
+
+void Map::LockDoors()
+{
+	for (int idx = 0; idx < keyDoorPairsCount; ++idx)
+	{
+		keyDoorPairs[idx].isDoorLocked = true;
+	}
+}
+
+void Map::UnlockDoor(char symbol)
+{
+	for (int i = 0; i < keyDoorPairsCount; ++i)
+	{
+		if (keyDoorPairs[i].door == symbol)
+		{
+			keyDoorPairs[i].isDoorLocked = false;
+		}
+	}
+}
+
+void Map::UnlockDoorWithKey(char symbol)
+{
+	for (int i = 0; i < keyDoorPairsCount; ++i)
+	{
+		if (keyDoorPairs[i].key == symbol)
+		{
+			keyDoorPairs[i].isDoorLocked = false;
+		}
+	}
 }
 
 void Map::UnsetTilesVisited()

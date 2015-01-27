@@ -7,15 +7,15 @@
 #include <queue>
 
 
+class Tile;
+
 class BFSPathfinder : public Pathfinder
 {
 private:
 	virtual PathInfo DoFindPath(Tile *start, Tile *end);
 
-	void AddIfPassable(Tile *currentTile, Tile *parent, Tile *end);
-
-private:
-	std::queue<Tile*> walkedTiles;
-	std::vector<Dir> path;
-	std::vector<Tile*> bestNeighbourForNode;
+	std::vector<Tile*> CalculateBestNeighbours(Tile *start, Tile *end);
+	std::vector<Tile*> GetDoorsFromPath(Tile *start, Tile *end, const std::vector<Tile*> &bestNeighbours);
+	PathInfo GetPathFromBestNeighbours(Tile *start, Tile *end, 
+									   const std::vector<Tile*> &bestNeighbours);
 };

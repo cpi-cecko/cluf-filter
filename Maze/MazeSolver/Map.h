@@ -29,14 +29,24 @@ public:
 public:
 	Tile* GetStartTile() const;
 	Tile* GetExitTile() const;
+	Tile* GetFirstTileWithSymbol(char symbol) const;
+	Tile* GetKeyForDoor(char symbol) const;
+	Tile* GetDoorForKey(char symbol) const;
 	std::vector<Tile*> GetDoorTiles() const;
+	std::vector<std::pair<Tile*, Tile*>> GetKeyDoorPairs() const;
 
 	int GetCols() const;
 	int GetRows() const;
 
-	bool IsDoorUnlocked(char doorSymbol) const;
+	bool IsDoorLocked(char doorSymbol) const;
 	bool IsDoor(char symbol) const;
 	bool IsKey(char symbol) const;
+	bool IsKeyRetrieved(char symbol) const;
+
+	void UnlockDoors();
+	void LockDoors();
+	void UnlockDoor(char symbol);
+	void UnlockDoorWithKey(char symbol);
 
 	void UnsetTilesVisited();
 

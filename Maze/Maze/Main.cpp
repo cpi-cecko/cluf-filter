@@ -7,7 +7,7 @@
 int main()
 {
 	Map newMap;
-	newMap.LoadMap("lab5.txt");
+	newMap.LoadMap("lab4.txt");
 	newMap.DebugPrintMap();
 
 	Solver newSolver;

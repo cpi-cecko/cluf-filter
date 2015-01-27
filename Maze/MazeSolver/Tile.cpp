@@ -30,6 +30,11 @@ char Tile::GetSymbol() const
 	return symbol;
 }
 
+void Tile::ClearVisitedForOwner()
+{
+	owner->UnsetTilesVisited();
+}
+
 int Tile::GetMazeSize() const
 {
 	return owner->GetCols() * owner->GetRows();
@@ -66,6 +71,15 @@ Tile* Tile::GetLeftTile() const
 		return NULL;
 
 	return &owner->map[pos.row][pos.col - 1];
+}
+Tile* Tile::GetKeyForThisDoor() const
+{
+	return owner->GetKeyForDoor(symbol);
+}
+
+Tile* Tile::GetDoorForThisKey() const
+{
+	return owner->GetDoorForKey(symbol);
 }
 
 Dir Tile::GetDir() const
@@ -105,6 +119,14 @@ bool Tile::IsDoor() const
 {
 	return owner->IsDoor(symbol);
 }
+bool Tile::IsLockedDoor() const
+{
+	return owner->IsDoorLocked(symbol);
+}
+bool Tile::IsKeyRetrieved() const
+{
+	return owner->IsKeyRetrieved(symbol);
+}
 
 void Tile::SetVisited(bool newIsVisited)
 {
@@ -114,4 +136,39 @@ void Tile::SetVisited(bool newIsVisited)
 void Tile::SetDir(Dir newDir)
 {
 	dir = newDir;
+}
+
+void Tile::Unlock()
+{
+	owner->UnlockDoor(symbol);
+}
+
+void Tile::MarkKeyRetrieved()
+{
+	owner->UnlockDoorWithKey(symbol);
+}
+
+Tile::Tile(const Tile &other)
+{
+	CopyFrom(other);
+}
+
+Tile& Tile::operator=(const Tile &other)
+{
+	if (this == &other)
+	{
+		return *this;
+	}
+
+	CopyFrom(other);
+	return *this;
+}
+
+void Tile::CopyFrom(const Tile &other)
+{
+	pos = other.pos;
+	symbol = other.symbol;
+	owner = other.owner;
+	isVisited = other.isVisited;
+	dir = other.dir;
 }
