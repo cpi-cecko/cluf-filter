@@ -150,7 +150,6 @@ bool Map::IsDoorLocked(char doorSymbol) const
 		{
 			return true;
 		}
-		else return false;
 	}
 	return false;
 }

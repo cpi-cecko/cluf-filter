@@ -14,31 +14,54 @@ PathInfo BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 {
 	std::vector<Tile*> bestNeighbourForNode = CalculateBestNeighbours(start, end);
 
-	std::vector<Tile*> reduced = GetDoorsFromPath(start, end, bestNeighbourForNode);
-	std::vector<Tile*> updatedReduced;
-	if ( ! reduced.empty())
+	std::list<Tile*> reduced = GetDoorsFromPath(start, end, bestNeighbourForNode);
+	reduced.push_front(start);
+	while ( ! reduced.empty())
 	{
-		for (size_t idx = 1; idx < reduced.size(); ++idx)
+		std::list<Tile*>::iterator doorToCheck;
+		for (doorToCheck = reduced.begin(); doorToCheck != reduced.end(); ++doorToCheck)
 		{
-			if ( ! reduced[idx]->IsDoor() || ! reduced[idx]->IsLockedDoor())
+			if ((*doorToCheck)->IsDoor() && (*doorToCheck)->IsLockedDoor())
 			{
-				updatedReduced.push_back(reduced[idx]);
-				continue;
-			}
-
-			Tile *doorKey = reduced[idx]->GetKeyForThisDoor();
-			auto newBestNeighbours = CalculateBestNeighbours(reduced[idx-1], doorKey);
-			auto reducedPathToKey = GetDoorsFromPath(reduced[idx-1], doorKey, newBestNeighbours);
-			if ( ! reducedPathToKey.empty())
-			{
-				reduced[idx]->Unlock();
-				updatedReduced.insert(updatedReduced.end(), 
-									  reducedPathToKey.begin(), reducedPathToKey.end());
+				break;
 			}
 		}
-	}
 
-	PathInfo path = GetPathFromBestNeighbours(start, end, bestNeighbourForNode);
+		if (doorToCheck == reduced.end())
+		{
+			break;
+		}
+
+		Tile *keyForDoor = (*doorToCheck)->GetKeyForThisDoor();
+		auto bestNeighbours = CalculateBestNeighbours(start, keyForDoor);
+		auto path = GetDoorsFromPath(start, keyForDoor, bestNeighbours);
+		if ( ! path.empty())
+		{
+			reduced.insert(doorToCheck, path.begin(), path.end());
+		}
+		reduced.insert(doorToCheck, keyForDoor);
+	}
+	reduced.push_back(end);
+
+	PathInfo path;// = GetPathFromBestNeighbours(start, end, bestNeighbourForNode);
+	path.start = start;
+	path.end = end;
+	while ( ! reduced.empty())
+	{
+		Tile *first = reduced.front();
+		reduced.pop_front();
+		Tile *second = reduced.front();
+		reduced.pop_front();
+		if (first->GetSymbol() == second->GetSymbol())
+		{
+			second = reduced.front();
+			reduced.pop_front();
+		}
+
+		auto best = CalculateBestNeighbours(first, second);
+		auto currentPath = GetPathFromBestNeighbours(first, second, best).path;
+		path.path.insert(path.path.end(), currentPath.begin(), currentPath.end());
+	}
 
 	return path;
 }
@@ -88,13 +111,13 @@ std::vector<Tile*> BFSPathfinder::CalculateBestNeighbours(Tile *start, Tile *end
 	return bestNeighbourForNode;
 }
 
-std::vector<Tile*> BFSPathfinder::GetDoorsFromPath(Tile *start, Tile *end,
-												   const std::vector<Tile*> &bestNeighbours)
+std::list<Tile*> BFSPathfinder::GetDoorsFromPath(Tile *start, Tile *end,
+												 const std::vector<Tile*> &bestNeighbours)
 {
 	if (bestNeighbours.empty())
-		return std::vector<Tile*>();
+		return std::list<Tile*>();
 
-	std::vector<Tile*> doors;
+	std::list<Tile*> doors;
 	Tile *current = end;
 
 	while (current != start)
@@ -102,15 +125,15 @@ std::vector<Tile*> BFSPathfinder::GetDoorsFromPath(Tile *start, Tile *end,
 		Tile *bestNeighbour = bestNeighbours[current->GetTileIdx()];
 		if (bestNeighbour)
 		{
-			if (current->IsDoor() )
+			if (current->IsDoor())
 			{
 				doors.push_back(current);
 			}
 			current = bestNeighbour;
 		}
-		else return std::vector<Tile*>();
+		else return std::list<Tile*>();
 	}
-
+	std::reverse(doors.begin(), doors.end());
 	return doors;
 }
 

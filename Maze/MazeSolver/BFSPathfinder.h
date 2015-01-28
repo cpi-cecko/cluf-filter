@@ -4,7 +4,7 @@
 #include "Pathfinder.h"
 
 #include <vector>
-#include <queue>
+#include <list>
 
 
 class Tile;
@@ -15,7 +15,7 @@ private:
 	virtual PathInfo DoFindPath(Tile *start, Tile *end);
 
 	std::vector<Tile*> CalculateBestNeighbours(Tile *start, Tile *end);
-	std::vector<Tile*> GetDoorsFromPath(Tile *start, Tile *end, const std::vector<Tile*> &bestNeighbours);
+	std::list<Tile*> GetDoorsFromPath(Tile *start, Tile *end, const std::vector<Tile*> &bestNeighbours);
 	PathInfo GetPathFromBestNeighbours(Tile *start, Tile *end, 
 									   const std::vector<Tile*> &bestNeighbours);
 };
