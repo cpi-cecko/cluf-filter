@@ -35,6 +35,11 @@ PathInfo BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 		Tile *keyForDoor = (*doorToCheck)->GetKeyForThisDoor();
 		auto bestNeighbours = CalculateBestNeighbours(start, keyForDoor);
 		auto path = GetDoorsFromPath(start, keyForDoor, bestNeighbours);
+		if (std::find(path.begin(), path.end(), (*doorToCheck)) != path.end())
+		{
+			// To reach the door's key, we have to pass through the door
+			return PathInfo();
+		}
 		if ( ! path.empty())
 		{
 			reduced.insert(doorToCheck, path.begin(), path.end());
@@ -46,16 +51,15 @@ PathInfo BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 	PathInfo path;// = GetPathFromBestNeighbours(start, end, bestNeighbourForNode);
 	path.start = start;
 	path.end = end;
-	while ( ! reduced.empty())
+	while (reduced.size() > 1)
 	{
 		Tile *first = reduced.front();
 		reduced.pop_front();
 		Tile *second = reduced.front();
-		reduced.pop_front();
 		if (first->GetSymbol() == second->GetSymbol())
 		{
-			second = reduced.front();
 			reduced.pop_front();
+			second = reduced.front();
 		}
 
 		auto best = CalculateBestNeighbours(first, second);
