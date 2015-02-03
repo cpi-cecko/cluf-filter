@@ -1,128 +1,93 @@
 #include "stdafx.h"
 #include "Solver.h"
 
-#include "Map.h"
-#include "BFSPathfinder.h"
-
+#include <vector>
 #include <iostream>
 #include <algorithm>
 
+#include "Map.h"
+#include "BFSPathfinder.h"
+#include "PathInfo.h"
 
-static void PrintPath(const PathInfo &path);
+
+
+static std::string PathToString(const PathInfo &path);
+static std::string CompressPath(const std::string &strPath);
 
 void Solver::SolveMaze(Map *mazeMap)
 {
-	//FindPathsToDoors(mazeMap);
-
-	//for (size_t idx = 0; idx < pathsToDoors.size(); ++idx)
-	//{
-	//	PrintPath(pathsToDoors[idx]);
-	//}
-
 	Pathfinder *bfsFinder = new BFSPathfinder();
 
 	PathInfo path = bfsFinder->FindPath(mazeMap->GetStartTile(), mazeMap->GetExitTile());
 
 	if ( ! path.path.empty())
 	{
-		PrintPath(path);
+		std::string strPath = PathToString(path);
+		std::string compressedPath = CompressPath(strPath);
+
+		std::cout << "(" << path.start->GetSymbol() << ", " << path.end->GetSymbol() << ") ";
+		std::cout << strPath << "\n\n";
+		std::cout << '\t' << compressedPath << "\n\n";
 	}
 }
 
-void Solver::FindPathsToDoors(Map *mazeMap)
+static std::string CompressPath(const std::string &path)
 {
-	Pathfinder *bfsFinder = new BFSPathfinder();
+	std::string compressedPath = "";
 
-	std::vector<std::pair<Tile*, Tile*>> keyDoorPairs = mazeMap->GetKeyDoorPairs();
-	Tile *start = mazeMap->GetStartTile();
-	Tile *end = mazeMap->GetExitTile();
-
-	for (size_t idx = 0; idx < keyDoorPairs.size(); ++idx)
+	char currentChar = path[0];
+	int charCount = 0;
+	for (size_t i = 1; i < path.length(); ++i)
 	{
-		mazeMap->UnsetTilesVisited();
-		PathInfo startToDoor = bfsFinder->FindPath(start, keyDoorPairs[idx].first);
-		if (startToDoor.path.empty())
+		if (currentChar == path[i])
 		{
-			break;
+			++charCount;
 		}
-		mazeMap->UnsetTilesVisited();
-		PathInfo keyToDoor = bfsFinder->FindPath(keyDoorPairs[idx].first, keyDoorPairs[idx].second);
-		if (keyToDoor.path.empty())
+		else
 		{
-			break;
+			if (charCount > 0)
+				compressedPath += std::to_string(charCount + 1);
+			compressedPath += currentChar;
+			currentChar = path[i];
+			charCount = 0;
+
+			if (compressedPath.size() % 8 == 0)
+			{
+				compressedPath += " ";
+			}
 		}
-		pathsToDoors.push_back(startToDoor);
-		pathsToDoors.push_back(keyToDoor);
 	}
+	if (charCount > 0)
+		compressedPath += std::to_string(charCount + 1);
+	compressedPath += currentChar;
+	charCount = 0;
 
-	pathsToDoors.erase(std::remove_if(pathsToDoors.begin(), pathsToDoors.end(), 
-					   [](PathInfo info) {return info.path.empty();}), pathsToDoors.end());
-
-
-
-
-
-
-	//for (size_t idx = 0; idx < doors.size(); ++idx)
-	//{
-	//	mazeMap->UnsetTilesVisited();
-	//	found = bfsFinder->FindPath(start, doors[idx]);
-	//	pathsToDoors.push_back(found);
-	//	mazeMap->UnsetTilesVisited();
-	//	found = bfsFinder->FindPath(doors[idx], end);
-	//	pathsToDoors.push_back(found);
-	//}
-
-	//for (size_t idx = 0; idx < doors.size(); ++idx)
-	//{
-	//	for (size_t idx2 = idx + 1; idx2 < doors.size(); ++idx2)
-	//	{
-	//		mazeMap->UnsetTilesVisited();
-	//		found = bfsFinder->FindPath(doors[idx], doors[idx2]);
-	//		pathsToDoors.push_back(found);
-	//	}
-	//}
-
-	//mazeMap->UnsetTilesVisited();
-	//found = bfsFinder->FindPath(start, end);
-	//pathsToDoors.push_back(found);
-
-	// auto keyPairs = mazeMap->GetKeyDoorPairs();
-	// for (size_t idx = 0; idx < keyPairs.size(); ++idx)
-	// {
-	// 	mazeMap->UnsetTilesVisited();
-	//	mazeMap->UnlockDoors(); // We want to find key-door paths regardless of locking
-	// 	found = bfsFinder->FindPath(keyPairs[idx].first, keyPairs[idx].second);
-	// 	pathsToDoors.push_back(found);
-	// }
-
-	//pathsToDoors.erase(std::remove_if(pathsToDoors.begin(), pathsToDoors.end(), 
-	//				   [](PathInfo info) {return info.path.empty();}), pathsToDoors.end());
+	return compressedPath;
 }
 
-static void PrintPath(const PathInfo &info)
+static std::string PathToString(const PathInfo &info)
 {
-	std::cout << "(" << info.start->GetSymbol() << ", " << info.end->GetSymbol() << ") ";
+	std::string path = "";
 	for (auto dirIt = info.path.begin(); dirIt != info.path.end(); ++dirIt)
 	{
 		switch ((*dirIt))
 		{
 		case DIR_UP:
-			std::cout << "U";
+			path += "U";
 			break;
 		case DIR_DOWN:
-			std::cout << "D";
+			path += "D";
 			break;
 		case DIR_RIGHT:
-			std::cout << "R";
+			path += "R";
 			break;
 		case DIR_LEFT:
-			std::cout << "L";
+			path += "L";
 			break;
 		default:
 			std::cerr << "Invalid direction\n";
 			break;
 		}
 	}
-	std::cout << std::endl;
+	return path;
 }
