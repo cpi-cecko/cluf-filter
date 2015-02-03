@@ -3,10 +3,10 @@
 #include <string>
 
 
-template<class A, class B, class R>
-std::function<B(A)> fmap(std::function<A(R)> f, std::function<B(A)> g)
+template<class C, class A, class B>
+std::function<C(A)> fmap(std::function<B(A)> f, std::function<C(B)> g)
 {
-	return g(f);
+	return [f,g](A x) { return g(f(x)); };
 }
 
 bool is_pos(int a)
@@ -22,7 +22,7 @@ std::string is_true(bool b)
 
 int main()
 {
-	fmap<bool, std::string, int>(is_pos(5), is_true)();
+	std::cout << fmap<std::string, int, bool>(is_pos, is_true)(0) << '\n';
 
 	return 0;
 }
