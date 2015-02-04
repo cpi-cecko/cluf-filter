@@ -19,7 +19,7 @@ void TestTree::Construction()
 
 	dirVector.clear();
 	newTree.Construct(dirVector);
-	newTree.ToString() == "";
+	assert(newTree.ToString() == "");
 
 	Dir dirs2[] = { DIR_UP, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_UP, DIR_DOWN,
 					DIR_LEFT, DIR_LEFT, DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_RIGHT, DIR_RIGHT, DIR_LEFT };
@@ -34,7 +34,8 @@ void TestTree::Construction()
 					DIR_LEFT, DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_RIGHT, DIR_RIGHT, DIR_DOWN,
 					DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_RIGHT, DIR_RIGHT, DIR_DOWN, DIR_DOWN, DIR_DOWN,
 					DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT };
-	dirVector.insert(dirVector.end(), &dirs3[0], &dirs[ARR_SIZE(dirs3, Dir)]);
+	dirVector.insert(dirVector.end(), &dirs3[0], &dirs3[ARR_SIZE(dirs3, Dir)]);
+	newTree.Construct(dirVector);
 	assert(newTree.ToString() == "2R2DL3DR2UL2URU6R4L4D2R4D2R3D5R");
 }
 

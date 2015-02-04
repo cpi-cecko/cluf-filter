@@ -11,11 +11,12 @@ class TestTree;
 class ExpressionTree
 {
 private:
-	size_t childrenCount;
-	ExpressionTree *children;
+	std::string op;
+	std::vector<ExpressionTree> children;
 
 public:
 	ExpressionTree();
+	ExpressionTree(const std::string &newOp);
 
 	void Construct(const std::vector<Dir> &dirs);
 
@@ -29,16 +30,8 @@ public:
 
 private:
 	static ExpressionTree* Combine(const ExpressionTree *one, const ExpressionTree *two);
-
-
-public:
-	~ExpressionTree();
-	ExpressionTree(const ExpressionTree &other);
-	ExpressionTree& operator=(const ExpressionTree &other);
-
-private:
-	void CopyTree(const ExpressionTree &other);
-	void DeleteTree();
+	void SetOp(const std::string &newOp);
+	void AddChild(const ExpressionTree &newChild);
 
 	friend TestTree;
 };
