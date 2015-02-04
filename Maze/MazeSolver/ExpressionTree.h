@@ -23,13 +23,13 @@ public:
 	// The mostest importantest method of this class
 	void Compress();
 
-	std::string ToString();
+	std::string ToString() const;
 
 	bool IsEqual(const ExpressionTree &other) const;
 	bool IsSimilar(const ExpressionTree &other) const;
 
 private:
-	static ExpressionTree* Combine(const ExpressionTree *one, const ExpressionTree *two);
+	static ExpressionTree* Combine(const std::vector<ExpressionTree> &trees);
 	void SetOp(const std::string &newOp);
 	void AddChild(const ExpressionTree &newChild);
 

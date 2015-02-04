@@ -68,6 +68,8 @@ std::string DirToString(Dir dir)
 
 bool ExpressionTree::IsEqual(const ExpressionTree &other) const
 {
+	if (&other)
+		return this->ToString() == other.ToString();
 	return false;
 }
 bool ExpressionTree::IsSimilar(const ExpressionTree &other) const
@@ -82,7 +84,7 @@ bool is_number(const std::string &str)
 	return !str.empty() && it == str.end();
 }
 
-std::string ExpressionTree::ToString()
+std::string ExpressionTree::ToString() const
 {
 	std::string result("");
 
@@ -95,9 +97,11 @@ std::string ExpressionTree::ToString()
 	return result;
 }
 
-ExpressionTree* ExpressionTree::Combine(const ExpressionTree *one, const ExpressionTree *two)
+ExpressionTree* ExpressionTree::Combine(const std::vector<ExpressionTree> &trees)
 {
-	return NULL;
+	ExpressionTree *newTree = new ExpressionTree(std::to_string(trees.size()));
+	newTree->AddChild(trees[0]);
+	return newTree;
 }
 
 

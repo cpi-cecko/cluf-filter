@@ -65,8 +65,11 @@ void TestTree::Equality()
 	first.Construct(dirVector);
 	second.Construct(dirVector);
 	assert(first.IsEqual(second));
-	ExpressionTree *third = ExpressionTree::Combine(&first, &second);
-	ExpressionTree *fourth = ExpressionTree::Combine(&first, &second);
+	std::vector<ExpressionTree> trees;
+	trees.push_back(first);
+	trees.push_back(second);
+	ExpressionTree *third = ExpressionTree::Combine(trees);
+	ExpressionTree *fourth = ExpressionTree::Combine(trees);
 	assert(third->IsEqual(*fourth));
 
 	delete third;
@@ -97,7 +100,10 @@ void TestTree::Combine()
 	std::vector<Dir> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Dir)]);
 	first.Construct(dirVector);
 	second.Construct(dirVector);
-	ExpressionTree *third = ExpressionTree::Combine(&first, &second);
+	std::vector<ExpressionTree> trees;
+	trees.push_back(first);
+	trees.push_back(second);
+	ExpressionTree *third = ExpressionTree::Combine(trees);
 	assert(third->ToString() == "2(2(3UL)U)");
 
 	delete third;
