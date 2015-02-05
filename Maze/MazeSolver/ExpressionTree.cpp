@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cctype>
+#include <assert.h>
 
 
 ExpressionTree::ExpressionTree()
@@ -42,10 +43,6 @@ bool ExpressionTree::IsEqual(const ExpressionTree &other) const
 	}
 	return false;
 }
-bool ExpressionTree::IsSimilar(const ExpressionTree &other) const
-{
-	return false;
-}
 
 std::string ExpressionTree::ToString() const
 {
@@ -67,7 +64,18 @@ std::string ExpressionTree::ToString() const
 	return result;
 }
 
-ExpressionTree* ExpressionTree::Combine(const std::vector<ExpressionTree> &trees)
+ExpressionTree* ExpressionTree::Combine(const TreePair &treeLeft, const TreePair &treeRight)
 {
-	return NULL;
+	ExpressionTree *combinedTree = new ExpressionTree();
+
+	assert(treeLeft.second.IsEqual(treeRight.second));
+	combinedTree->children.push_back(std::make_pair(treeLeft.first + treeRight.first, treeLeft.second));
+
+	return combinedTree;
+}
+
+
+const ExpressionTree::TreePair* ExpressionTree::GetChild(size_t childIdx) const
+{
+	return &children[childIdx];
 }

@@ -10,27 +10,28 @@ class TestTree;
 
 //
 // Should be:
-//    ExpTree = ExpTree [(Int, (ExpTree Char))]
+//    ExpTree = ExpTree Char [(Int, ExpTree)]
 //
 class ExpressionTree
 {
 private:
 	char dir;
-	std::vector<std::pair<int, ExpressionTree>> children;
+
+	typedef std::pair<int, ExpressionTree> TreePair;
+	std::vector<TreePair> children;
 
 public:
 	ExpressionTree();
 	ExpressionTree(char newDir);
 
 	//
-	// Given a vector of dirs, constructs a tree such that each leaf either shows the repetition count of
-	// the direction followed by the direction or shows only the direction.
+	// Given a vector of dirs, constructs a tree such that each leaf shows the direction followed by 
+	//	its repetition count.
 	//
-	// UUDDRRRRL => _/___
-	//	           / / / \
-	//            2 2 4   L
-	//            | | |
-	//		      U D R
+	// UUDDRRRRL =>   /-2-U
+	//				/-|-2-D
+	//				  |-4-R
+	//				  \-1-L
 	//
 	void Construct(const std::vector<Dir> &dirs);
 
@@ -46,20 +47,16 @@ private:
 	//
 	// Combine two expression trees into one
 	//
-	static ExpressionTree* Combine(const std::vector<ExpressionTree> &trees);
+	static ExpressionTree* Combine(const TreePair &treeLeft, const TreePair &treeRight);
 
 	//
 	// Returns `true` if both trees' printable expressions are equal
 	//
 	bool IsEqual(const ExpressionTree &other) const;
-	//
-	// Returns `true` if there's only a difference between the count with which the second expression appears
-	//
-	// 2(UR) ~= 5(UR)
-	//
-	bool IsSimilar(const ExpressionTree &other) const;
 
 	void AddChild(const ExpressionTree &newChild);
+
+	const TreePair* GetChild(size_t childIdx) const;
 
 	friend TestTree;
 };

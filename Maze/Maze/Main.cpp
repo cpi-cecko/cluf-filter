@@ -25,6 +25,5 @@ void RunTests()
 {
 	TestTree::Construction();
 	// TestTree::Equality();
-	// TestTree::Similarity();
 	// TestTree::Combine();
 }
