@@ -156,7 +156,7 @@ PathInfo BFSPathfinder::GetPathFromBestNeighbours(Tile *start, Tile *end,
 		if (bestNeighbour)
 		{
 			Dir bestDir = GetDir(current, bestNeighbour);
-			if (bestDir != DIR_COUNT)
+			if (bestDir != DIR_INVALID)
 			{
 				path.push_back(bestDir);
 			}
@@ -186,7 +186,7 @@ static Dir GetDir(Tile *current, Tile *neighbour)
 	{
 		return DIR_UP;
 	}
-	return DIR_COUNT;
+	return DIR_INVALID;
 }
 
 static Tile* GetCurrentTileByIdx(size_t idx, Tile *parent)

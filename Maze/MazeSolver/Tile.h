@@ -3,12 +3,12 @@
 
 enum Dir
 {
-	DIR_LEFT,
-	DIR_UP,
-	DIR_RIGHT,
-	DIR_DOWN,
+	DIR_LEFT = int('L'),
+	DIR_UP = int('U'),
+	DIR_RIGHT = int('R'),
+	DIR_DOWN = int('D'),
 
-	DIR_COUNT
+	DIR_INVALID = -1
 };
 
 struct Position

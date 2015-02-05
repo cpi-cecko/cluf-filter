@@ -24,7 +24,7 @@ int main()
 void RunTests()
 {
 	TestTree::Construction();
-	TestTree::Equality();
-	TestTree::Similarity();
-	TestTree::Combine();
+	// TestTree::Equality();
+	// TestTree::Similarity();
+	// TestTree::Combine();
 }

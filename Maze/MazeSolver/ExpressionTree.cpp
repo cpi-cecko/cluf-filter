@@ -7,17 +7,13 @@
 
 
 ExpressionTree::ExpressionTree()
-	: children(), op("")
+	: children(), dir(char(DIR_INVALID))
 {
 }
-
-ExpressionTree::ExpressionTree(const std::string &newOp)
-	: op(newOp)
+ExpressionTree::ExpressionTree(char newDir)
+	: children(), dir(newDir)
 {
 }
-
-
-std::string DirToString(Dir dir);
 
 void ExpressionTree::Construct(const std::vector<Dir> &dirs)
 {
@@ -32,44 +28,18 @@ void ExpressionTree::Construct(const std::vector<Dir> &dirs)
 		}
 		else
 		{
-			ExpressionTree child;
-			if (dirCount > 1)
-			{
-				child.SetOp(std::to_string(dirCount));
-				child.AddChild(ExpressionTree(DirToString(dirs[idx])));
-			}
-			else
-			{
-				child.SetOp(DirToString(dirs[idx]));
-			}
-			children.push_back(child);
+			children.push_back(std::make_pair(dirCount, char(dirs[idx])));
 			dirCount = 1;
 		}
-	}
-}
-
-std::string DirToString(Dir dir)
-{
-	switch (dir)
-	{
-	case DIR_UP:
-		return "U";
-	case DIR_DOWN:
-		return "D";
-	case DIR_LEFT:
-		return "L";
-	case DIR_RIGHT:
-		return "R";
-	default:
-		std::cerr << "Invalid dir " << dir;
-		return "";
 	}
 }
 
 bool ExpressionTree::IsEqual(const ExpressionTree &other) const
 {
 	if (&other)
+	{
 		return this->ToString() == other.ToString();
+	}
 	return false;
 }
 bool ExpressionTree::IsSimilar(const ExpressionTree &other) const
@@ -77,21 +47,21 @@ bool ExpressionTree::IsSimilar(const ExpressionTree &other) const
 	return false;
 }
 
-bool is_number(const std::string &str)
-{
-	std::string::const_iterator it = str.begin();
-	while (it != str.end() && std::isdigit(*it)) ++it;
-	return !str.empty() && it == str.end();
-}
-
 std::string ExpressionTree::ToString() const
 {
-	std::string result("");
+	std::string result;
+	if (dir != char(DIR_INVALID))
+	{
+		result += dir;
+	}
 
 	for (auto child : children)
 	{
-		result += child.op;
-		result += child.ToString();
+		if (child.first > 1)
+		{
+			result += std::to_string(child.first);
+		}
+		result += child.second.ToString();
 	}
 
 	return result;
@@ -99,18 +69,5 @@ std::string ExpressionTree::ToString() const
 
 ExpressionTree* ExpressionTree::Combine(const std::vector<ExpressionTree> &trees)
 {
-	ExpressionTree *newTree = new ExpressionTree(std::to_string(trees.size()));
-	newTree->AddChild(trees[0]);
-	return newTree;
-}
-
-
-void ExpressionTree::SetOp(const std::string &newOp)
-{
-	op = newOp;
-}
-
-void ExpressionTree::AddChild(const ExpressionTree &newChild)
-{
-	children.push_back(newChild);
+	return NULL;
 }

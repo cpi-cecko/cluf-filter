@@ -15,6 +15,7 @@ void TestTree::Construction()
 	Dir dirs[] = { DIR_UP, DIR_UP, DIR_DOWN, DIR_DOWN };
 	std::vector<Dir> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Dir)]);
 	newTree.Construct(dirVector);
+	std::string str = newTree.ToString();
 	assert(newTree.ToString() == "2U2D");
 
 	dirVector.clear();

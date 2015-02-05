@@ -11,12 +11,12 @@ const char TILE_EXIT = 'E';
 
 
 Tile::Tile()
-	: pos(), symbol('\0'), owner(NULL), dir(DIR_COUNT), isVisited(false)
+	: pos(), symbol('\0'), owner(NULL), dir(DIR_INVALID), isVisited(false)
 {
 }
 
 Tile::Tile(const Position &newPos, char newSymbol)
-	: pos(newPos), symbol(newSymbol), owner(NULL), dir(DIR_COUNT), isVisited(false)
+	: pos(newPos), symbol(newSymbol), owner(NULL), dir(DIR_INVALID), isVisited(false)
 {
 }
 
