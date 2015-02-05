@@ -47,7 +47,9 @@ private:
 	//
 	// Combine two expression trees into one
 	//
-	static ExpressionTree* Combine(const TreePair &treeLeft, const TreePair &treeRight);
+	static ExpressionTree* Combine(const std::vector<TreePair> &subTrees);
+
+	void Merge(const ExpressionTree &left, const ExpressionTree &right);
 
 	//
 	// Returns `true` if both trees' printable expressions are equal

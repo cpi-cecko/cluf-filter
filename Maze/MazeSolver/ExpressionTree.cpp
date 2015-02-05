@@ -35,6 +35,38 @@ void ExpressionTree::Construct(const std::vector<Dir> &dirs)
 	}
 }
 
+void ExpressionTree::Compress()
+{
+	// Get first child
+	// Compare it to the second
+	// If match, merge and do the same with the next pair
+	// Else get first and second children
+	// Compare them to the third and fourth
+	// If match, merge and do the same with the next pair
+	// Continue until middle
+	size_t middle = children.size() / 2;
+	size_t currLast = 1;
+	size_t idxIncr = 1;
+	for (size_t idx = 0; idx < currLast; idx += idxIncr)
+	{
+		ExpressionTree *combinedLeft = Combine(std::vector<TreePair>(children.begin() + idx, 
+																	 children.begin() + currLast - 1));
+		ExpressionTree *combinedRight = Combine(std::vector<TreePair>(children.begin() + currLast,
+																	  children.begin() + idx + currLast));
+		if (combinedLeft->IsEqual(*combinedRight))
+		{
+			Merge(*combinedLeft, *combinedRight);
+			if (currLast < middle)
+				currLast++;
+		}
+		else
+		{
+			currLast++;
+			idxIncr++;
+		}
+	}
+}
+
 bool ExpressionTree::IsEqual(const ExpressionTree &other) const
 {
 	if (&other)
@@ -64,14 +96,20 @@ std::string ExpressionTree::ToString() const
 	return result;
 }
 
-ExpressionTree* ExpressionTree::Combine(const TreePair &treeLeft, const TreePair &treeRight)
+ExpressionTree* ExpressionTree::Combine(const std::vector<TreePair> &subTrees)
 {
 	ExpressionTree *combinedTree = new ExpressionTree();
 
-	assert(treeLeft.second.IsEqual(treeRight.second));
-	combinedTree->children.push_back(std::make_pair(treeLeft.first + treeRight.first, treeLeft.second));
+	for (auto sub : subTrees)
+	{
+		combinedTree->children.push_back(sub);
+	}
 
 	return combinedTree;
+}
+
+void ExpressionTree::Merge(const ExpressionTree &left, const ExpressionTree &right)
+{
 }
 
 
