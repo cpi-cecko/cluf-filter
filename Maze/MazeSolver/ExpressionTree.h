@@ -5,9 +5,41 @@
 #include <string>
 
 
-enum Dir;
+enum Symbol;
 class TestTree;
 
+//
+// An expression represented as a vector of its operands.
+//
+class ExpressionTree
+{
+private:
+	std::vector<int> expression; // int is disguised Symbol
+
+public:
+	ExpressionTree();
+
+	void Construct(const std::vector<Symbol> &dirs);
+
+	void Compress();
+
+	std::string ToString() const;
+
+private:
+	//static ExpressionTree* Combine(const std::vector<TreePair> &subTrees);
+
+	void Merge(const ExpressionTree &left, const ExpressionTree &right);
+
+	bool IsEqual(const ExpressionTree &other) const;
+
+	void AddChild(const ExpressionTree &newChild);
+
+	// const TreePair* GetChild(size_t childIdx) const;
+
+	friend TestTree;
+};
+
+/*
 //
 // Should be:
 //    ExpTree = ExpTree Char [(Int, ExpTree)]
@@ -33,7 +65,7 @@ public:
 	//				  |-4-R
 	//				  \-1-L
 	//
-	void Construct(const std::vector<Dir> &dirs);
+	void Construct(const std::vector<Symbol> &dirs);
 
 	// The mostest importantest method of this class
 	void Compress();
@@ -45,10 +77,13 @@ public:
 
 private:
 	//
-	// Combine two expression trees into one
+	// Puts all subtrees under a common root
 	//
 	static ExpressionTree* Combine(const std::vector<TreePair> &subTrees);
 
+	//
+	// Merges two subtrees into one in this tree
+	//
 	void Merge(const ExpressionTree &left, const ExpressionTree &right);
 
 	//
@@ -62,3 +97,4 @@ private:
 
 	friend TestTree;
 };
+*/

@@ -2,11 +2,11 @@
 
 
 class Tile;
-enum Dir;
+enum Symbol;
 
 struct PathInfo
 {
-	std::vector<Dir> path;
+	std::vector<Symbol> path;
 	Tile *start;
 	Tile *end;
 
@@ -15,7 +15,7 @@ struct PathInfo
 	{
 	}
 
-	PathInfo(const std::vector<Dir> &newPath, Tile *newStart, Tile *newEnd)
+	PathInfo(const std::vector<Symbol> &newPath, Tile *newStart, Tile *newEnd)
 		: path(newPath), start(newStart), end(newEnd)
 	{
 	}

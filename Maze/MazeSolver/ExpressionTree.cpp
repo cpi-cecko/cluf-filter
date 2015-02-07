@@ -8,17 +8,13 @@
 
 
 ExpressionTree::ExpressionTree()
-	: children(), dir(char(DIR_INVALID))
-{
-}
-ExpressionTree::ExpressionTree(char newDir)
-	: children(), dir(newDir)
+	: expression()
 {
 }
 
-void ExpressionTree::Construct(const std::vector<Dir> &dirs)
+void ExpressionTree::Construct(const std::vector<Symbol> &dirs)
 {
-	children.clear();
+	expression.clear();
 
 	size_t dirCount = 1;
 	for (size_t idx = 0; idx < dirs.size(); ++idx)
@@ -29,7 +25,8 @@ void ExpressionTree::Construct(const std::vector<Dir> &dirs)
 		}
 		else
 		{
-			children.push_back(std::make_pair(dirCount, char(dirs[idx])));
+			expression.push_back(dirCount);
+			expression.push_back(dirs[idx]);
 			dirCount = 1;
 		}
 	}
@@ -37,32 +34,22 @@ void ExpressionTree::Construct(const std::vector<Dir> &dirs)
 
 void ExpressionTree::Compress()
 {
-	// Get first child
-	// Compare it to the second
-	// If match, merge and do the same with the next pair
-	// Else get first and second children
-	// Compare them to the third and fourth
-	// If match, merge and do the same with the next pair
-	// Continue until middle
-	size_t middle = children.size() / 2;
-	size_t currLast = 1;
-	size_t idxIncr = 1;
-	for (size_t idx = 0; idx < currLast; idx += idxIncr)
+	size_t count = 1;
+	size_t beg = 0;
+	while (count < expression.size() / 2 ||
+		   beg > expression.size() - count)
 	{
-		ExpressionTree *combinedLeft = Combine(std::vector<TreePair>(children.begin() + idx, 
-																	 children.begin() + currLast - 1));
-		ExpressionTree *combinedRight = Combine(std::vector<TreePair>(children.begin() + currLast,
-																	  children.begin() + idx + currLast));
-		if (combinedLeft->IsEqual(*combinedRight))
+		std::vector<int> &firstCount = GetNSymbolsFrom(beg, count);
+		std::vector<int> &secondCount = GetNSymbolsFrom(count + 1, count);
+		if (IsEqual(firstCount, secondCount))
 		{
-			Merge(*combinedLeft, *combinedRight);
-			if (currLast < middle)
-				currLast++;
+			MergeIn(expression, firstCount, secondCount);
+			count = 1;
+			++beg;
 		}
 		else
 		{
-			currLast++;
-			idxIncr++;
+			++count;
 		}
 	}
 }
@@ -79,41 +66,42 @@ bool ExpressionTree::IsEqual(const ExpressionTree &other) const
 std::string ExpressionTree::ToString() const
 {
 	std::string result;
-	if (dir != char(DIR_INVALID))
-	{
-		result += dir;
-	}
 
-	for (auto child : children)
+	for (auto symbol : expression)
 	{
-		if (child.first > 1)
+		// Positive symbols represent quotients, negative symbols represent
+		// parens or dirs
+		if (symbol > 1)
 		{
-			result += std::to_string(child.first);
+			result += std::to_string(symbol);
 		}
-		result += child.second.ToString();
+		else if (symbol < 0)
+		{
+			result += char(-symbol);
+		}
 	}
 
 	return result;
 }
 
-ExpressionTree* ExpressionTree::Combine(const std::vector<TreePair> &subTrees)
-{
-	ExpressionTree *combinedTree = new ExpressionTree();
+//ExpressionTree* ExpressionTree::Combine(const std::vector<TreePair> &subTrees)
+//{
+//	ExpressionTree *combinedTree = new ExpressionTree();
 
-	for (auto sub : subTrees)
-	{
-		combinedTree->children.push_back(sub);
-	}
+//	for (auto sub : subTrees)
+//	{
+//		combinedTree->children.push_back(sub);
+//	}
 
-	return combinedTree;
-}
+//	return combinedTree;
+//}
 
 void ExpressionTree::Merge(const ExpressionTree &left, const ExpressionTree &right)
 {
 }
 
 
-const ExpressionTree::TreePair* ExpressionTree::GetChild(size_t childIdx) const
-{
-	return &children[childIdx];
-}
+//const ExpressionTree::TreePair* ExpressionTree::GetChild(size_t childIdx) const
+//{
+//	return &children[childIdx];
+//}

@@ -5,7 +5,7 @@
 #include <stack>
 
 
-static Dir GetDir(Tile *current, Tile *neighbour);
+static Symbol GetDir(Tile *current, Tile *neighbour);
 
 static Tile* GetCurrentTileByIdx(size_t idx, Tile *parent);
 
@@ -147,7 +147,7 @@ PathInfo BFSPathfinder::GetPathFromBestNeighbours(Tile *start, Tile *end,
 	if (bestNeighbours.empty())
 		return PathInfo();
 
-	std::vector<Dir> path;
+	std::vector<Symbol> path;
 	Tile *current = end;
 
 	while (current != start)
@@ -155,7 +155,7 @@ PathInfo BFSPathfinder::GetPathFromBestNeighbours(Tile *start, Tile *end,
 		Tile *bestNeighbour = bestNeighbours[current->GetTileIdx()];
 		if (bestNeighbour)
 		{
-			Dir bestDir = GetDir(current, bestNeighbour);
+			Symbol bestDir = GetDir(current, bestNeighbour);
 			if (bestDir != DIR_INVALID)
 			{
 				path.push_back(bestDir);
@@ -168,7 +168,7 @@ PathInfo BFSPathfinder::GetPathFromBestNeighbours(Tile *start, Tile *end,
 	return PathInfo(path, start, end);
 }
 
-static Dir GetDir(Tile *current, Tile *neighbour)
+static Symbol GetDir(Tile *current, Tile *neighbour)
 {
 	if (current->GetLeftTile() == neighbour)
 	{

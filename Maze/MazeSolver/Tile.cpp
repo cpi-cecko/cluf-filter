@@ -82,7 +82,7 @@ Tile* Tile::GetDoorForThisKey() const
 	return owner->GetDoorForKey(symbol);
 }
 
-Dir Tile::GetDir() const
+Symbol Tile::GetDir() const
 {
 	return dir;
 }
@@ -133,7 +133,7 @@ void Tile::SetVisited(bool newIsVisited)
 	isVisited = newIsVisited;
 }
 
-void Tile::SetDir(Dir newDir)
+void Tile::SetDir(Symbol newDir)
 {
 	dir = newDir;
 }
