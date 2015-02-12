@@ -9,5 +9,5 @@ class TestTree
 public:
 	static void Construction();
 	static void Equality();
-	static void Combine();
+	static void Compress();
 };

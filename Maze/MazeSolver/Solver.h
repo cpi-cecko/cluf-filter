@@ -3,7 +3,7 @@
 
 class Map;
 class Tile;
-enum Symbol;
+enum Dir;
 
 class Solver
 {

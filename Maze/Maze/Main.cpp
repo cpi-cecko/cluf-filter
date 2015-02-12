@@ -23,7 +23,7 @@ int main()
 
 void RunTests()
 {
-	TestTree::Construction();
+	//TestTree::Construction();
 	// TestTree::Equality();
-	// TestTree::Combine();
+	TestTree::Compress();
 }

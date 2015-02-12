@@ -5,36 +5,54 @@
 #include <string>
 
 
-enum Symbol;
+enum Dir;
 class TestTree;
 
 //
-// An expression represented as a vector of its operands.
+// (Maybe Int, Maybe String)
+//
+class Node
+{
+private:
+	// if both are invalid, the node is Nothing
+	int count; // count <= 0 is invalid
+	std::string expression; // empty expression is invalid
+
+public:
+	// Creates the Nothing node, e.g. a node with both members invalid
+	explicit Node();
+	Node(int newCount);
+	Node(const std::string &newExpression);
+
+	int Count() const;
+	const std::string& Expression() const;
+};
+
+//
+// An expression represented as a tree, where each node is either a count,
+// a string of directions or Nothing.
 //
 class ExpressionTree
 {
 private:
-	std::vector<int> expression; // int is disguised Symbol
+	Node op;
+	typedef std::vector<ExpressionTree> ChildrenVector;
+	ChildrenVector children;
 
 public:
 	ExpressionTree();
 
-	void Construct(const std::vector<Symbol> &dirs);
+	void Construct(const std::vector<Dir> &dirs);
 
 	void Compress();
 
 	std::string ToString() const;
 
 private:
-	//static ExpressionTree* Combine(const std::vector<TreePair> &subTrees);
-
-	void Merge(const ExpressionTree &left, const ExpressionTree &right);
+	ChildrenVector::iterator Merge(ChildrenVector::iterator which, size_t chunkBeg, size_t chunkLen, size_t chunkCount);
 
 	bool IsEqual(const ExpressionTree &other) const;
-
-	void AddChild(const ExpressionTree &newChild);
-
-	// const TreePair* GetChild(size_t childIdx) const;
+	void SetOp(const Node &newOp);
 
 	friend TestTree;
 };
@@ -65,7 +83,7 @@ public:
 	//				  |-4-R
 	//				  \-1-L
 	//
-	void Construct(const std::vector<Symbol> &dirs);
+	void Construct(const std::vector<Dir> &dirs);
 
 	// The mostest importantest method of this class
 	void Compress();

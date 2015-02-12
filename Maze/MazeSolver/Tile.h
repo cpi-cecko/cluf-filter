@@ -1,16 +1,12 @@
 #pragma once
 
 
-enum Symbol
+enum Dir
 {
-	// positives are reserved for the dir count
-	DIR_LEFT = -int('L'),
-	DIR_UP = -int('U'),
-	DIR_RIGHT = -int('R'),
-	DIR_DOWN = -int('D'),
-
-	DIR_LPAREN = -int('('),
-	DIR_RPAREN = -int(')'),
+	DIR_LEFT = int('L'),
+	DIR_UP = int('U'),
+	DIR_RIGHT = int('R'),
+	DIR_DOWN = int('D'),
 
 	DIR_INVALID = -1
 };
@@ -40,7 +36,7 @@ private:
 	char symbol;
 	Map *owner;
 	bool isVisited;
-	Symbol dir;
+	Dir dir;
 
 public:
 	void SetOwner(Map *newOwner);
@@ -58,7 +54,7 @@ public:
 	int GetMazeSize() const;
 	int GetTileIdx() const;
 
-	Symbol GetDir() const;
+	Dir GetDir() const;
 
 	bool IsExit() const;
 	bool IsStart() const;
@@ -72,7 +68,7 @@ public:
 	bool IsKeyRetrieved() const;
 
 	void SetVisited(bool newIsVisited);
-	void SetDir(Symbol newDir);
+	void SetDir(Dir newDir);
 	void Unlock();
 	void MarkKeyRetrieved();
 

@@ -12,8 +12,8 @@
 void TestTree::Construction()
 {
 	ExpressionTree newTree;
-	Symbol dirs[] = { DIR_UP, DIR_UP, DIR_DOWN, DIR_DOWN };
-	std::vector<Symbol> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Symbol)]);
+	Dir dirs[] = { DIR_UP, DIR_UP, DIR_DOWN, DIR_DOWN };
+	std::vector<Dir> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Dir)]);
 	newTree.Construct(dirVector);
 	std::string str = newTree.ToString();
 	assert(newTree.ToString() == "2U2D");
@@ -22,20 +22,20 @@ void TestTree::Construction()
 	newTree.Construct(dirVector);
 	assert(newTree.ToString() == "");
 
-	Symbol dirs2[] = { DIR_UP, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_UP, DIR_DOWN,
+	Dir dirs2[] = { DIR_UP, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_UP, DIR_DOWN, DIR_UP, DIR_DOWN,
 					DIR_LEFT, DIR_LEFT, DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_RIGHT, DIR_RIGHT, DIR_LEFT };
-	dirVector.insert(dirVector.end(), &dirs2[0], &dirs2[ARR_SIZE(dirs2, Symbol)]);
+	dirVector.insert(dirVector.end(), &dirs2[0], &dirs2[ARR_SIZE(dirs2, Dir)]);
 	newTree.Construct(dirVector);
 	assert(newTree.ToString() == "U3RUDUD3LRU2RL");
 
 	dirVector.clear();
-	Symbol dirs3[] = { DIR_RIGHT, DIR_RIGHT, DIR_DOWN, DIR_DOWN, DIR_LEFT, DIR_DOWN, DIR_DOWN, DIR_DOWN,
+	Dir dirs3[] = { DIR_RIGHT, DIR_RIGHT, DIR_DOWN, DIR_DOWN, DIR_LEFT, DIR_DOWN, DIR_DOWN, DIR_DOWN,
 					DIR_RIGHT, DIR_UP, DIR_UP, DIR_LEFT, DIR_UP, DIR_UP, DIR_RIGHT, DIR_UP, DIR_RIGHT,
 					DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_LEFT, DIR_LEFT, DIR_LEFT,
 					DIR_LEFT, DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_RIGHT, DIR_RIGHT, DIR_DOWN,
 					DIR_DOWN, DIR_DOWN, DIR_DOWN, DIR_RIGHT, DIR_RIGHT, DIR_DOWN, DIR_DOWN, DIR_DOWN,
 					DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT, DIR_RIGHT };
-	dirVector.insert(dirVector.end(), &dirs3[0], &dirs3[ARR_SIZE(dirs3, Symbol)]);
+	dirVector.insert(dirVector.end(), &dirs3[0], &dirs3[ARR_SIZE(dirs3, Dir)]);
 	newTree.Construct(dirVector);
 	assert(newTree.ToString() == "2R2DL3DR2UL2URU6R4L4D2R4D2R3D5R");
 }
@@ -44,25 +44,25 @@ void TestTree::Equality()
 {
 	ExpressionTree first;
 	ExpressionTree second;
-	Symbol dirs[] = { DIR_DOWN, DIR_RIGHT };
-	std::vector<Symbol> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Symbol)]);
+	Dir dirs[] = { DIR_DOWN, DIR_RIGHT };
+	std::vector<Dir> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Dir)]);
 	first.Construct(dirVector);
 	second.Construct(dirVector);
 	assert(first.IsEqual(second));
 
-	Symbol dirs2[] = { DIR_DOWN, DIR_DOWN, DIR_RIGHT };
+	Dir dirs2[] = { DIR_DOWN, DIR_DOWN, DIR_RIGHT };
 	dirVector.clear();
-	dirVector.insert(dirVector.end(), &dirs2[0], &dirs2[ARR_SIZE(dirs2, Symbol)]);
+	dirVector.insert(dirVector.end(), &dirs2[0], &dirs2[ARR_SIZE(dirs2, Dir)]);
 	first.Construct(dirVector);
 	second.Construct(dirVector);
 	assert(first.IsEqual(second));
 
-	Symbol dirs3[] = { DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
+	Dir dirs3[] = { DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
 					DIR_UP, DIR_UP, DIR_UP, DIR_LEFT, DIR_UP,
 					DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
 					DIR_UP, DIR_UP, DIR_UP, DIR_LEFT, DIR_UP };
 	dirVector.clear();
-	dirVector.insert(dirVector.end(), &dirs3[0], &dirs3[ARR_SIZE(dirs3, Symbol)]);
+	dirVector.insert(dirVector.end(), &dirs3[0], &dirs3[ARR_SIZE(dirs3, Dir)]);
 	first.Construct(dirVector);
 	second.Construct(dirVector);
 	assert(first.IsEqual(second));
@@ -77,22 +77,17 @@ void TestTree::Equality()
 	// delete fourth;
 }
 
-void TestTree::Combine()
+void TestTree::Compress()
 {
-	ExpressionTree first;
-	ExpressionTree second;
-	Symbol dirs[] = { DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
+	Dir dirs[] = { DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
 				   DIR_UP, DIR_UP, DIR_UP, DIR_LEFT, DIR_UP,
 				   DIR_UP, DIR_UP, DIR_UP, DIR_LEFT,
 				   DIR_UP, DIR_UP, DIR_UP, DIR_LEFT, DIR_UP };
-	std::vector<Symbol> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Symbol)]);
-	first.Construct(dirVector);
-	second.Construct(dirVector);
-	//std::vector<ExpressionTree> trees;
-	//trees.push_back(first);
-	//trees.push_back(second);
-	//ExpressionTree *third = ExpressionTree::Combine(trees);
-	//assert(third->ToString() == "2(2(3UL)U)");
-
-	//delete third;
+	std::vector<Dir> dirVector(&dirs[0], &dirs[ARR_SIZE(dirs, Dir)]);
+	ExpressionTree tree;
+	tree.Construct(dirVector);
+	std::string str = tree.ToString();
+	tree.Compress();
+	str = tree.ToString();
+	assert(tree.ToString() == "2(2(3UL)U)");
 }
