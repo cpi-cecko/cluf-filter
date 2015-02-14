@@ -48,7 +48,7 @@ PathInfo BFSPathfinder::DoFindPath(Tile *start, Tile *end)
 	}
 	reduced.push_back(end);
 
-	PathInfo path;// = GetPathFromBestNeighbours(start, end, bestNeighbourForNode);
+	PathInfo path;
 	path.start = start;
 	path.end = end;
 	while (reduced.size() > 1)

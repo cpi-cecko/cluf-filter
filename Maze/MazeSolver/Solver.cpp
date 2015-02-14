@@ -21,7 +21,10 @@ void Solver::SolveMaze(Map *mazeMap)
 	{
 		ExpressionTree solverTree;
 		solverTree.Construct(path.path);
+		std::cout << "Before: \n  ";
+		std::cout << solverTree.ToString() << '\n';
 		solverTree.Compress();
-		std::cout << solverTree.ToString();
+		std::cout << "After: \n  ";
+		std::cout << solverTree.ToString() << '\n';
 	}
 }

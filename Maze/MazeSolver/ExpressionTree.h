@@ -41,78 +41,66 @@ private:
 
 public:
 	ExpressionTree();
+	ExpressionTree(const std::string &expressionOp);
+	ExpressionTree(int countOp);
 
+	//
+	// Constructs the expression tree by converting `dirs` to string and setting them as the only child.
+	//
 	void Construct(const std::vector<Dir> &dirs);
 
+	//
+	// Compresses the tree, going through two phases.
+	// In phase one, we merge every single-character occurences in separate subtrees.
+	// In phase two, we try to find multi-character sequences.
+	//
 	void Compress();
 
 	std::string ToString() const;
 
 private:
-	ChildrenVector::iterator Merge(ChildrenVector::iterator which, size_t chunkBeg, size_t chunkLen, size_t chunkCount);
+	//
+	// Goes through the tree and compresses consequetive equal characters.
+	//
+	void CompressOne();
+	//
+	// Goes through the tree and tries to compress strings of characters.
+	//
+	void CompressTwo();
 
-	bool IsEqual(const ExpressionTree &other) const;
+	//
+	// Splits the subtree's expression in three
+	// The first resembles the string before the compressed expression,
+	// the second resembles the compressed expression,
+	// and the third resembles the string after the compressed expression.
+	// These three are inserted as new children of the tree.
+	//
+	ChildrenVector::iterator Merge(ChildrenVector::iterator which,
+								   size_t chunkBeg, size_t chunkLen, size_t chunkCount);
+
+	//
+	// Splits a subtree's expression in three.
+	//
+	std::vector<std::string> SplitAt(ChildrenVector::iterator which,
+									 size_t chunkBeg, size_t chunkLen, size_t chunkCount) const;
+	//
+	// Inserts before `which`
+	//
+	ChildrenVector::iterator InsertBefore(ChildrenVector::iterator which, const std::string &expression);
+	//
+	// Inserts before `which` but with count provided
+	//
+	ChildrenVector::iterator InsertBeforeWithCount(ChildrenVector::iterator which,
+												   const std::string &expression, int count);
+	//
+	// Inserts a new child
+	//
+	void Insert(const ExpressionTree &what);
+
+	//
+	// Removes a child
+	//
+	ChildrenVector::iterator Remove(ChildrenVector::iterator which);
+
 	void SetOp(const Node &newOp);
-
-	friend TestTree;
 };
-
-/*
-//
-// Should be:
-//    ExpTree = ExpTree Char [(Int, ExpTree)]
-//
-class ExpressionTree
-{
-private:
-	char dir;
-
-	typedef std::pair<int, ExpressionTree> TreePair;
-	std::vector<TreePair> children;
-
-public:
-	ExpressionTree();
-	ExpressionTree(char newDir);
-
-	//
-	// Given a vector of dirs, constructs a tree such that each leaf shows the direction followed by 
-	//	its repetition count.
-	//
-	// UUDDRRRRL =>   /-2-U
-	//				/-|-2-D
-	//				  |-4-R
-	//				  \-1-L
-	//
-	void Construct(const std::vector<Dir> &dirs);
-
-	// The mostest importantest method of this class
-	void Compress();
-
-	//
-	// Recurses the tree and creates a printable expression from it
-	//
-	std::string ToString() const;
-
-private:
-	//
-	// Puts all subtrees under a common root
-	//
-	static ExpressionTree* Combine(const std::vector<TreePair> &subTrees);
-
-	//
-	// Merges two subtrees into one in this tree
-	//
-	void Merge(const ExpressionTree &left, const ExpressionTree &right);
-
-	//
-	// Returns `true` if both trees' printable expressions are equal
-	//
-	bool IsEqual(const ExpressionTree &other) const;
-
-	void AddChild(const ExpressionTree &newChild);
-
-	const TreePair* GetChild(size_t childIdx) const;
-
-	friend TestTree;
-};
-*/
