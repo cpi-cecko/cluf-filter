@@ -67,6 +67,14 @@ MySortTester<T>::MySortTester(SorterImplementation<T> **sorters, size_t count)
 		{
 			summary << "  " << testsToRun[testIdx].id << '\n';
 
+			for (size_t dataIdx = 0; dataIdx < testsToRun[testIdx].dataCount; ++dataIdx)
+			{
+				summary << "	before: ";
+				summary << ArrayToString(testsToRun[testIdx].allData[dataIdx].data,
+										 testsToRun[testIdx].allData[dataIdx].count);
+			}
+			summary << '\n';
+
 			DoTest<T>(sorters[idx], &testsToRun[testIdx]);
 
 			for (size_t dataIdx = 0; dataIdx < testsToRun[testIdx].dataCount; ++dataIdx)
@@ -85,6 +93,8 @@ MySortTester<T>::MySortTester(SorterImplementation<T> **sorters, size_t count)
 				summary << '\n';
 			}
 		}
+		DeleteTests();
+		GenerateTestData();
 		summary << '\n';
 	}
 }
@@ -111,7 +121,7 @@ MySortTester<T>::~MySortTester()
 template<typename T>
 void MySortTester<T>::GenerateTestData()
 {
-	testsCount = 4;
+	testsCount = 5;
 	testsToRun = new Test<T>[testsCount];
 
 	testsToRun[0].id = "Test Zero Elements";
@@ -159,6 +169,15 @@ void MySortTester<T>::GenerateTestData()
 	testsToRun[3].allData[1].InitData(twoSorted, 2);
 	T twoEqual[] = {1, 1};
 	testsToRun[3].allData[2].InitData(twoEqual, 2);
+
+	testsToRun[4].id = "Big data";
+	testsToRun[4].dataCount = 1;
+	testsToRun[4].allData = new TestData<T>[testsToRun[4].dataCount];
+	T big[] = { 5,3,4,5,6,12,34,0,-1,4,1,2,5,45,623,33,-5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6666,666,66,6,123,123,123,123,123,
+			  -5,-5,-5,-123,55,-3,-5,-6,11,12,13,14,15,16,-533,-1001,101,12,12,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+			  -12,-16,-66,101,325,14,-5,-6,-7,-8,-9,111,112,113,114,115,116,117,118,119,120,-5,-6,-7,-8,1,2,3,4,5,55,44,33,
+			  22,11,0,16,17,18,189,213,76,42,15,-155,10000001,25325,23566,66745,34,467,34,809,9000,101,102,107,22,33,24 };
+	testsToRun[4].allData[0].InitData(big, 138);
 }
 
 

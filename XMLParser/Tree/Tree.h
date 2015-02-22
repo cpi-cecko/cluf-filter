@@ -238,7 +238,7 @@ bool Tree<VAL_TYPE>::Remove(const std::string &atKey)
 			// Revalidates nephews.
 			for (std::list<Tree*>::iterator alive = children.begin(); alive != --iterRem; ++alive)
 			{
-				if (alive != children.end())
+				//if (alive != children.end())
 				{
 					(*alive)->rightNephew = (*(++alive));
 					--alive;
