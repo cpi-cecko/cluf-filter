@@ -76,8 +76,7 @@ void TestWithSamples()
 
 int main()
 {
-	size_t size = 10000;
-
+	size_t size = 100;
 	int *arr = GenerateRandomArray(size);
 
 	Max found = FindMaxSubarray(arr, 0, size);
@@ -86,6 +85,10 @@ int main()
 
 	found = Brute_FindMaxSubarray(arr, 0, size);
 	std::cout << "Brute-force:\n";
+	std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
+
+	found = Linear_FindMaxSubarray(arr, size);
+	std::cout << "Linear:\n";
 	std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
 
 	delete [] arr;

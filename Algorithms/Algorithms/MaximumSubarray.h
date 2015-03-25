@@ -21,6 +21,30 @@ struct Max
 };
 
 
+Max Brute_FindMaxSubarray(int *arr, size_t low, size_t high)
+{
+	int maxSum = -99999;
+	int sum = 0;
+	size_t maxLow = 0;
+	size_t maxHigh = 0;
+	for (size_t i = low; i < high; ++i)
+	{
+		for (size_t j = i; j < high; ++j)
+		{
+			sum += arr[j];
+			if (sum > maxSum)
+			{
+				maxSum = sum;
+				maxLow = i;
+				maxHigh = j;
+			}
+		}
+		sum = 0;
+	}
+
+	return Max(maxLow, maxHigh, maxSum);
+}
+
 Max FindMaxCrossingSubarray(int *arr, size_t low, size_t mid, size_t high)
 {
 	int leftSum = -9999;
@@ -49,30 +73,6 @@ Max FindMaxCrossingSubarray(int *arr, size_t low, size_t mid, size_t high)
 	}
 
 	return Max(maxLeft, maxRight, leftSum + rightSum);
-}
-
-Max Brute_FindMaxSubarray(int *arr, size_t low, size_t high)
-{
-	int maxSum = -99999;
-	int sum = 0;
-	size_t maxLow = 0;
-	size_t maxHigh = 0;
-	for (size_t i = low; i < high; ++i)
-	{
-		for (size_t j = i; j < high; ++j)
-		{
-			sum += arr[j];
-			if (sum > maxSum)
-			{
-				maxSum = sum;
-				maxLow = i;
-				maxHigh = j;
-			}
-		}
-		sum = 0;
-	}
-
-	return Max(maxLow, maxHigh, maxSum);
 }
 
 Max FindMaxSubarray(int *arr, size_t low, size_t high)
@@ -122,4 +122,49 @@ Max FindMaxSubarray_Crossover(int *arr, size_t low, size_t high)
 				return centerMax;
 		}
 	}
+}
+
+Max Linear_FindMaxSubarray(int *arr, size_t high)
+{
+	int maxSum = -99999;
+	int sum = 0;
+	int subSum = 0;
+	int sumToJ = 0;
+	size_t idxJ = 0;
+	bool stop = false;
+	size_t max_i = 0;
+	size_t max_j = 0;
+	for (size_t j = 0; j < high - 1; ++j)
+	{
+		sum += arr[j];
+		// subSum = arr[j+1];
+		if (arr[j] > arr[max_i + 1])
+		{
+			stop = true;
+			subSum = sum - sumToJ + arr[j+1];
+			if (subSum > maxSum)
+			{
+				// That works to some extent!!!
+				max_i = idxJ;
+				max_j = j+1;
+				maxSum = subSum;
+				idxJ = j;
+				stop=false;
+			}
+		}
+		else if (! stop)
+		{
+			sumToJ += arr[j];
+			++idxJ;
+		}
+
+		if (sum > maxSum)
+		{
+			maxSum = sum;
+			max_i = 0;
+			max_j = j;
+		}
+	}
+
+	return Max(max_i, max_j, maxSum);
 }
