@@ -126,45 +126,33 @@ Max FindMaxSubarray_Crossover(int *arr, size_t low, size_t high)
 
 Max Linear_FindMaxSubarray(int *arr, size_t high)
 {
-	int maxSum = -99999;
-	int sum = 0;
-	int subSum = 0;
-	int sumToJ = 0;
-	size_t idxJ = 0;
-	bool stop = false;
+	int maxSoFar = 0;
+	int maxEndingHere = 0;
 	size_t max_i = 0;
+	size_t last_max_i = 0;
 	size_t max_j = 0;
-	for (size_t j = 0; j < high - 1; ++j)
+	bool first = true;
+	for (size_t j = 0; j < high; ++j)
 	{
-		sum += arr[j];
-		// subSum = arr[j+1];
-		if (arr[j] > arr[max_i + 1])
+		// maxEndingHere = max(0, maxEndingHere + arr[j]);
+		// maxSoFar = max(maxSoFar, maxEndingHere);
+		if (maxEndingHere + arr[j] > 0)
 		{
-			stop = true;
-			subSum = sum - sumToJ + arr[j+1];
-			if (subSum > maxSum)
-			{
-				// That works to some extent!!!
-				max_i = idxJ;
-				max_j = j+1;
-				maxSum = subSum;
-				idxJ = j;
-				stop=false;
-			}
+			maxEndingHere += arr[j];
 		}
-		else if (! stop)
+		else 
 		{
-			sumToJ += arr[j];
-			++idxJ;
+			last_max_i = j+1;
+			maxEndingHere = 0;
 		}
 
-		if (sum > maxSum)
+		if (maxEndingHere > maxSoFar)
 		{
-			maxSum = sum;
-			max_i = 0;
+			maxSoFar = maxEndingHere;
+			max_i = last_max_i;
 			max_j = j;
 		}
 	}
 
-	return Max(max_i, max_j, maxSum);
+	return Max(max_i, max_j, maxSoFar);
 }

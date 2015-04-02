@@ -1,42 +1,9 @@
 #include <iostream>
-#include <ctime>
-#include <chrono>
-#include <random>
-#include <functional>
-
-#include "MaximumSubarray.h"
 
 
-#define SIZE(arr) (sizeof(arr) / sizeof(int))
+#include "Utils.h"
+#include "MatrixMult.h"
 
-
-int *GenerateRandomArray(size_t size)
-{
-	std::random_device rd;
-
-	std::default_random_engine e1(rd());
-	std::uniform_int_distribution<int> uniform_dist(-40, 40);
-
-	int *arr = new int[size];
-
-	for (size_t i = 0; i < size; ++i)
-	{
-		arr[i] = uniform_dist(e1);
-	}
-
-	return arr;
-}
-
-long long TimeAlgo(std::function<void()> toTest)
-{
-	std::chrono::time_point<std::chrono::system_clock> start, end;
-	start = std::chrono::system_clock::now();
-	toTest();
-	end = std::chrono::system_clock::now();
-	std::chrono::milliseconds elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-	// std::cout << "Time: " << elapsed_ms.count() << '\n';
-	return elapsed_ms.count();
-}
 
 void TestWithSamples()
 {
@@ -51,7 +18,7 @@ void TestWithSamples()
 		divTimes[i] = TimeAlgo(
 			[arr, size]() 
 			{
-				Max found = FindMaxSubarray(arr, 0, size);
+				// Max found = FindMaxSubarray(arr, 0, size);
 				// std::cout << "Divide and Conquer:\n";
 				// std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
 			});
@@ -59,7 +26,7 @@ void TestWithSamples()
 		bruteTimes[i] = TimeAlgo(
 			[arr, size]()
 			{
-				Max found = Brute_FindMaxSubarray(arr, 0, size);
+				// Max found = Brute_FindMaxSubarray(arr, 0, size);
 				// std::cout << "Brute-force:\n";
 				// std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
 			});
@@ -76,22 +43,27 @@ void TestWithSamples()
 
 int main()
 {
-	size_t size = 100;
-	int *arr = GenerateRandomArray(size);
+	size_t rows = 2;
+	size_t cols = 2;
+	int **A = AllocateMatrix(rows, cols);
+	A[0][0] = 1; A[0][1] = 3;
+	A[1][0] = 7; A[1][1] = 5;
+	int **B = AllocateMatrix(rows, cols);
+	B[0][0] = 6; B[0][1] = 8;
+	B[1][0] = 4; B[1][1] = 2;
 
-	Max found = FindMaxSubarray(arr, 0, size);
-	std::cout << "Divide and Conquer:\n";
-	std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
+	int **C = MultiplySimple(A, B, rows);
 
-	found = Brute_FindMaxSubarray(arr, 0, size);
-	std::cout << "Brute-force:\n";
-	std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
+	PrintMatrix(A, rows, cols);
+	std::cout << "\n*\n\n";
+	PrintMatrix(B, rows, cols);
+	std::cout << "\n=\n\n";
+	PrintMatrix(C, rows, cols);
 
-	found = Linear_FindMaxSubarray(arr, size);
-	std::cout << "Linear:\n";
-	std::cout << '\t' << found.low << " : " << found.high << " = " << found.sum << '\n';
 
-	delete [] arr;
+	FreeMatrix(A, cols);
+	FreeMatrix(B, cols);
+	FreeMatrix(C, cols);
 
 	return 0;
 }
