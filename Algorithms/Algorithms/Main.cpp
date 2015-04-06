@@ -52,18 +52,18 @@ int main()
 	B[0][0] = 6; B[0][1] = 8;
 	B[1][0] = 4; B[1][1] = 2;
 
-	int **C = MultiplySimple(A, B, rows);
+	int **Cs = MultiplySimple(A, B, rows);
+	std::cout << "Multiply Simple:\n";
+	PrintMatrix(Cs, rows, cols);
 
-	PrintMatrix(A, rows, cols);
-	std::cout << "\n*\n\n";
-	PrintMatrix(B, rows, cols);
-	std::cout << "\n=\n\n";
-	PrintMatrix(C, rows, cols);
-
+	int **Cdq = Multiply_DivConq(A, B, rows);
+	std::cout << "Multiply Divide & Conquer:\n";
+	PrintMatrix(Cdq, rows, cols);
 
 	FreeMatrix(A, cols);
 	FreeMatrix(B, cols);
-	FreeMatrix(C, cols);
+	FreeMatrix(Cs, cols);
+	FreeMatrix(Cdq, cols);
 
 	return 0;
 }
