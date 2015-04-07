@@ -43,14 +43,10 @@ void TestWithSamples()
 
 int main()
 {
-	size_t rows = 2;
-	size_t cols = 2;
-	int **A = AllocateMatrix(rows, cols);
-	A[0][0] = 1; A[0][1] = 3;
-	A[1][0] = 7; A[1][1] = 5;
-	int **B = AllocateMatrix(rows, cols);
-	B[0][0] = 6; B[0][1] = 8;
-	B[1][0] = 4; B[1][1] = 2;
+	size_t rows = 64;
+	size_t cols = 64;
+	int **A = GenerateRandomMatrix(rows, cols);
+	int **B = GenerateRandomMatrix(rows, cols);
 
 	int **Cs = MultiplySimple(A, B, rows);
 	std::cout << "Multiply Simple:\n";
@@ -60,10 +56,15 @@ int main()
 	std::cout << "Multiply Divide & Conquer:\n";
 	PrintMatrix(Cdq, rows, cols);
 
+	int **Cstr = Multiply_Strassen(A, B, rows);
+	std::cout << "Multiply Strassen:\n";
+	PrintMatrix(Cstr, rows, cols);
+
 	FreeMatrix(A, cols);
 	FreeMatrix(B, cols);
 	FreeMatrix(Cs, cols);
 	FreeMatrix(Cdq, cols);
+	FreeMatrix(Cstr, cols);
 
 	return 0;
 }
